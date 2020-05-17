@@ -6,4 +6,3 @@ coverage
 dist
 build
 .vscode
-events-service/
