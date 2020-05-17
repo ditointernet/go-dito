@@ -62,6 +62,11 @@ module.exports = {
           props: { module }
         }),
         generate({
+          template: 'infra/errors/errors_test.go.ejs',
+          target: `${name}/infra/errors/errors_test.go`,
+          props: { module }
+        }),
+        generate({
           template: 'makefile.ejs',
           target: `${name}/Makefile`
         }),

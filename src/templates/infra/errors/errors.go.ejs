@@ -52,17 +52,22 @@ func Context(err error) context.Context {
 }
 
 // Trace ...
-func Trace(err *infra.Error) []infra.OpName {
-	trace := []infra.OpName{err.OpName}
-
-	nextError, ok := err.Err.(*infra.Error)
+func Trace(err error) []infra.OpName {
+	e, ok := err.(*infra.Error)
 	if !ok {
+		e = New()
+	}
+
+	trace := []infra.OpName{}
+	if e.OpName != "" {
+		trace = append(trace, e.OpName)
+	}
+
+	if e.Err == nil {
 		return trace
 	}
 
-	trace = append(trace, Trace(nextError)...)
-
-	return trace
+	return append(trace, Trace(e.Err)...)
 }
 
 // Kind ...
@@ -94,20 +99,30 @@ func Severity(err error) infra.Severity {
 }
 
 // Metadata ...
-func Metadata(err *infra.Error) infra.Metadata {
-	nextErr, ok := err.Err.(*infra.Error)
+func Metadata(err error) infra.Metadata {
+	e, ok := err.(*infra.Error)
 	if !ok {
-		return err.Metadata
+		return infra.Metadata{}
 	}
 
-	return Metadata(nextErr).Merge(&err.Metadata)
+	nextErr, ok := e.Err.(*infra.Error)
+	if !ok {
+		return e.Metadata
+	}
+
+	return Metadata(nextErr).Merge(&e.Metadata)
 }
 
 // OpName ...
-func OpName(err *infra.Error) infra.OpName {
-	nextError, ok := err.Err.(*infra.Error)
+func OpName(err error) infra.OpName {
+	e, ok := err.(*infra.Error)
 	if !ok {
-		return err.OpName
+		return infra.OpName("")
+	}
+
+	nextError, ok := e.Err.(*infra.Error)
+	if !ok {
+		return e.OpName
 	}
 
 	return OpName(nextError)

@@ -76,6 +76,10 @@ type Error struct {
 
 // Error ...
 func (e Error) Error() string {
+	if e.Err == nil {
+		return "Unknown error"
+	}
+
 	return e.Err.Error()
 }
 
