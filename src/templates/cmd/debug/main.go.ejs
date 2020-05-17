@@ -1,0 +1,16 @@
+package main
+
+import (
+	"context"
+
+	"<%= props.module %>/infra"
+	"<%= props.module %>/infra/log"
+)
+
+func main() {
+	const opName infra.OpName = "cmd/debug.main"
+	ctx := context.Background()
+
+	log := log.NewClient(log.ClientInput{})
+	log.Info(ctx, opName, "Hello World")
+}

@@ -14,13 +14,53 @@ module.exports = {
       return error('😠 Missing service name parameter')
     }
 
-    let { options: { module: moduleName } } = parameters
-    if (!moduleName) {
-      moduleName = name
+    let { options: { module } } = parameters
+    if (!module) {
+      module = name
     }
 
     await Promise.all(
       [
+        generate({
+          template: 'cmd/debug/main.go.ejs',
+          target: `${name}/cmd/debug/main.go`,
+          props: { module }
+        }),
+        generate({
+          template: 'application/contracts.go.ejs',
+          target: `${name}/application/contracts.go`,
+          props: { module }
+        }),
+        generate({
+          template: 'domain/contracts.go.ejs',
+          target: `${name}/domain/contracts.go`
+        }),
+        generate({
+          template: 'domain/entities.go.ejs',
+          target: `${name}/domain/entities.go`
+        }),
+        generate({
+          template: 'domain/value_objects.go.ejs',
+          target: `${name}/domain/value_objects.go`
+        }),
+        generate({
+          template: 'infra/contracts.go.ejs',
+          target: `${name}/infra/contracts.go`
+        }),
+        generate({
+          template: 'infra/value_objects.go.ejs',
+          target: `${name}/infra/value_objects.go`
+        }),
+        generate({
+          template: 'infra/log/log.go.ejs',
+          target: `${name}/infra/log/log.go`,
+          props: { module }
+        }),
+        generate({
+          template: 'infra/errors/errors.go.ejs',
+          target: `${name}/infra/errors/errors.go`,
+          props: { module }
+        }),
         generate({
           template: 'makefile.ejs',
           target: `${name}/Makefile`
@@ -37,7 +77,7 @@ module.exports = {
         generate({
           template: 'go.mod.ejs',
           target: `${name}/go.mod`,
-          props: { module: moduleName }
+          props: { module: module }
         }),
         generate({
           template: '.env-sample.ejs',
