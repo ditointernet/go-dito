@@ -628,147 +628,173 @@ func TestError(t *testing.T) {
 }
 
 func TestLog(t *testing.T) {
-	baseErr := errors.New(
-		context.Background(),
-		infra.OpName("op mock"),
-		fmt.Errorf("error mock"),
-		infra.Metadata{
-			"mock": "mock",
-		},
-	)
+	t.Run("pure error", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
 
-	tt := []struct {
-		name     string
-		severity infra.Severity
-		log      func(*gomock.Controller) infra.LogProvider
-	}{
-		// #0
-		{
-			name:     "log with Critial severity",
-			severity: infra.SeverityCritical,
-			log: func(ctrl *gomock.Controller) infra.LogProvider {
-				logM := mocks.NewMockLogProvider(ctrl)
+		errM := fmt.Errorf("error mock")
 
-				logM.
-					EXPECT().
-					CriticalMetadata(
-						baseErr.Ctx,
-						baseErr.OpName,
-						baseErr.Err.Error(),
-						baseErr.Metadata.Merge(&infra.Metadata{
-							"trace": errors.Trace(baseErr),
-							"kind":  errors.Kind(baseErr),
-						}),
-					).
-					Times(1)
+		logM := mocks.NewMockLogProvider(ctrl)
 
-				return logM
+		logM.
+			EXPECT().
+			ErrorMetadata(
+				context.Background(),
+				infra.OpName(""),
+				errM.Error(),
+				infra.Metadata{
+					"trace": errors.Trace(errM),
+					"kind":  errors.Kind(errM),
+				},
+			).
+			Times(1)
+
+		errors.Log(logM, errM)
+	})
+
+	t.Run("domain errors", func(t *testing.T) {
+		baseErr := errors.New(
+			context.Background(),
+			infra.OpName("op mock"),
+			fmt.Errorf("error mock"),
+			infra.Metadata{
+				"mock": "mock",
 			},
-		},
+		)
 
-		// #1
-		{
-			name:     "log with Error severity",
-			severity: infra.SeverityError,
-			log: func(ctrl *gomock.Controller) infra.LogProvider {
-				logM := mocks.NewMockLogProvider(ctrl)
+		tt := []struct {
+			name     string
+			severity infra.Severity
+			log      func(*gomock.Controller) infra.LogProvider
+		}{
+			// #0
+			{
+				name:     "log with Critial severity",
+				severity: infra.SeverityCritical,
+				log: func(ctrl *gomock.Controller) infra.LogProvider {
+					logM := mocks.NewMockLogProvider(ctrl)
 
-				logM.
-					EXPECT().
-					ErrorMetadata(
-						baseErr.Ctx,
-						baseErr.OpName,
-						baseErr.Err.Error(),
-						baseErr.Metadata.Merge(&infra.Metadata{
-							"trace": errors.Trace(baseErr),
-							"kind":  errors.Kind(baseErr),
-						}),
-					).
-					Times(1)
+					logM.
+						EXPECT().
+						CriticalMetadata(
+							baseErr.Ctx,
+							baseErr.OpName,
+							baseErr.Err.Error(),
+							baseErr.Metadata.Merge(&infra.Metadata{
+								"trace": errors.Trace(baseErr),
+								"kind":  errors.Kind(baseErr),
+							}),
+						).
+						Times(1)
 
-				return logM
+					return logM
+				},
 			},
-		},
 
-		// #2
-		{
-			name:     "log with Warning severity",
-			severity: infra.SeverityWarning,
-			log: func(ctrl *gomock.Controller) infra.LogProvider {
-				logM := mocks.NewMockLogProvider(ctrl)
+			// #1
+			{
+				name:     "log with Error severity",
+				severity: infra.SeverityError,
+				log: func(ctrl *gomock.Controller) infra.LogProvider {
+					logM := mocks.NewMockLogProvider(ctrl)
 
-				logM.
-					EXPECT().
-					WarningMetadata(
-						baseErr.Ctx,
-						baseErr.OpName,
-						baseErr.Err.Error(),
-						baseErr.Metadata.Merge(&infra.Metadata{
-							"trace": errors.Trace(baseErr),
-							"kind":  errors.Kind(baseErr),
-						}),
-					).
-					Times(1)
+					logM.
+						EXPECT().
+						ErrorMetadata(
+							baseErr.Ctx,
+							baseErr.OpName,
+							baseErr.Err.Error(),
+							baseErr.Metadata.Merge(&infra.Metadata{
+								"trace": errors.Trace(baseErr),
+								"kind":  errors.Kind(baseErr),
+							}),
+						).
+						Times(1)
 
-				return logM
+					return logM
+				},
 			},
-		},
 
-		// #3
-		{
-			name:     "log with Info severity",
-			severity: infra.SeverityInfo,
-			log: func(ctrl *gomock.Controller) infra.LogProvider {
-				logM := mocks.NewMockLogProvider(ctrl)
+			// #2
+			{
+				name:     "log with Warning severity",
+				severity: infra.SeverityWarning,
+				log: func(ctrl *gomock.Controller) infra.LogProvider {
+					logM := mocks.NewMockLogProvider(ctrl)
 
-				logM.
-					EXPECT().
-					InfoMetadata(
-						baseErr.Ctx,
-						baseErr.OpName,
-						baseErr.Err.Error(),
-						baseErr.Metadata.Merge(&infra.Metadata{
-							"trace": errors.Trace(baseErr),
-							"kind":  errors.Kind(baseErr),
-						}),
-					).
-					Times(1)
+					logM.
+						EXPECT().
+						WarningMetadata(
+							baseErr.Ctx,
+							baseErr.OpName,
+							baseErr.Err.Error(),
+							baseErr.Metadata.Merge(&infra.Metadata{
+								"trace": errors.Trace(baseErr),
+								"kind":  errors.Kind(baseErr),
+							}),
+						).
+						Times(1)
 
-				return logM
+					return logM
+				},
 			},
-		},
 
-		// #4
-		{
-			name:     "log with Debug severity",
-			severity: infra.SeverityDebug,
-			log: func(ctrl *gomock.Controller) infra.LogProvider {
-				logM := mocks.NewMockLogProvider(ctrl)
+			// #3
+			{
+				name:     "log with Info severity",
+				severity: infra.SeverityInfo,
+				log: func(ctrl *gomock.Controller) infra.LogProvider {
+					logM := mocks.NewMockLogProvider(ctrl)
 
-				logM.
-					EXPECT().
-					DebugMetadata(
-						baseErr.Ctx,
-						baseErr.OpName,
-						baseErr.Err.Error(),
-						baseErr.Metadata.Merge(&infra.Metadata{
-							"trace": errors.Trace(baseErr),
-							"kind":  errors.Kind(baseErr),
-						}),
-					).
-					Times(1)
+					logM.
+						EXPECT().
+						InfoMetadata(
+							baseErr.Ctx,
+							baseErr.OpName,
+							baseErr.Err.Error(),
+							baseErr.Metadata.Merge(&infra.Metadata{
+								"trace": errors.Trace(baseErr),
+								"kind":  errors.Kind(baseErr),
+							}),
+						).
+						Times(1)
 
-				return logM
+					return logM
+				},
 			},
-		},
-	}
 
-	for _, tc := range tt {
-		t.Run(tc.name, func(t *testing.T) {
-			ctrl := gomock.NewController(t)
-			defer ctrl.Finish()
+			// #4
+			{
+				name:     "log with Debug severity",
+				severity: infra.SeverityDebug,
+				log: func(ctrl *gomock.Controller) infra.LogProvider {
+					logM := mocks.NewMockLogProvider(ctrl)
 
-			errors.Log(tc.log(ctrl), errors.New(baseErr, tc.severity))
-		})
-	}
+					logM.
+						EXPECT().
+						DebugMetadata(
+							baseErr.Ctx,
+							baseErr.OpName,
+							baseErr.Err.Error(),
+							baseErr.Metadata.Merge(&infra.Metadata{
+								"trace": errors.Trace(baseErr),
+								"kind":  errors.Kind(baseErr),
+							}),
+						).
+						Times(1)
+
+					return logM
+				},
+			},
+		}
+
+		for _, tc := range tt {
+			t.Run(tc.name, func(t *testing.T) {
+				ctrl := gomock.NewController(t)
+				defer ctrl.Finish()
+
+				errors.Log(tc.log(ctrl), errors.New(baseErr, tc.severity))
+			})
+		}
+	})
 }

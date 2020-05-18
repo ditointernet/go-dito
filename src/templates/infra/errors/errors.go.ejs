@@ -128,6 +128,28 @@ func OpName(err error) infra.OpName {
 	return OpName(nextError)
 }
 
+// Log ...
+func Log(log infra.LogProvider, err error) {
+	e, ok := err.(*infra.Error)
+	if !ok {
+		e = New(err)
+	}
+
+	method := fmt.Sprintf("%sMetadata", Severity(err))
+
+	values := []reflect.Value{
+		reflect.ValueOf(Context(e)),
+		reflect.ValueOf(OpName(e)),
+		reflect.ValueOf(e.Err.Error()),
+		reflect.ValueOf(Metadata(e).Merge(&infra.Metadata{
+			"trace": Trace(e),
+			"kind":  Kind(e),
+		})),
+	}
+
+	reflect.ValueOf(log).MethodByName(method).Call(values)
+}
+
 // Error ...
 func Error(err *infra.Error) error {
 	nextError, ok := err.Err.(*infra.Error)
@@ -136,21 +158,4 @@ func Error(err *infra.Error) error {
 	}
 
 	return Error(nextError)
-}
-
-// Log ...
-func Log(log infra.LogProvider, err *infra.Error) {
-	method := fmt.Sprintf("%sMetadata", Severity(err))
-
-	values := []reflect.Value{
-		reflect.ValueOf(Context(err)),
-		reflect.ValueOf(OpName(err)),
-		reflect.ValueOf(err.Err.Error()),
-		reflect.ValueOf(Metadata(err).Merge(&infra.Metadata{
-			"trace": Trace(err),
-			"kind":  Kind(err),
-		})),
-	}
-
-	reflect.ValueOf(log).MethodByName(method).Call(values)
 }
