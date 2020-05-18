@@ -1,9 +1,12 @@
 import { GluegunToolbox } from 'gluegun';
 
-const buildProjectFiles = ({
+const buildProjectFiles = async ({
   parameters,
   template: { generate },
+  print: { spin, checkmark },
 }) => {
+  const spinner = spin('Creating project files...')
+
   const name = parameters.first
 
   let { options: { module } } = parameters
@@ -11,7 +14,7 @@ const buildProjectFiles = ({
     module = name
   }
 
-  return Promise.all(
+  await Promise.all(
     [
       generate({
         template: 'cmd/debug/main.go.ejs',
@@ -98,27 +101,37 @@ const buildProjectFiles = ({
       }),
     ]
   )
+
+  spinner.stopAndPersist({ symbol: checkmark, text: 'Project files created' })
 }
 
-const downloadDependencies = ({ parameters, system }) => {
-  return system.run(`cd ${parameters.first} && make deps`)
+const downloadDependencies = async ({ parameters, system, print: { spin, checkmark } }) => {
+  let spinner = spin('Downloading dependencies...')
+  await system.run(`cd ${parameters.first} && make deps`)
+  spinner.stopAndPersist({ symbol: checkmark, text: 'Dependencies downloaded' })
 }
 
-const buildMocks = ({ parameters, system }) => {
-  return system.run(`cd ${parameters.first} && make mock`)
+const createMocks = async ({ parameters, system, print: { spin, checkmark } }) => {
+  let spinner = spin('Creating mocks...')
+  await system.run(`cd ${parameters.first} && make mock`)
+  spinner.stopAndPersist({ symbol: checkmark, text: 'Mocks created' })
 }
 
-const runTests = ({ parameters, system }) => {
-  return system.run(`cd ${parameters.first} && make test`)
+const runTests = async ({ parameters, system, print: { spin, checkmark } }) => {
+  let spinner = spin('Running tests...')
+  await system.run(`cd ${parameters.first} && make test`)
+  spinner.stopAndPersist({ symbol: checkmark, text: 'Tests passed' })
 }
 
-const createGitRepository = ({ parameters, system }) => {
-  return system.run(`
+const createGitRepository = async ({ parameters, system, print: { spin, checkmark } }) => {
+  let spinner = spin('Creating Git repository...')
+  await system.run(`
     cd ${parameters.first} && \
     git init && \
     git add . && \
     git commit -m "First commit"
   `)
+  spinner.stopAndPersist({ symbol: checkmark, text: 'Git repository created' })
 }
 
 module.exports = {
@@ -126,7 +139,7 @@ module.exports = {
   run: async (toolbox: GluegunToolbox) => {
     const {
       parameters,
-      print: { error, spin },
+      print: { error },
     } = toolbox
 
     if (!parameters.first) {
@@ -134,24 +147,10 @@ module.exports = {
       process.exit(0)
     }
 
-    let spinner = spin('Creating project files...')
     await buildProjectFiles(toolbox)
-    spinner.succeed('Project files created')
-
-    spinner = spin('Downloading dependencies...')
     await downloadDependencies(toolbox)
-    spinner.succeed('Dependencies downloaded')
-
-    spinner = spin('Building project mocks...')
-    await buildMocks(toolbox)
-    spinner.succeed('Mocks created')
-
-    spinner = spin('Running tests...')
+    await createMocks(toolbox)
     await runTests(toolbox)
-    spinner.succeed('Tests passed')
-
-    spinner = spin('Creating Git repository...')
     await createGitRepository(toolbox)
-    spinner.succeed('Git repository created')
   }
 }
