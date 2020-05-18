@@ -108,6 +108,10 @@ const buildMocks = ({ parameters, system }) => {
   return system.run(`cd ${parameters.first} && make mock`)
 }
 
+const runTests = ({ parameters, system }) => {
+  return system.run(`cd ${parameters.first} && make test`)
+}
+
 const createGitRepository = ({ parameters, system }) => {
   return system.run(`
     cd ${parameters.first} && \
@@ -141,6 +145,10 @@ module.exports = {
     spinner = spin('Building project mocks...')
     await buildMocks(toolbox)
     spinner.succeed('Mocks created')
+
+    spinner = spin('Running tests...')
+    await runTests(toolbox)
+    spinner.succeed('Tests passed')
 
     spinner = spin('Creating Git repository...')
     await createGitRepository(toolbox)
