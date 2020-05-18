@@ -6,8 +6,12 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/golang/mock/gomock"
+
 	"<%= props.module %>/infra"
 	"<%= props.module %>/infra/errors"
+
+	"<%= props.module %>/mocks"
 )
 
 func TestNew(t *testing.T) {
@@ -619,6 +623,152 @@ func TestError(t *testing.T) {
 			if err != tc.expected {
 				t.Errorf("mismatch error. Expected '%v', got: '%v'", tc.expected, err)
 			}
+		})
+	}
+}
+
+func TestLog(t *testing.T) {
+	baseErr := errors.New(
+		context.Background(),
+		infra.OpName("op mock"),
+		fmt.Errorf("error mock"),
+		infra.Metadata{
+			"mock": "mock",
+		},
+	)
+
+	tt := []struct {
+		name     string
+		severity infra.Severity
+		log      func(*gomock.Controller) infra.LogProvider
+	}{
+		// #0
+		{
+			name:     "log with Critial severity",
+			severity: infra.SeverityCritical,
+			log: func(ctrl *gomock.Controller) infra.LogProvider {
+				logM := mocks.NewMockLogProvider(ctrl)
+
+				logM.
+					EXPECT().
+					CriticalMetadata(
+						baseErr.Ctx,
+						baseErr.OpName,
+						baseErr.Err.Error(),
+						baseErr.Metadata.Merge(&infra.Metadata{
+							"trace": errors.Trace(baseErr),
+							"kind":  errors.Kind(baseErr),
+						}),
+					).
+					Times(1)
+
+				return logM
+			},
+		},
+
+		// #1
+		{
+			name:     "log with Error severity",
+			severity: infra.SeverityError,
+			log: func(ctrl *gomock.Controller) infra.LogProvider {
+				logM := mocks.NewMockLogProvider(ctrl)
+
+				logM.
+					EXPECT().
+					ErrorMetadata(
+						baseErr.Ctx,
+						baseErr.OpName,
+						baseErr.Err.Error(),
+						baseErr.Metadata.Merge(&infra.Metadata{
+							"trace": errors.Trace(baseErr),
+							"kind":  errors.Kind(baseErr),
+						}),
+					).
+					Times(1)
+
+				return logM
+			},
+		},
+
+		// #2
+		{
+			name:     "log with Warning severity",
+			severity: infra.SeverityWarning,
+			log: func(ctrl *gomock.Controller) infra.LogProvider {
+				logM := mocks.NewMockLogProvider(ctrl)
+
+				logM.
+					EXPECT().
+					WarningMetadata(
+						baseErr.Ctx,
+						baseErr.OpName,
+						baseErr.Err.Error(),
+						baseErr.Metadata.Merge(&infra.Metadata{
+							"trace": errors.Trace(baseErr),
+							"kind":  errors.Kind(baseErr),
+						}),
+					).
+					Times(1)
+
+				return logM
+			},
+		},
+
+		// #3
+		{
+			name:     "log with Info severity",
+			severity: infra.SeverityInfo,
+			log: func(ctrl *gomock.Controller) infra.LogProvider {
+				logM := mocks.NewMockLogProvider(ctrl)
+
+				logM.
+					EXPECT().
+					InfoMetadata(
+						baseErr.Ctx,
+						baseErr.OpName,
+						baseErr.Err.Error(),
+						baseErr.Metadata.Merge(&infra.Metadata{
+							"trace": errors.Trace(baseErr),
+							"kind":  errors.Kind(baseErr),
+						}),
+					).
+					Times(1)
+
+				return logM
+			},
+		},
+
+		// #4
+		{
+			name:     "log with Debug severity",
+			severity: infra.SeverityDebug,
+			log: func(ctrl *gomock.Controller) infra.LogProvider {
+				logM := mocks.NewMockLogProvider(ctrl)
+
+				logM.
+					EXPECT().
+					DebugMetadata(
+						baseErr.Ctx,
+						baseErr.OpName,
+						baseErr.Err.Error(),
+						baseErr.Metadata.Merge(&infra.Metadata{
+							"trace": errors.Trace(baseErr),
+							"kind":  errors.Kind(baseErr),
+						}),
+					).
+					Times(1)
+
+				return logM
+			},
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			errors.Log(tc.log(ctrl), errors.New(baseErr, tc.severity))
 		})
 	}
 }
