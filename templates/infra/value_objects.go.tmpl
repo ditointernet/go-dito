@@ -1,0 +1,161 @@
+package infra
+
+import (
+	"context"
+	"errors"
+	"fmt"
+	"net/http"
+	"time"
+)
+
+var (
+	// ErrNotImplemented ...
+	ErrNotImplemented = errors.New("not implemented yet")
+)
+
+// Environment ...
+type Environment string
+
+const (
+	// EnvironmentDevelopment ...
+	EnvironmentDevelopment Environment = "development"
+	// EnvironmentStaging ...
+	EnvironmentStaging Environment = "staging"
+	// EnvironmentProduction ...
+	EnvironmentProduction Environment = "production"
+)
+
+// Severity ...
+type Severity string
+
+const (
+	// SeverityCritical ...
+	SeverityCritical Severity = "Critical"
+	// SeverityError ...
+	SeverityError Severity = "Error"
+	// SeverityWarning ...
+	SeverityWarning Severity = "Warning"
+	// SeverityInfo ...
+	SeverityInfo Severity = "Info"
+	// SeverityDebug ...
+	SeverityDebug Severity = "Debug"
+)
+
+// MissingDependencyError ...
+type MissingDependencyError struct {
+	DependencyName string
+}
+
+func (e MissingDependencyError) Error() string {
+	return fmt.Sprintf("missing required dependency: %s", e.DependencyName)
+}
+
+// MissingMetricError ...
+type MissingMetricError struct {
+	Name ApplicationMetricName
+}
+
+func (e MissingMetricError) Error() string {
+	return fmt.Sprintf("metri '%s' not registred", e.Name)
+}
+
+const (
+	// IDContextValueKey ...
+	IDContextValueKey string = "contextId"
+)
+
+// Error ...
+type Error struct {
+	Ctx      context.Context `json:"-"`
+	Err      error           `json:"-"`
+	Severity Severity        `json:"severity"`
+	OpName   OpName          `json:"opName"`
+	Kind     ErrorKind       `json:"kind"`
+	Metadata Metadata        `json:"metadata"`
+}
+
+// Error ...
+func (e Error) Error() string {
+	if e.Err == nil {
+		return "Unknown error"
+	}
+
+	return e.Err.Error()
+}
+
+// OpName ...
+type OpName string
+
+// Op ...
+type Op struct {
+	Name      OpName
+	StartTime time.Time
+}
+
+// NewOp ...
+func NewOp(name OpName) *Op {
+	return &Op{
+		Name:      name,
+		StartTime: time.Now(),
+	}
+}
+
+// Duration ...
+func (op Op) Duration() float64 {
+	return time.Since(op.StartTime).Seconds()
+}
+
+// MeasureDuration ...
+func (op Op) MeasureDuration(ctx context.Context, monitor ApplicationMonitor) error {
+	if odsm := monitor.GetMetric(OperationDurationInSecondsMetric); odsm != nil {
+		odsm.WithLabelValues(string(op.Name)).Measure(ctx, op.Duration())
+	}
+
+	return MissingMetricError{Name: OperationDurationInSecondsMetric}
+}
+
+// Metadata ...
+type Metadata map[string]interface{}
+
+// Merge ...
+func (cd Metadata) Merge(newCd *Metadata) Metadata {
+	if newCd == nil {
+		return cd
+	}
+
+	for k, v := range *newCd {
+		cd[k] = v
+	}
+
+	return cd
+}
+
+// ErrorKind ...
+type ErrorKind int
+
+const (
+	// KindIncompleteResponse ...
+	KindIncompleteResponse ErrorKind = http.StatusPartialContent
+	// KindBadRequest ...
+	KindBadRequest ErrorKind = http.StatusBadRequest
+	// KindNotFound ...
+	KindNotFound ErrorKind = http.StatusNotFound
+	// KindUnexpected ...
+	KindUnexpected ErrorKind = http.StatusInternalServerError
+	// KindExpected ...
+	KindExpected ErrorKind = http.StatusOK
+)
+
+// ApplicationMetricName ...
+type ApplicationMetricName string
+
+var (
+	// APIRequestsCounterMetric ...
+	APIRequestsCounterMetric ApplicationMetricName = "dito_api_requests_total"
+	// APIResponseTimeMetric ...
+	APIResponseTimeMetric ApplicationMetricName = "dito_api_response_time"
+	// OperationDurationInSecondsMetric ...
+	OperationDurationInSecondsMetric ApplicationMetricName = "dito_operation_duration_seconds"
+	// ErrorCountMetric ...
+	ErrorCountMetric ApplicationMetricName = "dito_errors_total"
+)

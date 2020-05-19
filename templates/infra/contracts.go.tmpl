@@ -1,0 +1,48 @@
+package infra
+
+import "context"
+
+// LogProvider provides functions to log information with
+// different visibility levels in the following order
+// from least important to more important:
+//
+// - Debug
+// - Warning
+// - Info
+// - Error
+//
+type LogProvider interface {
+	Critical(context.Context, OpName, string)
+	Criticalf(context.Context, OpName, string, ...interface{})
+	CriticalMetadata(context.Context, OpName, string, Metadata)
+	Info(context.Context, OpName, string)
+	Infof(context.Context, OpName, string, ...interface{})
+	InfoMetadata(context.Context, OpName, string, Metadata)
+	Error(context.Context, OpName, string)
+	Errorf(context.Context, OpName, string, ...interface{})
+	ErrorMetadata(context.Context, OpName, string, Metadata)
+	Warning(context.Context, OpName, string)
+	Warningf(context.Context, OpName, string, ...interface{})
+	WarningMetadata(context.Context, OpName, string, Metadata)
+	Debug(context.Context, OpName, string)
+	Debugf(context.Context, OpName, string, ...interface{})
+	DebugMetadata(context.Context, OpName, string, Metadata)
+}
+
+// ApplicationMetric ...
+type ApplicationMetric interface {
+	Name() ApplicationMetricName
+	WithLabelValues(...string) ApplicationMetricLabeled
+}
+
+// ApplicationMetricLabeled ...
+type ApplicationMetricLabeled interface {
+	Measure(context.Context, interface{}) *Error
+}
+
+// ApplicationMonitor ...
+type ApplicationMonitor interface {
+	Register(context.Context, ApplicationMetric) *Error
+	GetMetric(name ApplicationMetricName) ApplicationMetric
+	Expose(context.Context) *Error
+}

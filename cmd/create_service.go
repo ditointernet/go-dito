@@ -15,13 +15,12 @@ var createSvcCmd = &cobra.Command{
 	Args:      cobra.ExactArgs(1),
 	ValidArgs: []string{"name"},
 	RunE: func(cmd *cobra.Command, args []string) error {
-		input := struct {
-			Name string
-		}{
-			Name: args[0],
+		input := map[string]string{
+			"Name":   args[0],
+			"Module": args[0],
 		}
 
-		if err := os.Mkdir(input.Name, 0755); err != nil {
+		if err := os.Mkdir(input["Name"], 0755); err != nil {
 			return err
 		}
 
@@ -30,7 +29,7 @@ var createSvcCmd = &cobra.Command{
 				return nil
 			}
 
-			outPath := strings.Replace(path, "templates", input.Name, 1)
+			outPath := strings.Replace(path, "templates", input["Name"], 1)
 			outPath = strings.Replace(outPath, ".tmpl", "", 1)
 
 			if info.IsDir() {
