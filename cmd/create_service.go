@@ -57,6 +57,36 @@ var createSvcCmd = &cobra.Command{
 			return err
 		}
 
+		err = runSysCmds(input["Name"], []*sysCommand{
+			&sysCommand{
+				cmd:  "make",
+				args: []string{"deps"},
+			},
+			&sysCommand{
+				cmd:  "make",
+				args: []string{"mock"},
+			},
+			&sysCommand{
+				cmd:  "make",
+				args: []string{"test"},
+			},
+			&sysCommand{
+				cmd:  "git",
+				args: []string{"init"},
+			},
+			&sysCommand{
+				cmd:  "git",
+				args: []string{"add", "."},
+			},
+			&sysCommand{
+				cmd:  "git",
+				args: []string{"commit", "-m", "First commit by go-dito"},
+			},
+		})
+		if err != nil {
+			return err
+		}
+
 		return nil
 	},
 }
