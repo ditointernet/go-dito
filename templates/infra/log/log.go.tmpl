@@ -26,7 +26,6 @@ var logLevels = map[infra.Severity]int{
 // ClientInput ...
 type ClientInput struct {
 	Level infra.Severity
-	GoEnv infra.Environment
 }
 
 // Client ...
@@ -60,9 +59,9 @@ func (c Client) Criticalf(ctx context.Context, opName infra.OpName, msg string, 
 }
 
 // CriticalMetadata ...
-func (c Client) CriticalMetadata(ctx context.Context, opName infra.OpName, msg string, Metadata infra.Metadata) {
+func (c Client) CriticalMetadata(ctx context.Context, opName infra.OpName, msg string, metadata infra.Metadata) {
 	if c.levelCode >= 1 {
-		fmt.Println(c.buildLogValues(ctx, opName, infra.SeverityCritical, msg, Metadata))
+		fmt.Println(c.buildLogValues(ctx, opName, infra.SeverityCritical, msg, metadata))
 	}
 }
 
@@ -81,9 +80,9 @@ func (c Client) Errorf(ctx context.Context, opName infra.OpName, msg string, inf
 }
 
 // ErrorMetadata ...
-func (c Client) ErrorMetadata(ctx context.Context, opName infra.OpName, msg string, Metadata infra.Metadata) {
+func (c Client) ErrorMetadata(ctx context.Context, opName infra.OpName, msg string, metadata infra.Metadata) {
 	if c.levelCode >= 2 {
-		fmt.Println(c.buildLogValues(ctx, opName, infra.SeverityError, msg, Metadata))
+		fmt.Println(c.buildLogValues(ctx, opName, infra.SeverityError, msg, metadata))
 	}
 }
 
@@ -102,9 +101,9 @@ func (c Client) Warningf(ctx context.Context, opName infra.OpName, msg string, i
 }
 
 // WarningMetadata ...
-func (c Client) WarningMetadata(ctx context.Context, opName infra.OpName, msg string, Metadata infra.Metadata) {
+func (c Client) WarningMetadata(ctx context.Context, opName infra.OpName, msg string, metadata infra.Metadata) {
 	if c.levelCode >= 3 {
-		fmt.Println(c.buildLogValues(ctx, opName, infra.SeverityWarning, msg, Metadata))
+		fmt.Println(c.buildLogValues(ctx, opName, infra.SeverityWarning, msg, metadata))
 	}
 }
 
@@ -123,9 +122,9 @@ func (c Client) Infof(ctx context.Context, opName infra.OpName, msg string, info
 }
 
 // InfoMetadata ...
-func (c Client) InfoMetadata(ctx context.Context, opName infra.OpName, msg string, Metadata infra.Metadata) {
+func (c Client) InfoMetadata(ctx context.Context, opName infra.OpName, msg string, metadata infra.Metadata) {
 	if c.levelCode >= 4 {
-		fmt.Println(c.buildLogValues(ctx, opName, infra.SeverityInfo, msg, Metadata))
+		fmt.Println(c.buildLogValues(ctx, opName, infra.SeverityInfo, msg, metadata))
 	}
 }
 
@@ -144,9 +143,9 @@ func (c Client) Debugf(ctx context.Context, opName infra.OpName, msg string, inf
 }
 
 // DebugMetadata ...
-func (c Client) DebugMetadata(ctx context.Context, opName infra.OpName, msg string, Metadata infra.Metadata) {
+func (c Client) DebugMetadata(ctx context.Context, opName infra.OpName, msg string, metadata infra.Metadata) {
 	if c.levelCode >= 5 {
-		fmt.Println(c.buildLogValues(ctx, opName, infra.SeverityDebug, msg, Metadata))
+		fmt.Println(c.buildLogValues(ctx, opName, infra.SeverityDebug, msg, metadata))
 	}
 }
 
@@ -164,15 +163,7 @@ func (c Client) buildLogValues(ctx context.Context, opName infra.OpName, level i
 		values.Metadata = &metadata
 	}
 
-	logMessage, err := json.Marshal(values)
-
-	if c.in.GoEnv == infra.EnvironmentDevelopment {
-		logMessage, err = json.MarshalIndent(values, "", " ")
-	}
-
-	if err != nil {
-		logMessage = []byte(message)
-	}
+	logMessage, _ := json.Marshal(values)
 
 	return string(logMessage)
 }
