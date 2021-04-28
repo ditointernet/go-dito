@@ -4,9 +4,17 @@ import (
 	e "errors"
 )
 
+// CodeType is a string that contains error's code description
 type CodeType string
+
+// KindType is a string that contains error's kind description
 type KindType string
 
+//CustomError is a structure that encodes useful information about a given error.
+//It's supposed to flow within the application in detriment of the the default golang error,
+// since its Kind and Code attributes are the keys to express its semantic and uniqueness, respectively.
+// It should be generated once by the peace of code that found the error (because it's where we have more context about the error),
+// and be by passed to the upper layers of the application.
 type CustomError struct {
 	kind    KindType
 	code    CodeType
@@ -14,7 +22,11 @@ type CustomError struct {
 }
 
 const (
+	//DefaultKind is the default kind returned by the error library, whenever the method Kind(err error) KindType is called
+	// and the error argument isnt a CustomError
 	DefaultKind KindType = "DEFAULT_ERROR_KIND"
+	//DefaultCode is the default code returned by the error library, whenever the method Code(err error) CodeType is called
+	// and the error argument isnt a CustomError
 	DefaultCode CodeType = "DEFAULT_ERROR_CODE"
 	// KindInternal are errors caused by some internal fail like failed IO calls or invalid memory states
 	KindInternal KindType = "INTERNAL"
