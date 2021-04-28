@@ -14,12 +14,22 @@ type CustomError struct {
 }
 
 const (
-	DefaultKind KindType = ""
-	DefaultCode CodeType = ""
+	DefaultKind KindType = "DEFAULT_ERROR_KIND"
+	DefaultCode CodeType = "DEFAULT_ERROR_CODE"
+	// KindInternal are errors caused by some internal fail like failed IO calls or invalid memory states
+	KindInternal KindType = "INTERNAL"
+	// KindInvalidInput are errors caused by some invalid values on the input
+	KindInvalidInput KindType = "INVALID_INPUT"
+	// KindNotFound are errors caused by any required resources that not exists on the data repository
+	KindNotFound KindType = "NOT_FOUND"
+	// KindAuthentication are errors caused by an unauthenticated call
+	KindAuthentication KindType = "AUTHENTICATION"
+	// KindAuthorization are errors caused by an unauthorized call
+	KindAuthorization KindType = "AUTHORIZATION"
 )
 
-// GetService returns a new instance of CustomError with kind, code and message
-func New(kind KindType, message string, code CodeType) CustomError {
+// GetService returns a new instance of CustomError with message, kind and code
+func New(message string, kind KindType, code CodeType) CustomError {
 	return CustomError{
 		kind:    kind,
 		code:    code,

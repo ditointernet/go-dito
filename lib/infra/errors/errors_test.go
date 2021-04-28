@@ -12,7 +12,7 @@ func TestNewType(t *testing.T) {
 
 	t.Run("Should return an error with type Custom Error", func(t *testing.T) {
 
-		err := New("some kind", "some message", "some code")
+		err := New("some message", "some kind", "some code")
 
 		if !e.As(err, &customError) {
 			t.Errorf("Expected error as a type Custom Error, got: '%T'", err)
@@ -22,7 +22,7 @@ func TestNewType(t *testing.T) {
 }
 
 func TestNewValues(t *testing.T) {
-	err := New("some kind", "some message", "some code")
+	err := New("some message", "some kind", "some code")
 	t.Run("should have same kind of the new error", func(t *testing.T) {
 		var expectedKind KindType
 		expectedKind = "some kind"
@@ -47,7 +47,7 @@ func TestNewValues(t *testing.T) {
 }
 
 func TestError(t *testing.T) {
-	err := New("some kind", "some message", "some code")
+	err := New("some message", "some kind", "some code")
 	t.Run("should have same kind of the new error", func(t *testing.T) {
 		expectedMessage := "some message"
 		if expectedMessage != err.Error() {
@@ -68,12 +68,12 @@ func TestKind(t *testing.T) {
 		},
 		{
 			name:         "custom error",
-			err:          New("some kind", "some message", ""),
+			err:          New("some message", "some kind", ""),
 			expectedKind: "some kind",
 		},
 		{
 			name:         "empty kind",
-			err:          New("", "some message", ""),
+			err:          New("some message", "", ""),
 			expectedKind: "",
 		},
 	}
@@ -102,12 +102,12 @@ func TestCode(t *testing.T) {
 		},
 		{
 			name:         "custom error",
-			err:          New("some kind", "some message", "some code"),
+			err:          New("some message", "some kind", "some code"),
 			expectedCode: "some code",
 		},
 		{
 			name:         "empty code",
-			err:          New("", "some message", ""),
+			err:          New("some message", "", ""),
 			expectedCode: "",
 		},
 	}
