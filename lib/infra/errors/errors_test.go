@@ -26,12 +26,12 @@ func TestNew(t *testing.T) {
 	t.Run("should produce and error with the default kind and code when not informed", func(t *testing.T) {
 		err := errors.New("mocked message")
 
-		if errors.Kind(err) != errors.DefaultKind {
-			t.Errorf("expected '%s', got '%s'", errors.DefaultKind, errors.Kind(err))
+		if errors.Kind(err) != errors.KindUnexpected {
+			t.Errorf("expected '%s', got '%s'", errors.KindUnexpected, errors.Kind(err))
 		}
 
-		if errors.Code(err) != errors.DefaultCode {
-			t.Errorf("expected '%s', got '%s'", errors.DefaultCode, errors.Code(err))
+		if errors.Code(err) != errors.CodeUnknown {
+			t.Errorf("expected '%s', got '%s'", errors.CodeUnknown, errors.Code(err))
 		}
 	})
 
@@ -77,12 +77,12 @@ func TestKind(t *testing.T) {
 		{
 			name:         "go native error",
 			err:          e.New("new error"),
-			expectedKind: errors.DefaultKind,
+			expectedKind: errors.KindUnexpected,
 		},
 		{
 			name:         "custom error with default kind",
 			err:          errors.New("some message"),
-			expectedKind: errors.DefaultKind,
+			expectedKind: errors.KindUnexpected,
 		},
 		{
 			name:         "custom error with non-default kind",
@@ -109,12 +109,12 @@ func TestCode(t *testing.T) {
 		{
 			name:         "go native error",
 			err:          e.New("new error"),
-			expectedCode: errors.DefaultCode,
+			expectedCode: errors.CodeUnknown,
 		},
 		{
 			name:         "custom error with default code",
 			err:          errors.New("some message"),
-			expectedCode: errors.DefaultCode,
+			expectedCode: errors.CodeUnknown,
 		},
 		{
 			name:         "custom error with non-default code",

@@ -23,29 +23,29 @@ type CustomError struct {
 }
 
 const (
-	// DefaultKind is the default kind returned by the error library, whenever the method Kind(err error) KindType is called
-	// and the error argument isnt a CustomError
-	DefaultKind KindType = "DEFAULT_ERROR_KIND"
-	//DefaultCode is the default code returned by the error library, whenever the method Code(err error) CodeType is called
-	// and the error argument isnt a CustomError
-	DefaultCode CodeType = "DEFAULT_ERROR_CODE"
+	// CodeUnknown is the default code returned when the application doesn't attach any code into the error
+	CodeUnknown CodeType = "UNKNOWN"
+	// KindUnexpected is the default kind returned  when the application doesn't attach any kind into the error
+	KindUnexpected KindType = "UNEXPECTED"
+	// KindConflict are errors caused by requests with data that conflicts with the current state of the system
+	KindConflict KindType = "CONFLICT"
 	// KindInternal are errors caused by some internal fail like failed IO calls or invalid memory states
 	KindInternal KindType = "INTERNAL"
 	// KindInvalidInput are errors caused by some invalid values on the input
 	KindInvalidInput KindType = "INVALID_INPUT"
 	// KindNotFound are errors caused by any required resources that not exists on the data repository
 	KindNotFound KindType = "NOT_FOUND"
-	// KindAuthentication are errors caused by an unauthenticated call
-	KindAuthentication KindType = "AUTHENTICATION"
-	// KindAuthorization are errors caused by an unauthorized call
-	KindAuthorization KindType = "AUTHORIZATION"
+	// KindUnauthentication are errors caused by an unauthenticated call
+	KindUnauthenticated KindType = "UNAUTHENTICATED"
+	// KindUnauthorized are errors caused by an unauthorized call
+	KindUnauthorized KindType = "UNAUTHORIZED"
 )
 
 // New returns a new instance of CustomError with the given message
 func New(message string, args ...interface{}) CustomError {
 	return CustomError{
-		kind:    DefaultKind,
-		code:    DefaultCode,
+		kind:    KindUnexpected,
+		code:    CodeUnknown,
 		message: fmt.Sprintf(message, args...),
 	}
 }
@@ -74,7 +74,7 @@ func Kind(err error) KindType {
 	if e.As(err, &customError) {
 		return customError.kind
 	}
-	return DefaultKind
+	return KindUnexpected
 }
 
 // Kind this method receives an error, then compares its interface type with the CustomError interface
@@ -84,5 +84,5 @@ func Code(err error) CodeType {
 	if e.As(err, &customError) {
 		return customError.code
 	}
-	return DefaultCode
+	return CodeUnknown
 }
