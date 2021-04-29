@@ -2,6 +2,7 @@ package errors
 
 import (
 	e "errors"
+	"fmt"
 )
 
 // CodeType is a string that contains error's code description
@@ -10,8 +11,8 @@ type CodeType string
 // KindType is a string that contains error's kind description
 type KindType string
 
-//CustomError is a structure that encodes useful information about a given error.
-//It's supposed to flow within the application in detriment of the the default golang error,
+// CustomError is a structure that encodes useful information about a given error.
+// It's supposed to flow within the application in detriment of the the default golang error,
 // since its Kind and Code attributes are the keys to express its semantic and uniqueness, respectively.
 // It should be generated once by the peace of code that found the error (because it's where we have more context about the error),
 // and be by passed to the upper layers of the application.
@@ -22,7 +23,7 @@ type CustomError struct {
 }
 
 const (
-	//DefaultKind is the default kind returned by the error library, whenever the method Kind(err error) KindType is called
+	// DefaultKind is the default kind returned by the error library, whenever the method Kind(err error) KindType is called
 	// and the error argument isnt a CustomError
 	DefaultKind KindType = "DEFAULT_ERROR_KIND"
 	//DefaultCode is the default code returned by the error library, whenever the method Code(err error) CodeType is called
@@ -40,13 +41,25 @@ const (
 	KindAuthorization KindType = "AUTHORIZATION"
 )
 
-// GetService returns a new instance of CustomError with message, kind and code
-func New(message string, kind KindType, code CodeType) CustomError {
+// New returns a new instance of CustomError with the given message
+func New(message string, args ...interface{}) CustomError {
 	return CustomError{
-		kind:    kind,
-		code:    code,
-		message: message,
+		kind:    DefaultKind,
+		code:    DefaultCode,
+		message: fmt.Sprintf(message, args...),
 	}
+}
+
+// WithKind return a copy of the CustomError with the given KindType filled
+func (ce CustomError) WithKind(kind KindType) CustomError {
+	ce.kind = kind
+	return ce
+}
+
+// WithCode return a copy of the CustomError with the given CodeType filled
+func (ce CustomError) WithCode(code CodeType) CustomError {
+	ce.code = code
+	return ce
 }
 
 // Error returns CustomError message

@@ -1,88 +1,99 @@
-package errors
+package errors_test
 
 import (
 	e "errors"
-	"fmt"
 	"testing"
+
+	"github.com/ditointernet/go-dito/lib/infra/errors"
 )
 
-// TestNew tests a creation of a new error with only the kind parameter
-func TestNewType(t *testing.T) {
-	var customError CustomError
-
-	t.Run("Should return an error with type Custom Error", func(t *testing.T) {
-
-		err := New("some message", "some kind", "some code")
-
-		if !e.As(err, &customError) {
-			t.Errorf("Expected error as a type Custom Error, got: '%T'", err)
+// TestNew tests a creation of a new error and its mutations
+func TestNew(t *testing.T) {
+	t.Run("should produce and error with the given message", func(t *testing.T) {
+		msg := "mocked message"
+		if err := errors.New(msg); err.Error() != msg {
+			t.Errorf("Wrong error message received. Expected '%s', got '%s'", msg, err.Error())
 		}
 	})
 
+	t.Run("should produce and error with an dynamic message", func(t *testing.T) {
+		expectedMsg := "mocked message with dynamic value 1000"
+		if err := errors.New("mocked message with dynamic value %d", 1000); err.Error() != expectedMsg {
+			t.Errorf("Wrong error message received. Expected '%s', got '%s'", expectedMsg, err.Error())
+		}
+	})
+
+	t.Run("should produce and error with the default kind and code when not informed", func(t *testing.T) {
+		err := errors.New("mocked message")
+
+		if errors.Kind(err) != errors.DefaultKind {
+			t.Errorf("expected '%s', got '%s'", errors.DefaultKind, errors.Kind(err))
+		}
+
+		if errors.Code(err) != errors.DefaultCode {
+			t.Errorf("expected '%s', got '%s'", errors.DefaultCode, errors.Code(err))
+		}
+	})
+
+	t.Run("should produce and error with a non-defaul Kind filled", func(t *testing.T) {
+		err := errors.New("mocked message").WithKind(errors.KindInternal)
+
+		if errors.Kind(err) != errors.KindInternal {
+			t.Errorf("expected '%s', got '%s'", errors.KindInternal, errors.Kind(err))
+		}
+	})
+
+	t.Run("should override the Kind if WithKind is called more than once", func(t *testing.T) {
+		err := errors.New("mocked message").WithKind(errors.KindInternal).WithKind(errors.KindNotFound)
+
+		if errors.Kind(err) != errors.KindNotFound {
+			t.Errorf("expected '%s', got '%s'", errors.KindNotFound, errors.Kind(err))
+		}
+	})
+
+	t.Run("should produce and error with a non-defaul Code filled", func(t *testing.T) {
+		err := errors.New("mocked message").WithCode("MOCKED_CODE")
+
+		if errors.Code(err) != "MOCKED_CODE" {
+			t.Errorf("expected 'MOCKED_CODE', got %s", errors.Code(err))
+		}
+	})
+
+	t.Run("should override the Code if WithCode is called more than once", func(t *testing.T) {
+		err := errors.New("mocked message").WithCode("MOCKED_CODE").WithCode("MOCKED_CODE_2")
+
+		if errors.Code(err) != "MOCKED_CODE_2" {
+			t.Errorf("expected 'MOCKED_CODE_2', got %s", errors.Code(err))
+		}
+	})
 }
 
-func TestNewValues(t *testing.T) {
-	err := New("some message", "some kind", "some code")
-	t.Run("should have same kind of the new error", func(t *testing.T) {
-		var expectedKind KindType
-		expectedKind = "some kind"
-		if expectedKind != err.kind {
-			t.Errorf("expected kind to be: '%s' got: '%s'", expectedKind, err.kind)
-		}
-	})
-	t.Run("should have same message of the new error", func(t *testing.T) {
-		var expectedMessage string
-		expectedMessage = "some message"
-		if expectedMessage != err.message {
-			t.Errorf("expected message to be: '%s' got: '%s'", expectedMessage, err.kind)
-		}
-	})
-	t.Run("should have same kind of the new error", func(t *testing.T) {
-		var expectedCode CodeType
-		expectedCode = "some code"
-		if expectedCode != err.code {
-			t.Errorf("expected code to be: '%s' got: '%s'", expectedCode, err.code)
-		}
-	})
-}
-
-func TestError(t *testing.T) {
-	err := New("some message", "some kind", "some code")
-	t.Run("should have same kind of the new error", func(t *testing.T) {
-		expectedMessage := "some message"
-		if expectedMessage != err.Error() {
-			t.Errorf("expected message to be: '%s' got: '%s'", expectedMessage, err.kind)
-		}
-	})
-}
 func TestKind(t *testing.T) {
 	tt := []struct {
 		name         string
 		err          error
-		expectedKind KindType
+		expectedKind errors.KindType
 	}{
 		{
 			name:         "go native error",
 			err:          e.New("new error"),
-			expectedKind: DefaultKind,
+			expectedKind: errors.DefaultKind,
 		},
 		{
-			name:         "custom error",
-			err:          New("some message", "some kind", ""),
+			name:         "custom error with default kind",
+			err:          errors.New("some message"),
+			expectedKind: errors.DefaultKind,
+		},
+		{
+			name:         "custom error with non-default kind",
+			err:          errors.New("some message").WithKind("some kind"),
 			expectedKind: "some kind",
-		},
-		{
-			name:         "empty kind",
-			err:          New("some message", "", ""),
-			expectedKind: "",
 		},
 	}
 
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
-			kind := Kind(tc.err)
-			fmt.Println(kind)
-			if kind != tc.expectedKind {
+			if kind := errors.Kind(tc.err); kind != tc.expectedKind {
 				t.Errorf("Expected kind to be '%s': received '%s'", tc.expectedKind, kind)
 			}
 		})
@@ -93,29 +104,28 @@ func TestCode(t *testing.T) {
 	tt := []struct {
 		name         string
 		err          error
-		expectedCode CodeType
+		expectedCode errors.CodeType
 	}{
 		{
 			name:         "go native error",
 			err:          e.New("new error"),
-			expectedCode: DefaultCode,
+			expectedCode: errors.DefaultCode,
 		},
 		{
-			name:         "custom error",
-			err:          New("some message", "some kind", "some code"),
+			name:         "custom error with default code",
+			err:          errors.New("some message"),
+			expectedCode: errors.DefaultCode,
+		},
+		{
+			name:         "custom error with non-default code",
+			err:          errors.New("some message").WithCode("some code"),
 			expectedCode: "some code",
-		},
-		{
-			name:         "empty code",
-			err:          New("some message", "", ""),
-			expectedCode: "",
 		},
 	}
 
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
-			code := Code(tc.err)
-			if code != tc.expectedCode {
+			if code := errors.Code(tc.err); code != tc.expectedCode {
 				t.Errorf("Expected code to be: '%s', received '%s'", tc.expectedCode, code)
 			}
 		})
