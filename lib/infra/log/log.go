@@ -33,7 +33,7 @@ var levelPriority = map[Level]int{
 // LogAttribute represents an information to be extracted from the context and included into the log
 type LogAttribute string
 
-// LogAttributeSet is a set og LogAttributes
+// LogAttributeSet is a set of LogAttributes
 type LogAttributeSet map[LogAttribute]bool
 
 // LoggerInput defines the dependencies of a Logger
@@ -48,7 +48,7 @@ type Logger struct {
 	attributes LogAttributeSet
 }
 
-// NewLogger ...
+// NewLogger constructs a new Logger instance
 func NewLogger(in LoggerInput) *Logger {
 	if _, ok := levelPriority[in.Level]; !ok {
 		in.Level = LevelInfo
@@ -92,15 +92,14 @@ func (l Logger) Critical(ctx context.Context, err error) {
 	}
 }
 
-// LogData encapsulates the data being logged
-type LogData struct {
+type logData struct {
 	Level      Level                        `json:"level"`
 	Message    string                       `json:"message"`
 	Attributes map[LogAttribute]interface{} `json:"attributes,omitempty"`
 }
 
 func (l Logger) print(ctx context.Context, msg string, level Level) {
-	data, _ := json.Marshal(LogData{
+	data, _ := json.Marshal(logData{
 		Level:      level,
 		Message:    msg,
 		Attributes: l.extractLogAttributesFromContext(ctx),
