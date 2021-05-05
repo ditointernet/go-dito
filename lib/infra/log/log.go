@@ -4,30 +4,38 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"time"
 )
+
+type timeFormatter interface {
+	Format(string) string
+}
 
 // Level indicates the severity of the data being logged
-type Level string
+type Level int
 
-var (
-	// LevelDebug are debug or trace information
-	LevelDebug Level = "DEBUG"
-	// LevelInfo are routine information
-	LevelInfo Level = "INFO"
-	// LevelWarning warns about events the might cause problems to the system
-	LevelWarning Level = "WARNING"
-	// LevelError alerts about events that are likely to cause problems
-	LevelError Level = "ERROR"
+const (
 	// LevelCritical alerts about severe problems. Most of the time, needs some human intervention ASAP
-	LevelCritical Level = "CRITICAL"
+	LevelCritical = iota + 1
+	// LevelError alerts about events that are likely to cause problems
+	LevelError
+	// LevelWarning warns about events the might cause problems to the system
+	LevelWarning
+	// LevelInfo are routine information
+	LevelInfo
+	// LevelDebug are debug or trace information
+	LevelDebug
 )
 
-var levelPriority = map[Level]int{
-	LevelCritical: 5,
-	LevelError:    10,
-	LevelWarning:  15,
-	LevelInfo:     20,
-	LevelDebug:    25,
+// String returns the name of the LogLevel
+func (l Level) String() string {
+	return []string{
+		"CRITICAL",
+		"ERROR",
+		"WARNING",
+		"INFO",
+		"DEBUG",
+	}[l-1]
 }
 
 // LogAttribute represents an information to be extracted from the context and included into the log
@@ -46,61 +54,64 @@ type LoggerInput struct {
 type Logger struct {
 	level      Level
 	attributes LogAttributeSet
+	now        func() time.Time
 }
 
 // NewLogger constructs a new Logger instance
 func NewLogger(in LoggerInput) *Logger {
-	if _, ok := levelPriority[in.Level]; !ok {
+	if in.Level < LevelCritical || in.Level > LevelDebug {
 		in.Level = LevelInfo
 	}
 
-	return &Logger{level: in.Level, attributes: in.Attributes}
+	return &Logger{level: in.Level, attributes: in.Attributes, now: time.Now}
 }
 
 // Debug logs debug data
 func (l Logger) Debug(ctx context.Context, msg string, args ...interface{}) {
-	if levelPriority[l.level] >= 25 {
+	if l.level >= LevelDebug {
 		l.print(ctx, fmt.Sprintf(msg, args...), LevelDebug)
 	}
 }
 
 // Info logs info data
 func (l Logger) Info(ctx context.Context, msg string, args ...interface{}) {
-	if levelPriority[l.level] >= 20 {
+	if l.level >= LevelInfo {
 		l.print(ctx, fmt.Sprintf(msg, args...), LevelInfo)
 	}
 }
 
 // Warning logs warning data
 func (l Logger) Warning(ctx context.Context, msg string, args ...interface{}) {
-	if levelPriority[l.level] >= 15 {
+	if l.level >= LevelWarning {
 		l.print(ctx, fmt.Sprintf(msg, args...), LevelWarning)
 	}
 }
 
 // Error logs error data
 func (l Logger) Error(ctx context.Context, err error) {
-	if levelPriority[l.level] >= 10 {
+	if l.level >= LevelError {
 		l.print(ctx, err.Error(), LevelError)
 	}
 }
 
 // Critical logs critical data
 func (l Logger) Critical(ctx context.Context, err error) {
-	if levelPriority[l.level] >= 5 {
+	if l.level >= LevelCritical {
 		l.print(ctx, err.Error(), LevelCritical)
 	}
 }
 
 type logData struct {
-	Level      Level                        `json:"level"`
+	Timestamp  string                       `json:"timestamp"`
+	Level      string                       `json:"level"`
 	Message    string                       `json:"message"`
 	Attributes map[LogAttribute]interface{} `json:"attributes,omitempty"`
 }
 
 func (l Logger) print(ctx context.Context, msg string, level Level) {
 	data, _ := json.Marshal(logData{
-		Level:      level,
+		Timestamp:  l.now().Format(time.RFC3339),
+		Level:      level.String(),
 		Message:    msg,
 		Attributes: l.extractLogAttributesFromContext(ctx),
 	})
