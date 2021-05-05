@@ -4,7 +4,7 @@ import (
 	e "errors"
 	"testing"
 
-	"github.com/ditointernet/go-dito/lib/infra/errors"
+	"github.com/ditointernet/go-dito/lib/errors"
 )
 
 // TestNew tests a creation of a new error and its mutations
