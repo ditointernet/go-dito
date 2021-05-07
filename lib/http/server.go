@@ -41,6 +41,7 @@ type Server struct {
 	logger         logger
 }
 
+// NewServer creates a new instance of Server
 func NewServer(in ServerInput) Server {
 	router := routing.New()
 
@@ -64,6 +65,7 @@ func NewServer(in ServerInput) Server {
 	return server
 }
 
+// Run listen and serves HTTP requests at the Port specified in Server construction
 func (s Server) Run() error {
 	return fasthttp.ListenAndServe(fmt.Sprintf(":%d", s.port), s.router.HandleRequest)
 }
