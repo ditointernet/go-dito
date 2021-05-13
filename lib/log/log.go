@@ -7,10 +7,6 @@ import (
 	"time"
 )
 
-type timeFormatter interface {
-	Format(string) string
-}
-
 // Level indicates the severity of the data being logged
 type Level int
 
@@ -26,6 +22,14 @@ const (
 	// LevelDebug are debug or trace information
 	LevelDebug
 )
+
+var levelStringValueMap = map[string]Level{
+	"CRITICAL": LevelCritical,
+	"ERROR":    LevelError,
+	"WARNING":  LevelWarning,
+	"INFO":     LevelInfo,
+	"DEBUG":    LevelDebug,
+}
 
 // String returns the name of the LogLevel
 func (l Level) String() string {
@@ -46,7 +50,7 @@ type LogAttributeSet map[LogAttribute]bool
 
 // LoggerInput defines the dependencies of a Logger
 type LoggerInput struct {
-	Level      Level
+	Level      string
 	Attributes LogAttributeSet
 }
 
@@ -59,11 +63,13 @@ type Logger struct {
 
 // NewLogger constructs a new Logger instance
 func NewLogger(in LoggerInput) *Logger {
-	if in.Level < LevelCritical || in.Level > LevelDebug {
-		in.Level = LevelInfo
+	logger := &Logger{level: levelStringValueMap[in.Level], attributes: in.Attributes, now: time.Now}
+
+	if logger.level < LevelCritical || logger.level > LevelDebug {
+		logger.level = LevelInfo
 	}
 
-	return &Logger{level: in.Level, attributes: in.Attributes, now: time.Now}
+	return logger
 }
 
 // Debug logs debug data
