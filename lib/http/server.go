@@ -7,6 +7,8 @@ import (
 
 	routing "github.com/jackwhelpton/fasthttp-routing/v2"
 	"github.com/jackwhelpton/fasthttp-routing/v2/access"
+	"github.com/jackwhelpton/fasthttp-routing/v2/content"
+	"github.com/jackwhelpton/fasthttp-routing/v2/fault"
 	"github.com/jackwhelpton/fasthttp-routing/v2/slash"
 	"github.com/rs/cors"
 	"github.com/valyala/fasthttp"
@@ -53,6 +55,8 @@ func NewServer(in ServerInput) Server {
 	}
 
 	router.Use(slash.Remover(http.StatusMovedPermanently))
+	router.Use(content.TypeNegotiator(content.JSON))
+	router.Use(fault.ErrorHandler(nil, customErrorContentType))
 
 	server.addCorsMiddleware()
 	server.addRequestIPIntoContext()
@@ -105,4 +109,18 @@ func (s Server) addRequestLogger() {
 		req := fmt.Sprintf("%s %s %s", string(ctx.Request.Header.Method()), string(ctx.RequestURI()), string(ctx.Request.URI().Scheme()))
 		s.logger.Info(ctx, `[%v] [%.3fms] %s %d %d`, ip, elapsed, req, ctx.Response.StatusCode(), len(ctx.Response.Body()))
 	}))
+}
+
+func customErrorContentType(ctx *routing.Context, err error) error {
+	_, ok := err.(ErrorResponse)
+	if ok {
+		ctx.Response.Header.SetContentType(content.JSON)
+	}
+
+	_, ok = err.(ErrorListResponse)
+	if ok {
+		ctx.Response.Header.SetContentType(content.JSON)
+	}
+
+	return err
 }

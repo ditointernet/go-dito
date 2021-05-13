@@ -3,6 +3,7 @@ package http
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 
 	"github.com/ditointernet/go-dito/lib/errors"
 )
@@ -117,13 +118,29 @@ func kindToHTTPStatusCode(kind errors.KindType) int {
 	}
 }
 
-// ResponseMessage is a generic message that should be sent to a client of HTTP Server.
-type ResponseMessage struct {
+// MessageResponse is a generic message that should be sent to a client of HTTP Server.
+type MessageResponse struct {
 	Message string `json:"message"`
 }
 
-// NewResponseMessage creates a ResponseMessage serialized into JSON format.
-func NewResponseMessage(msg string) string {
-	res, _ := json.Marshal(ResponseMessage{Message: msg})
-	return string(res)
+// NewMessageResponse creates a MessageResponse
+func NewMessageResponse(msg string, params ...interface{}) MessageResponse {
+	return MessageResponse{Message: fmt.Sprintf(msg, params...)}
+}
+
+// ResourceCreatedResponse is is the default response sent when a new resource is created in the system.
+type ResourceCreatedResponse struct {
+	ID      string `json:"id"`
+	Message string `json:"message"`
+}
+
+// NewResourceCreatedResponse creates a new ResourceCreatedResponse.
+func NewResourceCreatedResponse(id string) ResourceCreatedResponse {
+	return ResourceCreatedResponse{ID: id, Message: "Resource created succesfuly!"}
+}
+
+// WithMessage overrides the default message.
+func (r ResourceCreatedResponse) WithMessage(msg string, params ...interface{}) ResourceCreatedResponse {
+	r.Message = fmt.Sprintf(msg, params...)
+	return r
 }
