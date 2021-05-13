@@ -49,7 +49,7 @@ func TestDebug(t *testing.T) {
 	tt := []struct {
 		desc        string
 		ctx         context.Context
-		level       Level
+		level       string
 		attrs       LogAttributeSet
 		msg         string
 		msgArgs     []interface{}
@@ -58,42 +58,42 @@ func TestDebug(t *testing.T) {
 		{
 			desc:        "should log when LogLevel is DEBUG",
 			ctx:         ctx,
-			level:       LevelDebug,
+			level:       "DEBUG",
 			msg:         "random message",
 			expectedLog: `{"timestamp":"2020-12-01T12:00:00Z","level":"DEBUG","message":"random message"}`,
 		},
 		{
 			desc:        "should not log when LogLevel is INFO",
 			ctx:         ctx,
-			level:       LevelInfo,
+			level:       "INFO",
 			msg:         "random message",
 			expectedLog: "",
 		},
 		{
 			desc:        "should not log when LogLevel is WARNING",
 			ctx:         ctx,
-			level:       LevelWarning,
+			level:       "WARNING",
 			msg:         "random message",
 			expectedLog: "",
 		},
 		{
 			desc:        "should not log when LogLevel is ERROR",
 			ctx:         ctx,
-			level:       LevelError,
+			level:       "ERROR",
 			msg:         "random message",
 			expectedLog: "",
 		},
 		{
 			desc:        "should not log when LogLevel is CRITICAL",
 			ctx:         ctx,
-			level:       LevelCritical,
+			level:       "CRITICAL",
 			msg:         "random message",
 			expectedLog: "",
 		},
 		{
 			desc:        "should log with dynamic message",
 			ctx:         ctx,
-			level:       LevelDebug,
+			level:       "DEBUG",
 			msg:         "random message with dynamic data %d",
 			msgArgs:     []interface{}{1},
 			expectedLog: `{"timestamp":"2020-12-01T12:00:00Z","level":"DEBUG","message":"random message with dynamic data 1"}`,
@@ -101,7 +101,7 @@ func TestDebug(t *testing.T) {
 		{
 			desc:        "should log with attributes",
 			ctx:         context.WithValue(ctx, "attr1", "value1"),
-			level:       LevelDebug,
+			level:       "DEBUG",
 			msg:         "random message",
 			attrs:       LogAttributeSet{"attr1": true},
 			expectedLog: `{"timestamp":"2020-12-01T12:00:00Z","level":"DEBUG","message":"random message","attributes":{"attr1":"value1"}}`,
@@ -130,7 +130,7 @@ func TestInfo(t *testing.T) {
 	tt := []struct {
 		desc        string
 		ctx         context.Context
-		level       Level
+		level       string
 		attrs       LogAttributeSet
 		msg         string
 		msgArgs     []interface{}
@@ -139,42 +139,42 @@ func TestInfo(t *testing.T) {
 		{
 			desc:        "should log when LogLevel is DEBUG",
 			ctx:         ctx,
-			level:       LevelDebug,
+			level:       "DEBUG",
 			msg:         "random message",
 			expectedLog: `{"timestamp":"2020-12-01T12:00:00Z","level":"INFO","message":"random message"}`,
 		},
 		{
 			desc:        "should log when LogLevel is INFO",
 			ctx:         ctx,
-			level:       LevelInfo,
+			level:       "INFO",
 			msg:         "random message",
 			expectedLog: `{"timestamp":"2020-12-01T12:00:00Z","level":"INFO","message":"random message"}`,
 		},
 		{
 			desc:        "should not log when LogLevel is WARNING",
 			ctx:         ctx,
-			level:       LevelWarning,
+			level:       "WARNING",
 			msg:         "random message",
 			expectedLog: "",
 		},
 		{
 			desc:        "should not log when LogLevel is ERROR",
 			ctx:         ctx,
-			level:       LevelError,
+			level:       "ERROR",
 			msg:         "random message",
 			expectedLog: "",
 		},
 		{
 			desc:        "should not log when LogLevel is CRITICAL",
 			ctx:         ctx,
-			level:       LevelCritical,
+			level:       "CRITICAL",
 			msg:         "random message",
 			expectedLog: "",
 		},
 		{
 			desc:        "should log with dynamic message",
 			ctx:         ctx,
-			level:       LevelDebug,
+			level:       "DEBUG",
 			msg:         "random message with dynamic data %d",
 			msgArgs:     []interface{}{1},
 			expectedLog: `{"timestamp":"2020-12-01T12:00:00Z","level":"INFO","message":"random message with dynamic data 1"}`,
@@ -182,7 +182,7 @@ func TestInfo(t *testing.T) {
 		{
 			desc:        "should log with attributes",
 			ctx:         context.WithValue(ctx, "attr1", "value1"),
-			level:       LevelDebug,
+			level:       "DEBUG",
 			msg:         "random message",
 			attrs:       LogAttributeSet{"attr1": true},
 			expectedLog: `{"timestamp":"2020-12-01T12:00:00Z","level":"INFO","message":"random message","attributes":{"attr1":"value1"}}`,
@@ -211,7 +211,7 @@ func TestWarning(t *testing.T) {
 	tt := []struct {
 		desc        string
 		ctx         context.Context
-		level       Level
+		level       string
 		attrs       LogAttributeSet
 		msg         string
 		msgArgs     []interface{}
@@ -220,42 +220,42 @@ func TestWarning(t *testing.T) {
 		{
 			desc:        "should log when LogLevel is DEBUG",
 			ctx:         ctx,
-			level:       LevelDebug,
+			level:       "DEBUG",
 			msg:         "random message",
 			expectedLog: `{"timestamp":"2020-12-01T12:00:00Z","level":"WARNING","message":"random message"}`,
 		},
 		{
 			desc:        "should log when LogLevel is INFO",
 			ctx:         ctx,
-			level:       LevelInfo,
+			level:       "INFO",
 			msg:         "random message",
 			expectedLog: `{"timestamp":"2020-12-01T12:00:00Z","level":"WARNING","message":"random message"}`,
 		},
 		{
 			desc:        "should log when LogLevel is WARNING",
 			ctx:         ctx,
-			level:       LevelWarning,
+			level:       "WARNING",
 			msg:         "random message",
 			expectedLog: `{"timestamp":"2020-12-01T12:00:00Z","level":"WARNING","message":"random message"}`,
 		},
 		{
 			desc:        "should not log when LogLevel is ERROR",
 			ctx:         ctx,
-			level:       LevelError,
+			level:       "ERROR",
 			msg:         "random message",
 			expectedLog: "",
 		},
 		{
 			desc:        "should not log when LogLevel is CRITICAL",
 			ctx:         ctx,
-			level:       LevelCritical,
+			level:       "CRITICAL",
 			msg:         "random message",
 			expectedLog: "",
 		},
 		{
 			desc:        "should log with dynamic message",
 			ctx:         ctx,
-			level:       LevelDebug,
+			level:       "DEBUG",
 			msg:         "random message with dynamic data %d",
 			msgArgs:     []interface{}{1},
 			expectedLog: `{"timestamp":"2020-12-01T12:00:00Z","level":"WARNING","message":"random message with dynamic data 1"}`,
@@ -263,7 +263,7 @@ func TestWarning(t *testing.T) {
 		{
 			desc:        "should log with attributes",
 			ctx:         context.WithValue(ctx, "attr1", "value1"),
-			level:       LevelDebug,
+			level:       "DEBUG",
 			msg:         "random message",
 			attrs:       LogAttributeSet{"attr1": true},
 			expectedLog: `{"timestamp":"2020-12-01T12:00:00Z","level":"WARNING","message":"random message","attributes":{"attr1":"value1"}}`,
@@ -292,7 +292,7 @@ func TestError(t *testing.T) {
 	tt := []struct {
 		desc        string
 		ctx         context.Context
-		level       Level
+		level       string
 		attrs       LogAttributeSet
 		err         error
 		expectedLog string
@@ -300,42 +300,42 @@ func TestError(t *testing.T) {
 		{
 			desc:        "should log when LogLevel is DEBUG",
 			ctx:         ctx,
-			level:       LevelDebug,
+			level:       "DEBUG",
 			err:         errors.New("random error"),
 			expectedLog: `{"timestamp":"2020-12-01T12:00:00Z","level":"ERROR","message":"random error"}`,
 		},
 		{
 			desc:        "should log when LogLevel is INFO",
 			ctx:         ctx,
-			level:       LevelInfo,
+			level:       "INFO",
 			err:         errors.New("random error"),
 			expectedLog: `{"timestamp":"2020-12-01T12:00:00Z","level":"ERROR","message":"random error"}`,
 		},
 		{
 			desc:        "should log when LogLevel is WARNING",
 			ctx:         ctx,
-			level:       LevelWarning,
+			level:       "WARNING",
 			err:         errors.New("random error"),
 			expectedLog: `{"timestamp":"2020-12-01T12:00:00Z","level":"ERROR","message":"random error"}`,
 		},
 		{
 			desc:        "should log when LogLevel is ERROR",
 			ctx:         ctx,
-			level:       LevelError,
+			level:       "ERROR",
 			err:         errors.New("random error"),
 			expectedLog: `{"timestamp":"2020-12-01T12:00:00Z","level":"ERROR","message":"random error"}`,
 		},
 		{
 			desc:        "should not log when LogLevel is CRITICAL",
 			ctx:         ctx,
-			level:       LevelCritical,
+			level:       "CRITICAL",
 			err:         errors.New("random error"),
 			expectedLog: "",
 		},
 		{
 			desc:        "should log with attributes",
 			ctx:         context.WithValue(ctx, "attr1", "value1"),
-			level:       LevelDebug,
+			level:       "DEBUG",
 			err:         errors.New("random error"),
 			attrs:       LogAttributeSet{"attr1": true},
 			expectedLog: `{"timestamp":"2020-12-01T12:00:00Z","level":"ERROR","message":"random error","attributes":{"attr1":"value1"}}`,
@@ -364,7 +364,7 @@ func TestCritical(t *testing.T) {
 	tt := []struct {
 		desc        string
 		ctx         context.Context
-		level       Level
+		level       string
 		attrs       LogAttributeSet
 		err         error
 		expectedLog string
@@ -372,42 +372,42 @@ func TestCritical(t *testing.T) {
 		{
 			desc:        "should log when LogLevel is DEBUG",
 			ctx:         ctx,
-			level:       LevelDebug,
+			level:       "DEBUG",
 			err:         errors.New("random error"),
 			expectedLog: `{"timestamp":"2020-12-01T12:00:00Z","level":"CRITICAL","message":"random error"}`,
 		},
 		{
 			desc:        "should log when LogLevel is INFO",
 			ctx:         ctx,
-			level:       LevelInfo,
+			level:       "INFO",
 			err:         errors.New("random error"),
 			expectedLog: `{"timestamp":"2020-12-01T12:00:00Z","level":"CRITICAL","message":"random error"}`,
 		},
 		{
 			desc:        "should log when LogLevel is WARNING",
 			ctx:         ctx,
-			level:       LevelWarning,
+			level:       "WARNING",
 			err:         errors.New("random error"),
 			expectedLog: `{"timestamp":"2020-12-01T12:00:00Z","level":"CRITICAL","message":"random error"}`,
 		},
 		{
 			desc:        "should log when LogLevel is ERROR",
 			ctx:         ctx,
-			level:       LevelError,
+			level:       "ERROR",
 			err:         errors.New("random error"),
 			expectedLog: `{"timestamp":"2020-12-01T12:00:00Z","level":"CRITICAL","message":"random error"}`,
 		},
 		{
 			desc:        "should log when LogLevel is CRITICAL",
 			ctx:         ctx,
-			level:       LevelCritical,
+			level:       "CRITICAL",
 			err:         errors.New("random error"),
 			expectedLog: `{"timestamp":"2020-12-01T12:00:00Z","level":"CRITICAL","message":"random error"}`,
 		},
 		{
 			desc:        "should log with attributes",
 			ctx:         context.WithValue(ctx, "attr1", "value1"),
-			level:       LevelDebug,
+			level:       "DEBUG",
 			err:         errors.New("random error"),
 			attrs:       LogAttributeSet{"attr1": true},
 			expectedLog: `{"timestamp":"2020-12-01T12:00:00Z","level":"CRITICAL","message":"random error","attributes":{"attr1":"value1"}}`,
