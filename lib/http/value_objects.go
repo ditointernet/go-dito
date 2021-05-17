@@ -144,3 +144,22 @@ func (r ResourceCreatedResponse) WithMessage(msg string, params ...interface{}) 
 	r.Message = fmt.Sprintf(msg, params...)
 	return r
 }
+
+// HTTPHeaders is a map'containing the relation key=value of the heades used on the http rest request.
+type HTTPHeaders map[string]string
+
+// HTTPQueryParams is a map'containing the relation key=value of the query params used on the http rest request
+type HTTPQueryParams map[string]string
+
+// HttpRequest are the params used to build a new http rest request
+type HttpRequest struct {
+	URL         string
+	Body        []byte
+	Headers     HTTPHeaders
+	QueryParams HTTPQueryParams
+}
+
+type HttpResult struct {
+	StatusCode int
+	Response   []byte
+}
