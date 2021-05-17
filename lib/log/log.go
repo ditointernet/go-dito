@@ -12,7 +12,7 @@ type Level int
 
 const (
 	// LevelCritical alerts about severe problems. Most of the time, needs some human intervention ASAP
-	LevelCritical = iota + 1
+	LevelCritical Level = iota + 1
 	// LevelError alerts about events that are likely to cause problems
 	LevelError
 	// LevelWarning warns about events the might cause problems to the system
