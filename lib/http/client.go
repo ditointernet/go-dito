@@ -2,6 +2,7 @@ package http
 
 import (
 	"bytes"
+	"context"
 	"io/ioutil"
 	"net/http"
 	URL "net/url"
@@ -28,55 +29,55 @@ func NewClient(timeout time.Duration) Client {
 }
 
 // Patch execute a http PATCH method with application/json headers
-func (c Client) Patch(request HttpRequest) (rst HttpResult, err error) {
+func (c Client) Patch(ctx context.Context, request HttpRequest) (rst HttpResult, err error) {
 	if request.Headers == nil {
 		request.Headers = make(map[string]string)
 	}
 	request.Headers["content-type"] = "application/json"
-	return c.processRequest("PATCH", request)
+	return c.processRequest(ctx, "PATCH", request)
 }
 
 // Put execute a http PUT method with application/json headers
-func (c Client) Put(request HttpRequest) (rst HttpResult, err error) {
+func (c Client) Put(ctx context.Context, request HttpRequest) (rst HttpResult, err error) {
 	if request.Headers == nil {
 		request.Headers = make(map[string]string)
 	}
 	request.Headers["content-type"] = "application/json"
-	return c.processRequest("PATCH", request)
+	return c.processRequest(ctx, "PATCH", request)
 }
 
 // Post execute a http POST method with application/json headers
-func (c Client) Post(request HttpRequest) (HttpResult, error) {
+func (c Client) Post(ctx context.Context, request HttpRequest) (HttpResult, error) {
 	if request.Headers == nil {
 		request.Headers = make(map[string]string)
 	}
 	request.Headers["content-type"] = "application/json"
-	return c.processRequest("POST", request)
+	return c.processRequest(ctx, "POST", request)
 }
 
 // Delete execute a http DELETE method with application/json headers
-func (c Client) Delete(request HttpRequest) (HttpResult, error) {
+func (c Client) Delete(ctx context.Context, request HttpRequest) (HttpResult, error) {
 	if request.Headers == nil {
 		request.Headers = make(map[string]string)
 	}
-	return c.processRequest("POST", request)
+	return c.processRequest(ctx, "POST", request)
 }
 
 // PostForm execute a http POST method with "application/x-www-form-urlencoded" headers
-func (c Client) PostForm(request HttpRequest) (HttpResult, error) {
+func (c Client) PostForm(ctx context.Context, request HttpRequest) (HttpResult, error) {
 	if request.Headers == nil {
 		request.Headers = make(map[string]string)
 	}
 	request.Headers["content-type"] = "application/x-www-form-urlencoded"
-	return c.processRequest("POST", request)
+	return c.processRequest(ctx, "POST", request)
 }
 
 // Get execute a http GET method
-func (c Client) Get(request HttpRequest) (HttpResult, error) {
-	return c.processRequest("GET", request)
+func (c Client) Get(ctx context.Context, request HttpRequest) (HttpResult, error) {
+	return c.processRequest(ctx, "GET", request)
 }
 
-func (c Client) processRequest(method string, request HttpRequest) (HttpResult, error) {
+func (c Client) processRequest(ctx context.Context, method string, request HttpRequest) (HttpResult, error) {
 	queryValues := URL.Values{}
 
 	for key, value := range request.QueryParams {
@@ -89,11 +90,10 @@ func (c Client) processRequest(method string, request HttpRequest) (HttpResult, 
 	}
 	url.RawQuery = queryValues.Encode()
 
-	httpRequest, err := http.NewRequest(method, url.String(), bytes.NewBuffer(request.Body))
+	httpRequest, err := http.NewRequestWithContext(ctx, method, url.String(), bytes.NewBuffer(request.Body))
 	if err != nil {
 		return HttpResult{}, err
 	}
-
 	for key, value := range request.Headers {
 		httpRequest.Header.Add(key, value)
 	}
