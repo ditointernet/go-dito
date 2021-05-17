@@ -22,7 +22,7 @@ type HttpResult struct {
 	Response   []byte
 }
 
-// HttpClient ...
+// HttpClient is the public interface of the http client lib
 type HttpClient interface {
 	Patch(ctx context.Context, request HttpRequest) (rst HttpResult, err error)
 	Put(ctx context.Context, request HttpRequest) (rst HttpResult, err error)

@@ -11,7 +11,7 @@ import (
 	"github.com/ditointernet/go-dito/lib/jwks/client"
 )
 
-// Client ...
+// Client is the structure responsible for handling the JWKS certificates
 type Client struct {
 	jwksURI              string
 	http                 client.HttpClient
@@ -21,7 +21,7 @@ type Client struct {
 	mux                  sync.Mutex
 }
 
-// NewClient ...
+// NewClient constructs a new JWKS instance
 func NewClient(jwksURI string, http client.HttpClient, renewMinuteThreshold int) (*Client, error) {
 	return &Client{
 		jwksURI:              jwksURI,
@@ -31,7 +31,7 @@ func NewClient(jwksURI string, http client.HttpClient, renewMinuteThreshold int)
 	}, nil
 }
 
-// NewClient ...
+// GetCerts makes a http request to jwksURI and retrieves a list of valid certtificates
 func (c *Client) GetCerts(ctx context.Context) error {
 	certs, err := c.fetchCerts(ctx)
 	if err != nil {
@@ -43,7 +43,7 @@ func (c *Client) GetCerts(ctx context.Context) error {
 	return nil
 }
 
-// RenewCerts ...
+// RenewCerts compare if the certs are valid if not retrieves a new list of valid certificates
 func (c *Client) RenewCerts(ctx context.Context) error {
 	c.mux.Lock()
 	if time.Since(c.lastRenewTime).Minutes() > float64(c.renewMinuteThreshold) {
