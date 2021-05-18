@@ -43,7 +43,7 @@ func (c Client) Put(ctx context.Context, request HTTPRequest) (rst HTTPResult, e
 		request.Headers = make(map[string]string)
 	}
 	request.Headers["content-type"] = "application/json"
-	return c.processRequest(ctx, "PATCH", request)
+	return c.processRequest(ctx, "PUT", request)
 }
 
 // Post execute a http POST method with application/json headers
@@ -60,7 +60,7 @@ func (c Client) Delete(ctx context.Context, request HTTPRequest) (HTTPResult, er
 	if request.Headers == nil {
 		request.Headers = make(map[string]string)
 	}
-	return c.processRequest(ctx, "POST", request)
+	return c.processRequest(ctx, "DELETE", request)
 }
 
 // PostForm execute a http POST method with "application/x-www-form-urlencoded" headers
