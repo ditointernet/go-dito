@@ -76,17 +76,17 @@ func verifyJWTSignature(certs map[string]string) func(token *jwt.Token) (interfa
 	return func(token *jwt.Token) (interface{}, error) {
 		kid, ok := token.Header["kid"].(string)
 		if !ok {
-			return nil, errors.New("token's kid header not found")
+			return nil, errors.New("token's kid header not found").WithKind(errors.KindUnauthenticated)
 		}
 
 		cert, ok := certs[kid]
 		if !ok {
-			return nil, errors.New("cert key not found")
+			return nil, errors.New("cert key not found").WithKind(errors.KindUnauthenticated)
 		}
 
 		result, err := jwt.ParseRSAPublicKeyFromPEM([]byte(cert))
 		if err != nil {
-			return nil, errors.New("error trying to validate signature")
+			return nil, errors.New("error trying to validate signature").WithKind(errors.KindInternal)
 		}
 
 		return result, nil
