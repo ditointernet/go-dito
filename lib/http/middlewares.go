@@ -37,7 +37,8 @@ func NewUserAuthenticator(logger logger, jwks JWKSCLient) UserAuthenticator {
 func (ua UserAuthenticator) Authenticate(ctx *routing.Context) error {
 	authHeader := string(ctx.Request.Header.Peek("Authorization"))
 	if len(authHeader) < 7 || strings.ToLower(authHeader[:7]) != "bearer " || authHeader[7:] == "" {
-		return errors.New("unauthenticated request").WithKind(errors.KindUnauthenticated)
+		err := errors.New("unauthenticated request").WithKind(errors.KindUnauthenticated)
+		return NewErrorResponse(ctx, err)
 	}
 	token := authHeader[7:]
 
@@ -51,17 +52,17 @@ func (ua UserAuthenticator) Authenticate(ctx *routing.Context) error {
 	if err := ua.jwks.RenewCerts(ctx); err != nil {
 		err = errors.New("error on renewing the certificates").WithKind(errors.KindInternal)
 		ua.logger.Error(ctx, err)
-		return err
+		return NewErrorResponse(ctx, err)
 	}
 	certs = ua.jwks.Certs()
 
 	parsedToken, err := jwt.Parse(token, verifyJWTSignature(certs))
-	if err == nil {
-		setUserID(ctx, parsedToken)
-		return nil
+	if err != nil {
+		return NewErrorResponse(ctx, err)
 	}
 
-	return err
+	setUserID(ctx, parsedToken)
+	return nil
 }
 
 func setUserID(ctx *routing.Context, token *jwt.Token) {
