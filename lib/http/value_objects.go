@@ -152,14 +152,14 @@ type HTTPHeaders map[string]string
 type HTTPQueryParams map[string]string
 
 // HttpRequest are the params used to build a new http rest request
-type HttpRequest struct {
+type HTTPRequest struct {
 	URL         string
 	Body        []byte
 	Headers     HTTPHeaders
 	QueryParams HTTPQueryParams
 }
 
-type HttpResult struct {
+type HTTPResult struct {
 	StatusCode int
 	Response   []byte
 }

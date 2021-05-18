@@ -29,7 +29,7 @@ func NewClient(timeout time.Duration) Client {
 }
 
 // Patch execute a http PATCH method with application/json headers
-func (c Client) Patch(ctx context.Context, request HttpRequest) (rst HttpResult, err error) {
+func (c Client) Patch(ctx context.Context, request HTTPRequest) (rst HTTPResult, err error) {
 	if request.Headers == nil {
 		request.Headers = make(map[string]string)
 	}
@@ -38,7 +38,7 @@ func (c Client) Patch(ctx context.Context, request HttpRequest) (rst HttpResult,
 }
 
 // Put execute a http PUT method with application/json headers
-func (c Client) Put(ctx context.Context, request HttpRequest) (rst HttpResult, err error) {
+func (c Client) Put(ctx context.Context, request HTTPRequest) (rst HTTPResult, err error) {
 	if request.Headers == nil {
 		request.Headers = make(map[string]string)
 	}
@@ -47,7 +47,7 @@ func (c Client) Put(ctx context.Context, request HttpRequest) (rst HttpResult, e
 }
 
 // Post execute a http POST method with application/json headers
-func (c Client) Post(ctx context.Context, request HttpRequest) (HttpResult, error) {
+func (c Client) Post(ctx context.Context, request HTTPRequest) (HTTPResult, error) {
 	if request.Headers == nil {
 		request.Headers = make(map[string]string)
 	}
@@ -56,7 +56,7 @@ func (c Client) Post(ctx context.Context, request HttpRequest) (HttpResult, erro
 }
 
 // Delete execute a http DELETE method with application/json headers
-func (c Client) Delete(ctx context.Context, request HttpRequest) (HttpResult, error) {
+func (c Client) Delete(ctx context.Context, request HTTPRequest) (HTTPResult, error) {
 	if request.Headers == nil {
 		request.Headers = make(map[string]string)
 	}
@@ -64,7 +64,7 @@ func (c Client) Delete(ctx context.Context, request HttpRequest) (HttpResult, er
 }
 
 // PostForm execute a http POST method with "application/x-www-form-urlencoded" headers
-func (c Client) PostForm(ctx context.Context, request HttpRequest) (HttpResult, error) {
+func (c Client) PostForm(ctx context.Context, request HTTPRequest) (HTTPResult, error) {
 	if request.Headers == nil {
 		request.Headers = make(map[string]string)
 	}
@@ -73,11 +73,11 @@ func (c Client) PostForm(ctx context.Context, request HttpRequest) (HttpResult, 
 }
 
 // Get execute a http GET method
-func (c Client) Get(ctx context.Context, request HttpRequest) (HttpResult, error) {
+func (c Client) Get(ctx context.Context, request HTTPRequest) (HTTPResult, error) {
 	return c.processRequest(ctx, "GET", request)
 }
 
-func (c Client) processRequest(ctx context.Context, method string, request HttpRequest) (HttpResult, error) {
+func (c Client) processRequest(ctx context.Context, method string, request HTTPRequest) (HTTPResult, error) {
 	queryValues := URL.Values{}
 
 	for key, value := range request.QueryParams {
@@ -86,13 +86,13 @@ func (c Client) processRequest(ctx context.Context, method string, request HttpR
 
 	url, err := URL.Parse(request.URL)
 	if err != nil {
-		return HttpResult{}, errors.New("error on parsing the request url")
+		return HTTPResult{}, errors.New("error on parsing the request url")
 	}
 	url.RawQuery = queryValues.Encode()
 
 	httpRequest, err := http.NewRequestWithContext(ctx, method, url.String(), bytes.NewBuffer(request.Body))
 	if err != nil {
-		return HttpResult{}, err
+		return HTTPResult{}, err
 	}
 	for key, value := range request.Headers {
 		httpRequest.Header.Add(key, value)
@@ -101,8 +101,8 @@ func (c Client) processRequest(ctx context.Context, method string, request HttpR
 	return processResponse(c.http.Do(httpRequest))
 }
 
-func processResponse(resp *http.Response, err error) (HttpResult, error) {
-	var result HttpResult
+func processResponse(resp *http.Response, err error) (HTTPResult, error) {
+	var result HTTPResult
 
 	if err != nil {
 		return result, err
