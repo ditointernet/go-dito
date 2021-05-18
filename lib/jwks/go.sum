@@ -4,11 +4,14 @@ github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
+github.com/dgrijalva/jwt-go v3.2.0+incompatible h1:7qlOGliEKZXTDg6OTjfoBKDXWrumCAMpl/TFQ4/5kLM=
 github.com/dgrijalva/jwt-go v3.2.0+incompatible/go.mod h1:E3ru+11k8xSBh+hMPgOLZmtrrCbhqsmaPHjLKYnJCaQ=
 github.com/ditointernet/go-dito/lib/errors v1.0.0 h1:XiPhbvNOcX2fOvQPn3Odjo0hKn+XAKY+nXEMlBolUV4=
 github.com/ditointernet/go-dito/lib/errors v1.0.0/go.mod h1:8/2xc1U8fC1okV0sSrBbXCah4QntQQVp0pSlyrvh1o4=
 github.com/ditointernet/go-dito/lib/http v1.2.1 h1:VWDC5YUenZNY80wmxIQcHTBDWN2unfjrtUY42qHtfUM=
 github.com/ditointernet/go-dito/lib/http v1.2.1/go.mod h1:CUQ0LBcd0d72met9+x2hZpyfSJQtPdy3OnkwpY2PTzw=
+github.com/ditointernet/go-dito/lib/http v1.2.2 h1:gUco24w4BJ4olEhda0tgYUy+HML9ARmmicHD9KrFCrw=
+github.com/ditointernet/go-dito/lib/http v1.2.2/go.mod h1:hrGn0ajrO0CcDu8G00Xxf1kiw+Duv/yVBK+U1ak86Fs=
 github.com/ditointernet/go-dito/lib/log v1.1.0/go.mod h1:FNLl7lTFvjCdOFLPbL3PMqoUiuP39VavBRIXgGW44IE=
 github.com/golang/mock v1.5.0 h1:jlYHihg//f7RRwuPfptm04yp4s7O6Kw8EZiVYIGcH0g=
 github.com/golang/mock v1.5.0/go.mod h1:CWnOUgYIOo4TcNZ0wHX3YZCqsaM1I1Jvs6v3mP3KVu8=

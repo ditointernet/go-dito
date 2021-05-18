@@ -74,7 +74,7 @@ type jwks struct {
 }
 
 func (c Client) fetchCerts(ctx context.Context) (map[string]string, error) {
-	resp, err := c.http.Get(ctx, httpCLient.HttpRequest{URL: c.jwksURI})
+	resp, err := c.http.Get(ctx, httpCLient.HTTPRequest{URL: c.jwksURI})
 	if err != nil {
 		return nil, err
 	}

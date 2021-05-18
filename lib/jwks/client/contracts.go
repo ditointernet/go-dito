@@ -8,10 +8,10 @@ import (
 
 // HttpClient is the public interface of the http client lib
 type HttpClient interface {
-	Patch(ctx context.Context, request http.HttpRequest) (rst http.HttpResult, err error)
-	Put(ctx context.Context, request http.HttpRequest) (rst http.HttpResult, err error)
-	Post(ctx context.Context, request http.HttpRequest) (rst http.HttpResult, err error)
-	Delete(ctx context.Context, request http.HttpRequest) (rst http.HttpResult, err error)
-	Get(ctx context.Context, request http.HttpRequest) (rst http.HttpResult, err error)
-	PostForm(ctx context.Context, request http.HttpRequest) (rst http.HttpResult, err error)
+	Patch(ctx context.Context, request http.HTTPRequest) (rst http.HTTPResult, err error)
+	Put(ctx context.Context, request http.HTTPRequest) (rst http.HTTPResult, err error)
+	Post(ctx context.Context, request http.HTTPRequest) (rst http.HTTPResult, err error)
+	Delete(ctx context.Context, request http.HTTPRequest) (rst http.HTTPResult, err error)
+	Get(ctx context.Context, request http.HTTPRequest) (rst http.HTTPResult, err error)
+	PostForm(ctx context.Context, request http.HTTPRequest) (rst http.HTTPResult, err error)
 }
