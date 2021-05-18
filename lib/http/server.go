@@ -2,6 +2,7 @@ package http
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -54,9 +55,11 @@ func NewServer(in ServerInput) Server {
 		logger:         in.Logger,
 	}
 
-	router.Use(slash.Remover(http.StatusMovedPermanently))
-	router.Use(content.TypeNegotiator(content.JSON))
-	router.Use(fault.ErrorHandler(nil, customErrorContentType))
+	router.Use(
+		slash.Remover(http.StatusMovedPermanently),
+		content.TypeNegotiator(content.JSON),
+		fault.ErrorHandler(nil, customErrorHandler),
+	)
 
 	server.addCorsMiddleware()
 	server.addRequestIPIntoContext()
@@ -111,16 +114,12 @@ func (s Server) addRequestLogger() {
 	}))
 }
 
-func customErrorContentType(ctx *routing.Context, err error) error {
-	_, ok := err.(ErrorResponse)
-	if ok {
-		ctx.Response.Header.SetContentType(content.JSON)
+func customErrorHandler(ctx *routing.Context, err error) error {
+	var errorResponse ErrorResponse
+	var errorListResponse ErrorListResponse
+	if errors.As(err, &errorResponse) || errors.As(err, &errorListResponse) {
+		return err
 	}
 
-	_, ok = err.(ErrorListResponse)
-	if ok {
-		ctx.Response.Header.SetContentType(content.JSON)
-	}
-
-	return err
+	return NewErrorResponse(ctx, err)
 }
