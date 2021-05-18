@@ -9,27 +9,27 @@ import (
 	routing "github.com/jackwhelpton/fasthttp-routing/v2"
 )
 
-type JWKSCLient interface {
+type jwksCLient interface {
 	GetCerts(ctx context.Context) error
 	RenewCerts(ctx context.Context) error
 	Certs() map[string]string
 }
 
-// UserAuthenticator ...
+// UserAuthenticator structure responsible for handling request authentication
 type UserAuthenticator struct {
 	logger logger
-	jwks   JWKSCLient
+	jwks   jwksCLient
 }
 
-// NewUserAuthenticator ...
-func NewUserAuthenticator(logger logger, jwks JWKSCLient) UserAuthenticator {
+// NewUserAuthenticator creates a new instance of the UserAuthenticator structure
+func NewUserAuthenticator(logger logger, jwks jwksCLient) UserAuthenticator {
 	return UserAuthenticator{
 		logger: logger,
 		jwks:   jwks,
 	}
 }
 
-// Authenticate ...
+// Authenticate is responsible for verify if the request is authenticated
 //
 // It tries to authenticate the token with the certifications on memory,
 // if it fails, the certifications are renewed and the authentication is
