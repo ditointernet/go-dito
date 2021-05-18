@@ -2,7 +2,6 @@ package http
 
 import (
 	"context"
-	"fmt"
 	"strings"
 
 	jwt "github.com/dgrijalva/jwt-go"
@@ -38,8 +37,7 @@ func NewUserAuthenticator(logger logger, jwks JWKSCLient) UserAuthenticator {
 func (ua UserAuthenticator) Authenticate(ctx *routing.Context) error {
 	authHeader := string(ctx.Request.Header.Peek("Authorization"))
 	if len(authHeader) < 7 || strings.ToLower(authHeader[:7]) != "bearer " || authHeader[7:] == "" {
-		// error
-		return nil
+		return errors.New("unauthenticated request").WithKind(errors.KindUnauthenticated)
 	}
 	token := authHeader[7:]
 
@@ -51,8 +49,9 @@ func (ua UserAuthenticator) Authenticate(ctx *routing.Context) error {
 	}
 
 	if err := ua.jwks.RenewCerts(ctx); err != nil {
-		// error on renewing token
-		return nil
+		err = errors.New("error on renewing the certificates").WithKind(errors.KindInternal)
+		ua.logger.Error(ctx, err)
+		return err
 	}
 	certs = ua.jwks.Certs()
 
@@ -62,8 +61,7 @@ func (ua UserAuthenticator) Authenticate(ctx *routing.Context) error {
 		return nil
 	}
 
-	// error invalid token
-	return nil
+	return err
 }
 
 func setUserID(ctx *routing.Context, token *jwt.Token) {
@@ -93,25 +91,4 @@ func verifyJWTSignature(certs map[string]string) func(token *jwt.Token) (interfa
 
 		return result, nil
 	}
-}
-
-func handleAuthenticationError(ctx *routing.Context, logger, err error) {
-	rID, _ := ctx.UserValue("request-id").(string)
-	var errResponse string
-	fmt.Println(rID)
-	// if e, ok := err.(domain.APIError); ok {
-	// 	ctx.SetStatusCode(http.StatusUnauthorized)
-	// 	errResponse = fmt.Sprintf(`{"errors":[{"error":"%s","code":"%s"}]}`, err.Error(), e.Code())
-	// 	// logger.Errorf(infra.LogOptions{TraceID: rID},
-	// 	// 	"token-authentication-error", "error: %s | code: %s", err.Error(), e.Code())
-	// } else {
-	// 	ctx.SetStatusCode(http.StatusInternalServerError)
-	// 	errResponse = `{"errors":[{"error":"internal"}]}`
-	// 	logger.Errorf(infra.LogOptions{TraceID: rID},
-	// 		"token-authentication-error", "internal: %s", err.Error())
-	// }
-
-	ctx.SetContentTypeBytes([]byte("application/json"))
-	ctx.SetBodyString(errResponse)
-	ctx.Abort()
 }
