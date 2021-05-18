@@ -8,11 +8,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ditointernet/go-dito/lib/jwks/client"
+	"github.com/ditointernet/go-dito/lib/http"
 	"github.com/ditointernet/go-dito/lib/jwks/mocks"
-	"github.com/stretchr/testify/assert"
-
 	"github.com/golang/mock/gomock"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestClient_Certs(t *testing.T) {
@@ -56,14 +55,14 @@ func TestClient_RenewCerts(t *testing.T) {
 
 	t.Run("should fail when the certificates fetch return error",
 		withMock(func(t *testing.T, c Client) {
-			httpMock.EXPECT().Get(context.TODO(), gomock.Any()).Return(client.HttpResult{}, errors.New("error"))
+			httpMock.EXPECT().Get(context.TODO(), gomock.Any()).Return(http.HttpResult{}, errors.New("error"))
 
 			assert.EqualError(t, c.RenewCerts(context.TODO()), "error")
 		}))
 
 	t.Run("should update the certificates when the renew process is successful",
 		withMock(func(t *testing.T, c Client) {
-			httpMock.EXPECT().Get(context.TODO(), gomock.Any()).Return(client.HttpResult{
+			httpMock.EXPECT().Get(context.TODO(), gomock.Any()).Return(http.HttpResult{
 				StatusCode: 200,
 				Response:   getBody(),
 			}, nil)
@@ -80,9 +79,9 @@ func TestClient_RenewCerts(t *testing.T) {
 
 	t.Run("should not update the certificates when the renew process is called in the renew threshold",
 		withMock(func(t *testing.T, c Client) {
-			httpMock.EXPECT().Get(context.TODO(), gomock.Any()).Do(func(request client.HttpRequest) (client.HttpResult, error) {
+			httpMock.EXPECT().Get(context.TODO(), gomock.Any()).Do(func(request http.HttpRequest) (http.HttpResult, error) {
 				t.FailNow()
-				return client.HttpResult{}, nil
+				return http.HttpResult{}, nil
 			}).AnyTimes()
 
 			c.renewMinuteThreshold = 5
@@ -107,7 +106,7 @@ func TestClient_NewClient(t *testing.T) {
 
 	t.Run("should fail when the certificates fetch don't receives a Ok http status",
 		withMock(func(t *testing.T) {
-			httpMock.EXPECT().Get(context.TODO(), gomock.Any()).Return(client.HttpResult{StatusCode: 500}, nil)
+			httpMock.EXPECT().Get(context.TODO(), gomock.Any()).Return(http.HttpResult{StatusCode: 500}, nil)
 
 			clientJwks, _ := NewClient("jwksURI", httpMock, 5)
 			err := clientJwks.GetCerts(context.TODO())
@@ -117,7 +116,7 @@ func TestClient_NewClient(t *testing.T) {
 
 	t.Run("should fail when the received certificates couldn't be parsed",
 		withMock(func(t *testing.T) {
-			httpMock.EXPECT().Get(context.TODO(), gomock.Any()).Return(client.HttpResult{
+			httpMock.EXPECT().Get(context.TODO(), gomock.Any()).Return(http.HttpResult{
 				StatusCode: 200,
 				Response:   []byte("0"),
 			}, nil)
@@ -131,7 +130,7 @@ func TestClient_NewClient(t *testing.T) {
 
 	t.Run("should return the certificates when they are received and parsed with success",
 		withMock(func(t *testing.T) {
-			httpMock.EXPECT().Get(context.TODO(), gomock.Any()).Return(client.HttpResult{
+			httpMock.EXPECT().Get(context.TODO(), gomock.Any()).Return(http.HttpResult{
 				StatusCode: 200,
 				Response:   getBody(),
 			}, nil)

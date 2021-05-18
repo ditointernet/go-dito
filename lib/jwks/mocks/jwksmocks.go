@@ -8,7 +8,7 @@ import (
 	context "context"
 	reflect "reflect"
 
-	client "github.com/ditointernet/go-dito/lib/jwks/client"
+	http "github.com/ditointernet/go-dito/lib/http"
 	gomock "github.com/golang/mock/gomock"
 )
 
@@ -36,10 +36,10 @@ func (m *MockHttpClient) EXPECT() *MockHttpClientMockRecorder {
 }
 
 // Delete mocks base method.
-func (m *MockHttpClient) Delete(ctx context.Context, request client.HttpRequest) (client.HttpResult, error) {
+func (m *MockHttpClient) Delete(ctx context.Context, request http.HttpRequest) (http.HttpResult, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Delete", ctx, request)
-	ret0, _ := ret[0].(client.HttpResult)
+	ret0, _ := ret[0].(http.HttpResult)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -51,10 +51,10 @@ func (mr *MockHttpClientMockRecorder) Delete(ctx, request interface{}) *gomock.C
 }
 
 // Get mocks base method.
-func (m *MockHttpClient) Get(ctx context.Context, request client.HttpRequest) (client.HttpResult, error) {
+func (m *MockHttpClient) Get(ctx context.Context, request http.HttpRequest) (http.HttpResult, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Get", ctx, request)
-	ret0, _ := ret[0].(client.HttpResult)
+	ret0, _ := ret[0].(http.HttpResult)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -66,10 +66,10 @@ func (mr *MockHttpClientMockRecorder) Get(ctx, request interface{}) *gomock.Call
 }
 
 // Patch mocks base method.
-func (m *MockHttpClient) Patch(ctx context.Context, request client.HttpRequest) (client.HttpResult, error) {
+func (m *MockHttpClient) Patch(ctx context.Context, request http.HttpRequest) (http.HttpResult, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Patch", ctx, request)
-	ret0, _ := ret[0].(client.HttpResult)
+	ret0, _ := ret[0].(http.HttpResult)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -81,10 +81,10 @@ func (mr *MockHttpClientMockRecorder) Patch(ctx, request interface{}) *gomock.Ca
 }
 
 // Post mocks base method.
-func (m *MockHttpClient) Post(ctx context.Context, request client.HttpRequest) (client.HttpResult, error) {
+func (m *MockHttpClient) Post(ctx context.Context, request http.HttpRequest) (http.HttpResult, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Post", ctx, request)
-	ret0, _ := ret[0].(client.HttpResult)
+	ret0, _ := ret[0].(http.HttpResult)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -96,10 +96,10 @@ func (mr *MockHttpClientMockRecorder) Post(ctx, request interface{}) *gomock.Cal
 }
 
 // PostForm mocks base method.
-func (m *MockHttpClient) PostForm(ctx context.Context, request client.HttpRequest) (client.HttpResult, error) {
+func (m *MockHttpClient) PostForm(ctx context.Context, request http.HttpRequest) (http.HttpResult, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "PostForm", ctx, request)
-	ret0, _ := ret[0].(client.HttpResult)
+	ret0, _ := ret[0].(http.HttpResult)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -111,10 +111,10 @@ func (mr *MockHttpClientMockRecorder) PostForm(ctx, request interface{}) *gomock
 }
 
 // Put mocks base method.
-func (m *MockHttpClient) Put(ctx context.Context, request client.HttpRequest) (client.HttpResult, error) {
+func (m *MockHttpClient) Put(ctx context.Context, request http.HttpRequest) (http.HttpResult, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Put", ctx, request)
-	ret0, _ := ret[0].(client.HttpResult)
+	ret0, _ := ret[0].(http.HttpResult)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
