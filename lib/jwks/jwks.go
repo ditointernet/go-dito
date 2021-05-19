@@ -3,12 +3,12 @@ package jwks
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"sync"
 	"time"
 
-	httpCLient "github.com/ditointernet/go-dito/lib/http"
+	"github.com/ditointernet/go-dito/lib/errors"
+	client "github.com/ditointernet/go-dito/lib/http"
 )
 
 // Client is the structure responsible for handling JWKS certificates
@@ -26,7 +26,6 @@ func NewClient(jwksURI string, http HTTPClient, renewMinuteThreshold int) (*Clie
 	return &Client{
 		jwksURI:              jwksURI,
 		http:                 http,
-		lastRenewTime:        time.Now(),
 		renewMinuteThreshold: renewMinuteThreshold,
 	}, nil
 }
@@ -52,7 +51,6 @@ func (c *Client) RenewCerts(ctx context.Context) error {
 			return err
 		}
 		c.certs = certs
-		c.lastRenewTime = time.Now()
 	}
 	c.mux.Unlock()
 	return nil
@@ -73,12 +71,12 @@ type jwks struct {
 }
 
 func (c Client) fetchCerts(ctx context.Context) (map[string]string, error) {
-	resp, err := c.http.Get(ctx, httpCLient.HTTPRequest{URL: c.jwksURI})
+	resp, err := c.http.Get(ctx, client.HTTPRequest{URL: c.jwksURI})
 	if err != nil {
 		return nil, err
 	}
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("request was not successful. Received status: %d", resp.StatusCode)
+		return nil, errors.New("request was not successful. Received status: %d", resp.StatusCode).WithKind(errors.KindInternal)
 	}
 
 	jwks := jwks{}
@@ -88,6 +86,8 @@ func (c Client) fetchCerts(ctx context.Context) (map[string]string, error) {
 	}
 
 	certs := make(map[string]string)
+	c.lastRenewTime = time.Now()
+
 	for _, k := range jwks.Keys {
 		certs[k.KeyID] = "-----BEGIN CERTIFICATE-----\n" + k.X509Certificate[0] + "\n-----END CERTIFICATE-----"
 	}

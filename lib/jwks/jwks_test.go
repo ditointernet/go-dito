@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"sync"
 	"testing"
 	"time"
@@ -68,13 +69,12 @@ func TestClient_RenewCerts(t *testing.T) {
 			}, nil)
 
 			c.RenewCerts(context.TODO())
-
 			expected := map[string]string{
 				"1": "-----BEGIN CERTIFICATE-----\ntest\n-----END CERTIFICATE-----",
 				"2": "-----BEGIN CERTIFICATE-----\ntest2\n-----END CERTIFICATE-----",
 			}
-
-			assert.Equal(t, expected, c.certs)
+			fmt.Println(c.Certs(), "aaaaaaaaaaaa")
+			assert.Equal(t, expected, c.Certs())
 		}))
 
 	t.Run("should not update the certificates when the renew process is called in the renew threshold",
@@ -138,13 +138,11 @@ func TestClient_NewClient(t *testing.T) {
 			clientJwks, _ := NewClient("jwksURI", httpMock, 5)
 
 			clientJwks.GetCerts(context.TODO())
-
 			expected := map[string]string{
 				"1": "-----BEGIN CERTIFICATE-----\ntest\n-----END CERTIFICATE-----",
 				"2": "-----BEGIN CERTIFICATE-----\ntest2\n-----END CERTIFICATE-----",
 			}
-
-			assert.Equal(t, expected, clientJwks.certs)
+			assert.Equal(t, expected, clientJwks.Certs())
 		}))
 }
 
