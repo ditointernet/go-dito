@@ -1,4 +1,4 @@
-module github.com/ditointernet/go-dito/lib/http/middlewares/authentication
+module github.com/ditointernet/go-dito/lib/http/middleware/authentication
 
 go 1.14
 
