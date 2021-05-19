@@ -9,13 +9,12 @@ import (
 	"time"
 
 	httpCLient "github.com/ditointernet/go-dito/lib/http"
-	"github.com/ditointernet/go-dito/lib/jwks/client"
 )
 
-// Client is the structure responsible for handling the JWKS certificates
+// Client is the structure responsible for handling JWKS certificates
 type Client struct {
 	jwksURI              string
-	http                 client.HttpClient
+	http                 HTTPClient
 	certs                map[string]string
 	lastRenewTime        time.Time
 	renewMinuteThreshold int
@@ -23,7 +22,7 @@ type Client struct {
 }
 
 // NewClient constructs a new JWKS instance
-func NewClient(jwksURI string, http client.HttpClient, renewMinuteThreshold int) (*Client, error) {
+func NewClient(jwksURI string, http HTTPClient, renewMinuteThreshold int) (*Client, error) {
 	return &Client{
 		jwksURI:              jwksURI,
 		http:                 http,

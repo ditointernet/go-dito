@@ -8,7 +8,7 @@ setup:
 
 mock:
 	rm -f mocks/inframocks.go
-	$(GOPATH)/bin/mockgen -source=client/contracts.go -destination=mocks/jwksmocks.go -package=mocks
+	$(GOPATH)/bin/mockgen -source=contracts.go -destination=mocks/jwksmocks.go -package=mocks
 
 test: mock
 	go test ./... -cover

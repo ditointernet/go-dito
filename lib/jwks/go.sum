@@ -6,6 +6,7 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/dgrijalva/jwt-go v3.2.0+incompatible h1:7qlOGliEKZXTDg6OTjfoBKDXWrumCAMpl/TFQ4/5kLM=
 github.com/dgrijalva/jwt-go v3.2.0+incompatible/go.mod h1:E3ru+11k8xSBh+hMPgOLZmtrrCbhqsmaPHjLKYnJCaQ=
+github.com/ditointernet/go-dito v0.0.0-20210518190926-00dce70f85b9 h1:SZTm69vqZiJTKlSBJIEBaDa2B4paqQRb8kglM7b6XwA=
 github.com/ditointernet/go-dito/lib/errors v1.0.0 h1:XiPhbvNOcX2fOvQPn3Odjo0hKn+XAKY+nXEMlBolUV4=
 github.com/ditointernet/go-dito/lib/errors v1.0.0/go.mod h1:8/2xc1U8fC1okV0sSrBbXCah4QntQQVp0pSlyrvh1o4=
 github.com/ditointernet/go-dito/lib/http v1.2.1 h1:VWDC5YUenZNY80wmxIQcHTBDWN2unfjrtUY42qHtfUM=

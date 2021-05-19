@@ -22,7 +22,7 @@ func TestClient_Certs(t *testing.T) {
 
 			runner(t, Client{
 				jwksURI: "jwksURI",
-				http:    mocks.NewMockHttpClient(ctrl),
+				http:    mocks.NewMockHTTPClient(ctrl),
 				certs:   map[string]string{"1": "-----BEGIN CERTIFICATE-----\ntest\n-----END CERTIFICATE-----"},
 			})
 		}
@@ -35,14 +35,14 @@ func TestClient_Certs(t *testing.T) {
 }
 
 func TestClient_RenewCerts(t *testing.T) {
-	var httpMock *mocks.MockHttpClient
+	var httpMock *mocks.MockHTTPClient
 
 	withMock := func(runner func(t *testing.T, c Client)) func(t *testing.T) {
 		return func(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
-			httpMock = mocks.NewMockHttpClient(ctrl)
+			httpMock = mocks.NewMockHTTPClient(ctrl)
 			runner(t, Client{
 				jwksURI:       "jwksURI",
 				http:          httpMock,
@@ -92,14 +92,14 @@ func TestClient_RenewCerts(t *testing.T) {
 }
 
 func TestClient_NewClient(t *testing.T) {
-	var httpMock *mocks.MockHttpClient
+	var httpMock *mocks.MockHTTPClient
 
 	withMock := func(runner func(t *testing.T)) func(t *testing.T) {
 		return func(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
-			httpMock = mocks.NewMockHttpClient(ctrl)
+			httpMock = mocks.NewMockHTTPClient(ctrl)
 			runner(t)
 		}
 	}

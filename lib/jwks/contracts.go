@@ -1,4 +1,4 @@
-package client
+package jwks
 
 import (
 	"context"
@@ -6,8 +6,8 @@ import (
 	"github.com/ditointernet/go-dito/lib/http"
 )
 
-// HttpClient is the public interface of the http client lib
-type HttpClient interface {
+// HTTPClient is the public interface of the http client lib
+type HTTPClient interface {
 	Patch(ctx context.Context, request http.HTTPRequest) (rst http.HTTPResult, err error)
 	Put(ctx context.Context, request http.HTTPRequest) (rst http.HTTPResult, err error)
 	Post(ctx context.Context, request http.HTTPRequest) (rst http.HTTPResult, err error)
