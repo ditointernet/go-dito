@@ -9,7 +9,10 @@ import (
 	routing "github.com/jackwhelpton/fasthttp-routing/v2"
 )
 
-type jwksCLient interface {
+// ContextKeyAccountID is the key used to retrieve and save accountId into the context
+const ContextKeyAccountID string = "account-id"
+
+type jwksClient interface {
 	GetCerts(ctx context.Context) error
 	RenewCerts(ctx context.Context) error
 	Certs() map[string]string
@@ -18,11 +21,11 @@ type jwksCLient interface {
 // UserAuthenticator structure responsible for handling request authentication
 type UserAuthenticator struct {
 	logger logger
-	jwks   jwksCLient
+	jwks   jwksClient
 }
 
 // NewUserAuthenticator creates a new instance of the UserAuthenticator structure
-func NewUserAuthenticator(logger logger, jwks jwksCLient) UserAuthenticator {
+func NewUserAuthenticator(logger logger, jwks jwksClient) UserAuthenticator {
 	return UserAuthenticator{
 		logger: logger,
 		jwks:   jwks,
@@ -45,7 +48,7 @@ func (ua UserAuthenticator) Authenticate(ctx *routing.Context) error {
 	certs := ua.jwks.Certs()
 
 	if parsedToken, err := jwt.Parse(token, verifyJWTSignature(certs)); err == nil {
-		setUserID(ctx, parsedToken)
+		setAccountID(ctx, parsedToken)
 		return nil
 	}
 
@@ -61,16 +64,16 @@ func (ua UserAuthenticator) Authenticate(ctx *routing.Context) error {
 		return NewErrorResponse(ctx, err)
 	}
 
-	setUserID(ctx, parsedToken)
+	setAccountID(ctx, parsedToken)
 	return nil
 }
 
-func setUserID(ctx *routing.Context, token *jwt.Token) {
+func setAccountID(ctx *routing.Context, token *jwt.Token) {
 	claims, _ := token.Claims.(jwt.MapClaims)
 	sub, _ := claims["sub"].(string)
 	// removes auth provider prefix 'auth0|' to get only the user identifier.
-	userID := strings.Split(sub, "|")[1]
-	ctx.SetUserValue("userID", userID)
+	accountID := strings.Split(sub, "|")[1]
+	ctx.SetUserValue(ContextKeyAccountID, accountID)
 }
 
 func verifyJWTSignature(certs map[string]string) func(token *jwt.Token) (interface{}, error) {
