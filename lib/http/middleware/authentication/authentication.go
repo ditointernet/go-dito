@@ -1,4 +1,4 @@
-package http
+package authentication
 
 import (
 	"context"
@@ -6,6 +6,7 @@ import (
 
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/ditointernet/go-dito/lib/errors"
+	"github.com/ditointernet/go-dito/lib/http"
 	routing "github.com/jackwhelpton/fasthttp-routing/v2"
 )
 
@@ -18,15 +19,23 @@ type jwksClient interface {
 	Certs() map[string]string
 }
 
-// UserAuthenticator structure responsible for handling request authentication
-type UserAuthenticator struct {
+type logger interface {
+	Debug(ctx context.Context, msg string, args ...interface{})
+	Info(ctx context.Context, msg string, args ...interface{})
+	Warning(ctx context.Context, msg string, args ...interface{})
+	Error(ctx context.Context, err error)
+	Critical(ctx context.Context, err error)
+}
+
+// AccountAuthenticator structure responsible for handling request authentication
+type AccountAuthenticator struct {
 	logger logger
 	jwks   jwksClient
 }
 
-// NewUserAuthenticator creates a new instance of the UserAuthenticator structure
-func NewUserAuthenticator(logger logger, jwks jwksClient) UserAuthenticator {
-	return UserAuthenticator{
+// NewAccountAuthenticator creates a new instance of the UserAuthenticator structure
+func NewAccountAuthenticator(logger logger, jwks jwksClient) AccountAuthenticator {
+	return AccountAuthenticator{
 		logger: logger,
 		jwks:   jwks,
 	}
@@ -37,11 +46,11 @@ func NewUserAuthenticator(logger logger, jwks jwksClient) UserAuthenticator {
 // It tries to authenticate the token with the certifications on memory,
 // if it fails, the certifications are renewed and the authentication is
 // run again.
-func (ua UserAuthenticator) Authenticate(ctx *routing.Context) error {
+func (ua AccountAuthenticator) Authenticate(ctx *routing.Context) error {
 	authHeader := string(ctx.Request.Header.Peek("Authorization"))
 	if len(authHeader) < 7 || strings.ToLower(authHeader[:7]) != "bearer " || authHeader[7:] == "" {
 		err := errors.New("unauthenticated request").WithKind(errors.KindUnauthenticated)
-		return NewErrorResponse(ctx, err)
+		return http.NewErrorResponse(ctx, err)
 	}
 	token := authHeader[7:]
 
@@ -55,13 +64,13 @@ func (ua UserAuthenticator) Authenticate(ctx *routing.Context) error {
 	if err := ua.jwks.RenewCerts(ctx); err != nil {
 		err = errors.New("error on renewing the certificates").WithKind(errors.KindInternal)
 		ua.logger.Error(ctx, err)
-		return NewErrorResponse(ctx, err)
+		return http.NewErrorResponse(ctx, err)
 	}
 	certs = ua.jwks.Certs()
 
 	parsedToken, err := jwt.Parse(token, verifyJWTSignature(certs))
 	if err != nil {
-		return NewErrorResponse(ctx, err)
+		return http.NewErrorResponse(ctx, err)
 	}
 
 	setAccountID(ctx, parsedToken)

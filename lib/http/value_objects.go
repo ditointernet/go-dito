@@ -148,10 +148,10 @@ func (r ResourceCreatedResponse) WithMessage(msg string, params ...interface{}) 
 // HTTPHeaders is a map containing the relation key=value of the headers used on the http rest request.
 type HTTPHeaders map[string]string
 
-// HTTPQueryParams is a map'containing the relation key=value of the query params used on the http rest request
+// HTTPQueryParams is a map containing the relation key=value of the query params used on the http rest request
 type HTTPQueryParams map[string]string
 
-// HttpRequest are the params used to build a new http rest request
+// HTTPRequest are the params used to build a new http rest request
 type HTTPRequest struct {
 	URL         string
 	Body        []byte
@@ -159,7 +159,7 @@ type HTTPRequest struct {
 	QueryParams HTTPQueryParams
 }
 
-// HttpResult are the params returned from the client HTTP request
+// HTTPResult are the params returned from the client HTTP request
 type HTTPResult struct {
 	StatusCode int
 	Response   []byte
