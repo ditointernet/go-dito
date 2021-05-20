@@ -36,10 +36,10 @@ type AccountAuthenticator struct {
 // NewAccountAuthenticator creates a new instance of the AccountAuthenticator structure
 func NewAccountAuthenticator(logger logger, jwks jwksClient) (AccountAuthenticator, error) {
 	if logger == nil {
-		return AccountAuthenticator{}, errors.New("missing logger dependency").WithKind(errors.KindInvalidInput)
+		return AccountAuthenticator{}, errors.New("missing logger dependency").WithKind(errors.KindInternal)
 	}
 	if jwks == nil {
-		return AccountAuthenticator{}, errors.New("missing jkwks client dependency").WithKind(errors.KindInvalidInput)
+		return AccountAuthenticator{}, errors.New("missing jkwks client dependency").WithKind(errors.KindInternal)
 	}
 	return AccountAuthenticator{
 		logger: logger,
