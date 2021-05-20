@@ -33,12 +33,29 @@ type AccountAuthenticator struct {
 	jwks   jwksClient
 }
 
-// NewAccountAuthenticator creates a new instance of the UserAuthenticator structure
-func NewAccountAuthenticator(logger logger, jwks jwksClient) AccountAuthenticator {
+// NewAccountAuthenticator creates a new instance of the AccountAuthenticator structure
+func NewAccountAuthenticator(logger logger, jwks jwksClient) (AccountAuthenticator, error) {
+	if logger == nil {
+		return AccountAuthenticator{}, errors.New("missing logger dependency").WithKind(errors.KindInvalidInput)
+	}
+	if jwks == nil {
+		return AccountAuthenticator{}, errors.New("missing jkwks client dependency").WithKind(errors.KindInvalidInput)
+	}
 	return AccountAuthenticator{
 		logger: logger,
 		jwks:   jwks,
+	}, nil
+}
+
+// NewAccountAuthenticator create a new AccountAuthenticator
+// It panics if any dependency is not given
+func MustNewAccountAuthenticator(logger logger, jwks jwksClient) AccountAuthenticator {
+	accountAuthenticator, err := NewAccountAuthenticator(logger, jwks)
+	if err != nil {
+		panic(err)
 	}
+
+	return accountAuthenticator
 }
 
 // Authenticate is responsible for verify if the request is authenticated
