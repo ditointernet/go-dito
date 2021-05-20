@@ -47,17 +47,6 @@ func NewAccountAuthenticator(logger logger, jwks jwksClient) (AccountAuthenticat
 	}, nil
 }
 
-// NewAccountAuthenticator create a new AccountAuthenticator
-// It panics if any dependency is not given
-func MustNewAccountAuthenticator(logger logger, jwks jwksClient) AccountAuthenticator {
-	accountAuthenticator, err := NewAccountAuthenticator(logger, jwks)
-	if err != nil {
-		panic(err)
-	}
-
-	return accountAuthenticator
-}
-
 // Authenticate is responsible for verify if the request is authenticated
 //
 // It tries to authenticate the token with the certifications on memory,
