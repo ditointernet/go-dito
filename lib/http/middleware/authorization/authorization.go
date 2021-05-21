@@ -11,11 +11,11 @@ import (
 	routing "github.com/jackwhelpton/fasthttp-routing/v2"
 )
 
-// ContextKeyAllowedStores ...
+// ContextKeyAllowedStores is the context key that get and sets all accounts allowed stores
 const ContextKeyAllowedStores string = "allowed-stores"
 
-// UserAuthorizator middleware
-type UserAuthorizator struct {
+// AccountAuthorizator is the struct responsible for create account authorizarion
+type AccountAuthorizator struct {
 	logger              Logger
 	authorizatorClient  AuthorizatorClient
 	authorizatorTimeout time.Duration
@@ -23,16 +23,16 @@ type UserAuthorizator struct {
 	regoClient          string
 }
 
-// NewUserAuthorizator constructs a new user authorization middleware
-func NewUserAuthorizator(
+// NewAccountAuthorizator constructs a new account authorization middleware
+func NewAccountAuthorizator(
 	logger Logger,
-	opaClient AuthorizatorClient,
+	authClient AuthorizatorClient,
 	authorizatorTimeout time.Duration,
 	regoClient string,
-) (UserAuthorizator, error) {
-	return UserAuthorizator{
+) (AccountAuthorizator, error) {
+	return AccountAuthorizator{
 		logger:              logger,
-		authorizatorClient:  opaClient,
+		authorizatorClient:  authClient,
 		authorizatorTimeout: authorizatorTimeout,
 		regoClient:          regoClient,
 		// Just for allowing mock time
@@ -40,8 +40,8 @@ func NewUserAuthorizator(
 	}, nil
 }
 
-// Authorize authorize request to the user
-func (a UserAuthorizator) Authorize(ctx *routing.Context) error {
+// Authorize is the middleware responsible for calling the auth client and check if user is authorized to make the current request
+func (a AccountAuthorizator) Authorize(ctx *routing.Context) error {
 
 	accountID := ctx.Value(authentication.ContextKeyAccountID)
 	if accountID == nil {

@@ -41,21 +41,21 @@ func TestAuthorize(t *testing.T) {
 	var opa *mocks.MockAuthorizatorClient
 	timeout := 100 * time.Millisecond
 
-	withMock := func(runner func(t *testing.T, m authorization.UserAuthorizator)) func(t *testing.T) {
+	withMock := func(runner func(t *testing.T, m authorization.AccountAuthorizator)) func(t *testing.T) {
 		return func(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
 			logger = mocks.NewMockLogger(ctrl)
 			opa = mocks.NewMockAuthorizatorClient(ctrl)
-			middleware, _ := authorization.NewUserAuthorizator(logger, opa, timeout, "some-client")
+			middleware, _ := authorization.NewAccountAuthorizator(logger, opa, timeout, "some-client")
 
 			runner(t, middleware)
 		}
 	}
 
 	t.Run("should not authorize when there is no user id on context",
-		withMock(func(t *testing.T, m authorization.UserAuthorizator) {
+		withMock(func(t *testing.T, m authorization.AccountAuthorizator) {
 			ctx := newCtxWithUserValues(map[string]interface{}{"brand-id": "any-brand2"})
 
 			logger.EXPECT().Error(gomock.Any(), gomock.Any())
@@ -72,7 +72,7 @@ func TestAuthorize(t *testing.T) {
 		}))
 
 	t.Run("should not authorize when there is no brand id on headers",
-		withMock(func(t *testing.T, m authorization.UserAuthorizator) {
+		withMock(func(t *testing.T, m authorization.AccountAuthorizator) {
 			ctx := newCtxWithUserValues(map[string]interface{}{authentication.ContextKeyAccountID: "123456"})
 
 			logger.EXPECT().Error(gomock.Any(), gomock.Any())
@@ -89,7 +89,7 @@ func TestAuthorize(t *testing.T) {
 		}))
 
 	t.Run("should return error when opa client returns an error",
-		withMock(func(t *testing.T, m authorization.UserAuthorizator) {
+		withMock(func(t *testing.T, m authorization.AccountAuthorizator) {
 			ctx := newCtxWithUserValues(map[string]interface{}{
 				authentication.ContextKeyAccountID: "123456",
 				"brand-id":                         "any-brand3",
@@ -114,7 +114,7 @@ func TestAuthorize(t *testing.T) {
 		}))
 
 	t.Run("should return error when opa client returns an empty result",
-		withMock(func(t *testing.T, m authorization.UserAuthorizator) {
+		withMock(func(t *testing.T, m authorization.AccountAuthorizator) {
 			ctx := newCtxWithUserValues(map[string]interface{}{
 				authentication.ContextKeyAccountID: "123456",
 				"brand-id":                         "any-brand3",
@@ -139,7 +139,7 @@ func TestAuthorize(t *testing.T) {
 		}))
 
 	t.Run("should return error when allow response is not found",
-		withMock(func(t *testing.T, m authorization.UserAuthorizator) {
+		withMock(func(t *testing.T, m authorization.AccountAuthorizator) {
 			ctx := newCtxWithUserValues(map[string]interface{}{
 				authentication.ContextKeyAccountID: "123456",
 				"brand-id":                         "any-brand3",
@@ -164,7 +164,7 @@ func TestAuthorize(t *testing.T) {
 		}))
 
 	t.Run("should not authorize unauthorized users",
-		withMock(func(t *testing.T, m authorization.UserAuthorizator) {
+		withMock(func(t *testing.T, m authorization.AccountAuthorizator) {
 			ctx := newCtxWithUserValues(map[string]interface{}{
 				authentication.ContextKeyAccountID: "123456",
 				"brand-id":                         "any-brand4",
@@ -191,7 +191,7 @@ func TestAuthorize(t *testing.T) {
 		}))
 
 	t.Run("should authorize user when the user exists in the bundle data",
-		withMock(func(t *testing.T, m authorization.UserAuthorizator) {
+		withMock(func(t *testing.T, m authorization.AccountAuthorizator) {
 			ctx := newCtxWithUserValues(map[string]interface{}{
 				authentication.ContextKeyAccountID: "123456",
 				"brand-id":                         "any-brand1",
@@ -212,7 +212,7 @@ func TestAuthorize(t *testing.T) {
 		}))
 
 	t.Run("should set filter values when they are found",
-		withMock(func(t *testing.T, m authorization.UserAuthorizator) {
+		withMock(func(t *testing.T, m authorization.AccountAuthorizator) {
 			logger.EXPECT().Info(gomock.Any(), gomock.Any())
 
 			ctx := newCtxWithUserValues(map[string]interface{}{
