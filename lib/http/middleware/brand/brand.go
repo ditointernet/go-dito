@@ -31,7 +31,7 @@ func (ua BrandFiller) Fill(ctx *routing.Context) error {
 	brandID := string(ctx.Request.Header.Peek(ContextKeyBrandID))
 	brandID = strings.TrimSpace(brandID)
 	if len(brandID) == 0 {
-		err := errors.New("Brand is not present on request headers").WithKind(errors.KindUnauthenticated)
+		err := errors.New("Brand is not present on request headers").WithKind(errors.KindUnauthorized)
 		ua.logger.Error(ctx, err)
 		return err
 	}
