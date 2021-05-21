@@ -68,7 +68,6 @@ func TestAuthorize(t *testing.T) {
 			var e ditoError.CustomError
 			assert.True(t, errors.As(err, &e))
 			assert.EqualError(t, e, "missing user id")
-			// assert.Equal(t, http.StatusForbidden, e.StatusCode())
 		}))
 
 	t.Run("should not authorize when there is no brand id on headers",
@@ -85,8 +84,23 @@ func TestAuthorize(t *testing.T) {
 			var e ditoError.CustomError
 			assert.True(t, errors.As(err, &e))
 			assert.EqualError(t, e, "missing brand id")
-			// assert.Equal(t, http.StatusForbidden, e.StatusCode())
 		}))
+	t.Run("should not authorize when there isn't a rego client",
+		func(t *testing.T) {
+			middleware, _ := authorization.NewAccountAuthorizator(logger, opa, timeout, "")
+			ctx := newCtxWithUserValues(map[string]interface{}{})
+
+			logger.EXPECT().Error(gomock.Any(), gomock.Any())
+
+			err := middleware.Authorize(ctx)
+			if err == nil {
+				t.Fatal("expected error was not found")
+			}
+
+			var e ditoError.CustomError
+			assert.True(t, errors.As(err, &e))
+			assert.EqualError(t, e, "missing rego client")
+		})
 
 	t.Run("should return error when opa client returns an error",
 		withMock(func(t *testing.T, m authorization.AccountAuthorizator) {

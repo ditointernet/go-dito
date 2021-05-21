@@ -42,7 +42,11 @@ func NewAccountAuthorizator(
 
 // Authorize is the middleware responsible for calling the auth client and check if user is authorized to make the current request
 func (a AccountAuthorizator) Authorize(ctx *routing.Context) error {
-
+	if a.regoClient == "" {
+		err := errors.New("missing rego client").WithKind(errors.KindInvalidInput)
+		a.logger.Error(ctx, err)
+		return err
+	}
 	accountID := ctx.Value(authentication.ContextKeyAccountID)
 	if accountID == nil {
 		err := errors.New("missing user id").WithKind(errors.KindInternal)
