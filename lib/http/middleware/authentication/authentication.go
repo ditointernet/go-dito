@@ -2,7 +2,6 @@ package authentication
 
 import (
 	"context"
-	"fmt"
 	"strings"
 
 	jwt "github.com/dgrijalva/jwt-go"
@@ -77,7 +76,6 @@ func setAccountID(ctx *routing.Context, token *jwt.Token) {
 	sub, _ := claims["sub"].(string)
 	// removes auth provider prefix 'auth0|' to get only the user identifier.
 	accountID := strings.Split(sub, "|")[1]
-	fmt.Println(accountID)
 	ctx.SetUserValue(ContextKeyAccountID, accountID)
 }
 
