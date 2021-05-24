@@ -18,10 +18,11 @@ const ContextKeyAllowedStores string = "allowed-stores"
 type ResourseFilter int
 
 const (
-	// StoreFilter means a numeric representation of the ID of the segment in database
+	// StoreFilter means a numeric representation of the stores filter
 	StoreFilter ResourseFilter = iota
 )
 
+// String returns the equivalent string of the Resource filters integers
 func (s ResourseFilter) String() string {
 	return [...]string{
 		"stores",
@@ -88,7 +89,6 @@ func (a AccountAuthorizator) Authorize(ctx *routing.Context) error {
 		"brand_id": brandID,
 		"user_id":  accountID,
 	}
-	fmt.Println(a.ResourseFilters)
 	if len(a.ResourseFilters) > 0 {
 		query = query + ` ; filter := data.authz.filter_values`
 		resourceInput["filter_type"] = a.ResourseFilters[0].String()
