@@ -2,6 +2,7 @@ package authentication
 
 import (
 	"context"
+	"fmt"
 	"strings"
 
 	jwt "github.com/dgrijalva/jwt-go"
@@ -12,20 +13,6 @@ import (
 
 // ContextKeyAccountID is the key used to retrieve and save accountId into the context
 const ContextKeyAccountID string = "account-id"
-
-type jwksClient interface {
-	GetCerts(ctx context.Context) error
-	RenewCerts(ctx context.Context) error
-	Certs() map[string]string
-}
-
-type logger interface {
-	Debug(ctx context.Context, msg string, args ...interface{})
-	Info(ctx context.Context, msg string, args ...interface{})
-	Warning(ctx context.Context, msg string, args ...interface{})
-	Error(ctx context.Context, err error)
-	Critical(ctx context.Context, err error)
-}
 
 // AccountAuthenticator structure responsible for handling request authentication
 type AccountAuthenticator struct {
@@ -56,13 +43,14 @@ func (ua AccountAuthenticator) Authenticate(ctx *routing.Context) error {
 	authHeader := string(ctx.Request.Header.Peek("Authorization"))
 	if len(authHeader) < 7 || strings.ToLower(authHeader[:7]) != "bearer " || authHeader[7:] == "" {
 		err := errors.New("unauthenticated request").WithKind(errors.KindUnauthenticated)
+		ua.logger.Error(ctx, err)
 		return http.NewErrorResponse(ctx, err)
 	}
 	token := authHeader[7:]
 
 	certs := ua.jwks.Certs()
-
-	if parsedToken, err := jwt.Parse(token, verifyJWTSignature(certs)); err == nil {
+	parsedToken, err := jwt.Parse(token, ua.verifyJWTSignature(ctx, certs))
+	if err == nil {
 		setAccountID(ctx, parsedToken)
 		return nil
 	}
@@ -74,8 +62,9 @@ func (ua AccountAuthenticator) Authenticate(ctx *routing.Context) error {
 	}
 	certs = ua.jwks.Certs()
 
-	parsedToken, err := jwt.Parse(token, verifyJWTSignature(certs))
+	parsedToken, err = jwt.Parse(token, ua.verifyJWTSignature(ctx, certs))
 	if err != nil {
+		ua.logger.Error(ctx, err)
 		return http.NewErrorResponse(ctx, err)
 	}
 
@@ -88,24 +77,27 @@ func setAccountID(ctx *routing.Context, token *jwt.Token) {
 	sub, _ := claims["sub"].(string)
 	// removes auth provider prefix 'auth0|' to get only the user identifier.
 	accountID := strings.Split(sub, "|")[1]
+	fmt.Println(accountID)
 	ctx.SetUserValue(ContextKeyAccountID, accountID)
 }
 
-func verifyJWTSignature(certs map[string]string) func(token *jwt.Token) (interface{}, error) {
+func (ua AccountAuthenticator) verifyJWTSignature(ctx context.Context, certs map[string]string) func(token *jwt.Token) (interface{}, error) {
 	return func(token *jwt.Token) (interface{}, error) {
 		kid, ok := token.Header["kid"].(string)
 		if !ok {
-			return nil, errors.New("token's kid header not found").WithKind(errors.KindUnauthenticated)
+			err := errors.New("token's kid header not found").WithKind(errors.KindUnauthenticated)
+			return nil, err
 		}
-
 		cert, ok := certs[kid]
 		if !ok {
-			return nil, errors.New("cert key not found").WithKind(errors.KindUnauthenticated)
+			err := errors.New("cert key not found").WithKind(errors.KindUnauthenticated)
+			return nil, err
 		}
 
 		result, err := jwt.ParseRSAPublicKeyFromPEM([]byte(cert))
 		if err != nil {
-			return nil, errors.New("error trying to validate signature").WithKind(errors.KindInternal)
+			err := errors.New("error trying to validate signature").WithKind(errors.KindInternal)
+			return nil, err
 		}
 
 		return result, nil
