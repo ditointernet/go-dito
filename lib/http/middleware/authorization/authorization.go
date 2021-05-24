@@ -8,6 +8,7 @@ import (
 
 	"github.com/ditointernet/go-dito/lib/errors"
 	"github.com/ditointernet/go-dito/lib/http/middleware/authentication"
+	"github.com/ditointernet/go-dito/lib/http/middleware/brand"
 	routing "github.com/jackwhelpton/fasthttp-routing/v2"
 )
 
@@ -82,7 +83,7 @@ func (a AccountAuthorizator) Authorize(ctx *routing.Context) error {
 		return err
 	}
 	// todo get brand id from package brand id
-	brandID := ctx.Value("brand-id")
+	brandID := ctx.Value(brand.ContextKeyBrandID)
 	if brandID == nil {
 		err := errors.New("missing brand id")
 		a.logger.Error(ctx, err)

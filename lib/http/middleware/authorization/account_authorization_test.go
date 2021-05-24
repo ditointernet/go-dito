@@ -10,6 +10,7 @@ import (
 	ditoError "github.com/ditointernet/go-dito/lib/errors"
 	"github.com/ditointernet/go-dito/lib/http/middleware/authentication"
 	"github.com/ditointernet/go-dito/lib/http/middleware/authorization/mocks"
+	"github.com/ditointernet/go-dito/lib/http/middleware/brand"
 	opaLib "github.com/ditointernet/go-dito/lib/opa"
 	"github.com/golang/mock/gomock"
 	routing "github.com/jackwhelpton/fasthttp-routing/v2"
@@ -92,7 +93,7 @@ func TestAuthorize(t *testing.T) {
 
 	t.Run("should not authorize when there is no user id on context",
 		withMock(func(t *testing.T, m AccountAuthorizator) {
-			ctx := newCtxWithUserValues(map[string]interface{}{"brand-id": "any-brand2"})
+			ctx := newCtxWithUserValues(map[string]interface{}{brand.ContextKeyBrandID: "any-brand2"})
 
 			logger.EXPECT().Error(gomock.Any(), gomock.Any())
 
@@ -126,7 +127,7 @@ func TestAuthorize(t *testing.T) {
 		withMock(func(t *testing.T, m AccountAuthorizator) {
 			ctx := newCtxWithUserValues(map[string]interface{}{
 				authentication.ContextKeyAccountID: "123456",
-				"brand-id":                         "any-brand3",
+				brand.ContextKeyBrandID:            "any-brand3",
 			})
 			now, _ := time.Parse(time.RFC3339, "2020-01-30T03:00:00Z")
 			expectedCtx, cancel := context.WithDeadline(ctx, now.Add(timeout))
@@ -151,7 +152,7 @@ func TestAuthorize(t *testing.T) {
 		withMock(func(t *testing.T, m AccountAuthorizator) {
 			ctx := newCtxWithUserValues(map[string]interface{}{
 				authentication.ContextKeyAccountID: "123456",
-				"brand-id":                         "any-brand3",
+				brand.ContextKeyBrandID:            "any-brand3",
 			})
 			now, _ := time.Parse(time.RFC3339, "2020-01-30T03:00:00Z")
 			expectedCtx, cancel := context.WithDeadline(ctx, now.Add(timeout))
@@ -176,7 +177,7 @@ func TestAuthorize(t *testing.T) {
 		withMock(func(t *testing.T, m AccountAuthorizator) {
 			ctx := newCtxWithUserValues(map[string]interface{}{
 				authentication.ContextKeyAccountID: "123456",
-				"brand-id":                         "any-brand3",
+				brand.ContextKeyBrandID:            "any-brand3",
 			})
 			now, _ := time.Parse(time.RFC3339, "2020-01-30T03:00:00Z")
 			expectedCtx, cancel := context.WithDeadline(ctx, now.Add(timeout))
@@ -201,7 +202,7 @@ func TestAuthorize(t *testing.T) {
 		withMock(func(t *testing.T, m AccountAuthorizator) {
 			ctx := newCtxWithUserValues(map[string]interface{}{
 				authentication.ContextKeyAccountID: "123456",
-				"brand-id":                         "any-brand4",
+				brand.ContextKeyBrandID:            "any-brand4",
 			})
 			now, _ := time.Parse(time.RFC3339, "2020-01-30T03:00:00Z")
 			expectedCtx, cancel := context.WithDeadline(ctx, now.Add(timeout))
@@ -228,7 +229,7 @@ func TestAuthorize(t *testing.T) {
 		withMock(func(t *testing.T, m AccountAuthorizator) {
 			ctx := newCtxWithUserValues(map[string]interface{}{
 				authentication.ContextKeyAccountID: "123456",
-				"brand-id":                         "any-brand1",
+				brand.ContextKeyBrandID:            "any-brand1",
 			})
 			timeout := 100 * time.Millisecond
 			now, _ := time.Parse(time.RFC3339, "2020-01-30T03:00:00Z")
@@ -266,7 +267,7 @@ func TestAuthorize_WithFIlters(t *testing.T) {
 
 	t.Run("should not authorize when there is no user id on context",
 		withMock(func(t *testing.T, m AccountAuthorizator) {
-			ctx := newCtxWithUserValues(map[string]interface{}{"brand-id": "any-brand2"})
+			ctx := newCtxWithUserValues(map[string]interface{}{brand.ContextKeyBrandID: "any-brand2"})
 
 			logger.EXPECT().Error(gomock.Any(), gomock.Any())
 
@@ -300,7 +301,7 @@ func TestAuthorize_WithFIlters(t *testing.T) {
 		withMock(func(t *testing.T, m AccountAuthorizator) {
 			ctx := newCtxWithUserValues(map[string]interface{}{
 				authentication.ContextKeyAccountID: "123456",
-				"brand-id":                         "any-brand3",
+				brand.ContextKeyBrandID:            "any-brand3",
 			})
 			now, _ := time.Parse(time.RFC3339, "2020-01-30T03:00:00Z")
 			expectedCtx, cancel := context.WithDeadline(ctx, now.Add(timeout))
@@ -325,7 +326,7 @@ func TestAuthorize_WithFIlters(t *testing.T) {
 		withMock(func(t *testing.T, m AccountAuthorizator) {
 			ctx := newCtxWithUserValues(map[string]interface{}{
 				authentication.ContextKeyAccountID: "123456",
-				"brand-id":                         "any-brand3",
+				brand.ContextKeyBrandID:            "any-brand3",
 			})
 			now, _ := time.Parse(time.RFC3339, "2020-01-30T03:00:00Z")
 			expectedCtx, cancel := context.WithDeadline(ctx, now.Add(timeout))
@@ -350,7 +351,7 @@ func TestAuthorize_WithFIlters(t *testing.T) {
 		withMock(func(t *testing.T, m AccountAuthorizator) {
 			ctx := newCtxWithUserValues(map[string]interface{}{
 				authentication.ContextKeyAccountID: "123456",
-				"brand-id":                         "any-brand3",
+				brand.ContextKeyBrandID:            "any-brand3",
 			})
 			now, _ := time.Parse(time.RFC3339, "2020-01-30T03:00:00Z")
 			expectedCtx, cancel := context.WithDeadline(ctx, now.Add(timeout))
@@ -375,7 +376,7 @@ func TestAuthorize_WithFIlters(t *testing.T) {
 		withMock(func(t *testing.T, m AccountAuthorizator) {
 			ctx := newCtxWithUserValues(map[string]interface{}{
 				authentication.ContextKeyAccountID: "123456",
-				"brand-id":                         "any-brand4",
+				brand.ContextKeyBrandID:            "any-brand4",
 			})
 			now, _ := time.Parse(time.RFC3339, "2020-01-30T03:00:00Z")
 			expectedCtx, cancel := context.WithDeadline(ctx, now.Add(timeout))
@@ -402,7 +403,7 @@ func TestAuthorize_WithFIlters(t *testing.T) {
 		withMock(func(t *testing.T, m AccountAuthorizator) {
 			ctx := newCtxWithUserValues(map[string]interface{}{
 				authentication.ContextKeyAccountID: "123456",
-				"brand-id":                         "any-brand1",
+				brand.ContextKeyBrandID:            "any-brand1",
 			})
 			timeout := 100 * time.Millisecond
 			now, _ := time.Parse(time.RFC3339, "2020-01-30T03:00:00Z")
@@ -425,7 +426,7 @@ func TestAuthorize_WithFIlters(t *testing.T) {
 
 			ctx := newCtxWithUserValues(map[string]interface{}{
 				authentication.ContextKeyAccountID: "123456",
-				"brand-id":                         "any-brand1",
+				brand.ContextKeyBrandID:            "any-brand1",
 			})
 
 			opa.EXPECT().
