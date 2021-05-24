@@ -8,35 +8,35 @@ import (
 	context "context"
 	reflect "reflect"
 
-	authorization "github.com/ditointernet/go-dito/lib/http/middleware/authorization"
+	opa "github.com/ditointernet/go-dito/lib/opa"
 	gomock "github.com/golang/mock/gomock"
 )
 
-// MockAuthorizatorClient is a mock of AuthorizatorClient interface.
-type MockAuthorizatorClient struct {
+// MockauthorizatorClient is a mock of authorizatorClient interface.
+type MockauthorizatorClient struct {
 	ctrl     *gomock.Controller
-	recorder *MockAuthorizatorClientMockRecorder
+	recorder *MockauthorizatorClientMockRecorder
 }
 
-// MockAuthorizatorClientMockRecorder is the mock recorder for MockAuthorizatorClient.
-type MockAuthorizatorClientMockRecorder struct {
-	mock *MockAuthorizatorClient
+// MockauthorizatorClientMockRecorder is the mock recorder for MockauthorizatorClient.
+type MockauthorizatorClientMockRecorder struct {
+	mock *MockauthorizatorClient
 }
 
-// NewMockAuthorizatorClient creates a new mock instance.
-func NewMockAuthorizatorClient(ctrl *gomock.Controller) *MockAuthorizatorClient {
-	mock := &MockAuthorizatorClient{ctrl: ctrl}
-	mock.recorder = &MockAuthorizatorClientMockRecorder{mock}
+// NewMockauthorizatorClient creates a new mock instance.
+func NewMockauthorizatorClient(ctrl *gomock.Controller) *MockauthorizatorClient {
+	mock := &MockauthorizatorClient{ctrl: ctrl}
+	mock.recorder = &MockauthorizatorClientMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockAuthorizatorClient) EXPECT() *MockAuthorizatorClientMockRecorder {
+func (m *MockauthorizatorClient) EXPECT() *MockauthorizatorClientMockRecorder {
 	return m.recorder
 }
 
 // DecideIfAllowed mocks base method.
-func (m *MockAuthorizatorClient) DecideIfAllowed(ctx context.Context, regoQuery, method, path, brandID, userID string) (bool, error) {
+func (m *MockauthorizatorClient) DecideIfAllowed(ctx context.Context, regoQuery, method, path, brandID, userID string) (bool, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DecideIfAllowed", ctx, regoQuery, method, path, brandID, userID)
 	ret0, _ := ret[0].(bool)
@@ -45,63 +45,63 @@ func (m *MockAuthorizatorClient) DecideIfAllowed(ctx context.Context, regoQuery,
 }
 
 // DecideIfAllowed indicates an expected call of DecideIfAllowed.
-func (mr *MockAuthorizatorClientMockRecorder) DecideIfAllowed(ctx, regoQuery, method, path, brandID, userID interface{}) *gomock.Call {
+func (mr *MockauthorizatorClientMockRecorder) DecideIfAllowed(ctx, regoQuery, method, path, brandID, userID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DecideIfAllowed", reflect.TypeOf((*MockAuthorizatorClient)(nil).DecideIfAllowed), ctx, regoQuery, method, path, brandID, userID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DecideIfAllowed", reflect.TypeOf((*MockauthorizatorClient)(nil).DecideIfAllowed), ctx, regoQuery, method, path, brandID, userID)
 }
 
 // ExecuteQuery mocks base method.
-func (m *MockAuthorizatorClient) ExecuteQuery(ctx context.Context, query string, input map[string]interface{}) (authorization.AuthQueryResult, error) {
+func (m *MockauthorizatorClient) ExecuteQuery(ctx context.Context, query string, input map[string]interface{}) (opa.AuthorizationResult, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ExecuteQuery", ctx, query, input)
-	ret0, _ := ret[0].(authorization.AuthQueryResult)
+	ret0, _ := ret[0].(opa.AuthorizationResult)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // ExecuteQuery indicates an expected call of ExecuteQuery.
-func (mr *MockAuthorizatorClientMockRecorder) ExecuteQuery(ctx, query, input interface{}) *gomock.Call {
+func (mr *MockauthorizatorClientMockRecorder) ExecuteQuery(ctx, query, input interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExecuteQuery", reflect.TypeOf((*MockAuthorizatorClient)(nil).ExecuteQuery), ctx, query, input)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExecuteQuery", reflect.TypeOf((*MockauthorizatorClient)(nil).ExecuteQuery), ctx, query, input)
 }
 
-// MockLogger is a mock of Logger interface.
-type MockLogger struct {
+// Mocklogger is a mock of logger interface.
+type Mocklogger struct {
 	ctrl     *gomock.Controller
-	recorder *MockLoggerMockRecorder
+	recorder *MockloggerMockRecorder
 }
 
-// MockLoggerMockRecorder is the mock recorder for MockLogger.
-type MockLoggerMockRecorder struct {
-	mock *MockLogger
+// MockloggerMockRecorder is the mock recorder for Mocklogger.
+type MockloggerMockRecorder struct {
+	mock *Mocklogger
 }
 
-// NewMockLogger creates a new mock instance.
-func NewMockLogger(ctrl *gomock.Controller) *MockLogger {
-	mock := &MockLogger{ctrl: ctrl}
-	mock.recorder = &MockLoggerMockRecorder{mock}
+// NewMocklogger creates a new mock instance.
+func NewMocklogger(ctrl *gomock.Controller) *Mocklogger {
+	mock := &Mocklogger{ctrl: ctrl}
+	mock.recorder = &MockloggerMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockLogger) EXPECT() *MockLoggerMockRecorder {
+func (m *Mocklogger) EXPECT() *MockloggerMockRecorder {
 	return m.recorder
 }
 
 // Critical mocks base method.
-func (m *MockLogger) Critical(ctx context.Context, err error) {
+func (m *Mocklogger) Critical(ctx context.Context, err error) {
 	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "Critical", ctx, err)
 }
 
 // Critical indicates an expected call of Critical.
-func (mr *MockLoggerMockRecorder) Critical(ctx, err interface{}) *gomock.Call {
+func (mr *MockloggerMockRecorder) Critical(ctx, err interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Critical", reflect.TypeOf((*MockLogger)(nil).Critical), ctx, err)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Critical", reflect.TypeOf((*Mocklogger)(nil).Critical), ctx, err)
 }
 
 // Debug mocks base method.
-func (m *MockLogger) Debug(ctx context.Context, msg string, args ...interface{}) {
+func (m *Mocklogger) Debug(ctx context.Context, msg string, args ...interface{}) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, msg}
 	for _, a := range args {
@@ -111,26 +111,26 @@ func (m *MockLogger) Debug(ctx context.Context, msg string, args ...interface{})
 }
 
 // Debug indicates an expected call of Debug.
-func (mr *MockLoggerMockRecorder) Debug(ctx, msg interface{}, args ...interface{}) *gomock.Call {
+func (mr *MockloggerMockRecorder) Debug(ctx, msg interface{}, args ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{ctx, msg}, args...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Debug", reflect.TypeOf((*MockLogger)(nil).Debug), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Debug", reflect.TypeOf((*Mocklogger)(nil).Debug), varargs...)
 }
 
 // Error mocks base method.
-func (m *MockLogger) Error(ctx context.Context, err error) {
+func (m *Mocklogger) Error(ctx context.Context, err error) {
 	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "Error", ctx, err)
 }
 
 // Error indicates an expected call of Error.
-func (mr *MockLoggerMockRecorder) Error(ctx, err interface{}) *gomock.Call {
+func (mr *MockloggerMockRecorder) Error(ctx, err interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Error", reflect.TypeOf((*MockLogger)(nil).Error), ctx, err)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Error", reflect.TypeOf((*Mocklogger)(nil).Error), ctx, err)
 }
 
 // Info mocks base method.
-func (m *MockLogger) Info(ctx context.Context, msg string, args ...interface{}) {
+func (m *Mocklogger) Info(ctx context.Context, msg string, args ...interface{}) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, msg}
 	for _, a := range args {
@@ -140,14 +140,14 @@ func (m *MockLogger) Info(ctx context.Context, msg string, args ...interface{}) 
 }
 
 // Info indicates an expected call of Info.
-func (mr *MockLoggerMockRecorder) Info(ctx, msg interface{}, args ...interface{}) *gomock.Call {
+func (mr *MockloggerMockRecorder) Info(ctx, msg interface{}, args ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{ctx, msg}, args...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Info", reflect.TypeOf((*MockLogger)(nil).Info), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Info", reflect.TypeOf((*Mocklogger)(nil).Info), varargs...)
 }
 
 // Warning mocks base method.
-func (m *MockLogger) Warning(ctx context.Context, msg string, args ...interface{}) {
+func (m *Mocklogger) Warning(ctx context.Context, msg string, args ...interface{}) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, msg}
 	for _, a := range args {
@@ -157,8 +157,8 @@ func (m *MockLogger) Warning(ctx context.Context, msg string, args ...interface{
 }
 
 // Warning indicates an expected call of Warning.
-func (mr *MockLoggerMockRecorder) Warning(ctx, msg interface{}, args ...interface{}) *gomock.Call {
+func (mr *MockloggerMockRecorder) Warning(ctx, msg interface{}, args ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{ctx, msg}, args...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Warning", reflect.TypeOf((*MockLogger)(nil).Warning), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Warning", reflect.TypeOf((*Mocklogger)(nil).Warning), varargs...)
 }

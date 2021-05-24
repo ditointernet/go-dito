@@ -31,8 +31,8 @@ func (s ResourseFilter) String() string {
 
 // AccountAuthorizator is the struct responsible for create account authorizarion
 type AccountAuthorizator struct {
-	logger              Logger
-	authorizatorClient  AuthorizatorClient
+	logger              logger
+	authorizatorClient  authorizatorClient
 	authorizatorTimeout time.Duration
 	Now                 func() time.Time
 	resourceName        string
@@ -41,12 +41,27 @@ type AccountAuthorizator struct {
 
 // NewAccountAuthorizator constructs a new account authorization middleware
 func NewAccountAuthorizator(
-	logger Logger,
-	authClient AuthorizatorClient,
+	logger logger,
+	authClient authorizatorClient,
 	authorizatorTimeout time.Duration,
 	resourceName string,
 	ResourseFilters []ResourseFilter,
 ) (AccountAuthorizator, error) {
+	if resourceName == "" {
+		err := errors.New("missing resource name").WithKind(errors.KindInternal)
+		return AccountAuthorizator{}, err
+	}
+
+	if authClient == nil {
+		err := errors.New("missing auth client").WithKind(errors.KindInternal)
+		return AccountAuthorizator{}, err
+	}
+
+	if logger == nil {
+		err := errors.New("missing logger").WithKind(errors.KindInternal)
+		return AccountAuthorizator{}, err
+	}
+
 	return AccountAuthorizator{
 		logger:              logger,
 		authorizatorClient:  authClient,
@@ -60,21 +75,16 @@ func NewAccountAuthorizator(
 
 // Authorize is the middleware responsible for calling the auth client and check if user is authorized to make the current request
 func (a AccountAuthorizator) Authorize(ctx *routing.Context) error {
-	if a.resourceName == "" {
-		err := errors.New("missing resource name").WithKind(errors.KindInvalidInput)
-		a.logger.Error(ctx, err)
-		return err
-	}
 	accountID := ctx.Value(authentication.ContextKeyAccountID)
 	if accountID == nil {
-		err := errors.New("missing user id").WithKind(errors.KindInternal)
+		err := errors.New("missing user id")
 		a.logger.Error(ctx, err)
 		return err
 	}
 	// todo get brand id from package brand id
 	brandID := ctx.Value("brand-id")
 	if brandID == nil {
-		err := errors.New("missing brand id").WithKind(errors.KindInternal)
+		err := errors.New("missing brand id")
 		a.logger.Error(ctx, err)
 		return err
 	}
@@ -118,18 +128,20 @@ func (a AccountAuthorizator) Authorize(ctx *routing.Context) error {
 		return err
 	}
 
-	filterValues, _ := result[0]["filter"].([]interface{})
-	var allowedStores []string
+	if len(a.ResourseFilters) > 0 {
+		filterValues, _ := result[0]["filter"].([]interface{})
+		var allowedStores []string
 
-	for _, f := range filterValues {
-		store, ok := f.(string)
-		if ok {
-			allowedStores = append(allowedStores, store)
+		for _, f := range filterValues {
+			store, ok := f.(string)
+			if ok {
+				allowedStores = append(allowedStores, store)
+			}
 		}
+
+		ctx.SetUserValue(ContextKeyAllowedStores, allowedStores)
 	}
 
-	ctx.SetUserValue(ContextKeyAllowedStores, allowedStores)
-
-	a.logger.Info(ctx, "Authorization decision - accountID: %s with brandID %s access granted")
+	a.logger.Info(ctx, "Authorization decision - accountID: %s with brandID %s access was granted")
 	return nil
 }

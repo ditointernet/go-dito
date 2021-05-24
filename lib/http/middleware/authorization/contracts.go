@@ -1,16 +1,17 @@
 package authorization
 
-import "context"
+import (
+	"context"
 
-// AuthQueryResult ...
-type AuthQueryResult []map[string]interface{}
+	"github.com/ditointernet/go-dito/lib/opa"
+)
 
-type AuthorizatorClient interface {
+type authorizatorClient interface {
 	DecideIfAllowed(ctx context.Context, regoQuery string, method, path, brandID, userID string) (bool, error)
-	ExecuteQuery(ctx context.Context, query string, input map[string]interface{}) (AuthQueryResult, error)
+	ExecuteQuery(ctx context.Context, query string, input map[string]interface{}) (opa.AuthorizationResult, error)
 }
 
-type Logger interface {
+type logger interface {
 	Debug(ctx context.Context, msg string, args ...interface{})
 	Info(ctx context.Context, msg string, args ...interface{})
 	Warning(ctx context.Context, msg string, args ...interface{})
