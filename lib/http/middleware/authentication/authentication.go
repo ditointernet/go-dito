@@ -83,19 +83,16 @@ func (ua AccountAuthenticator) verifyJWTSignature(ctx context.Context, certs map
 	return func(token *jwt.Token) (interface{}, error) {
 		kid, ok := token.Header["kid"].(string)
 		if !ok {
-			err := errors.New("token's kid header not found").WithKind(errors.KindUnauthenticated)
-			return nil, err
+			return nil, errors.New("token's kid header not found").WithKind(errors.KindUnauthenticated)
 		}
 		cert, ok := certs[kid]
 		if !ok {
-			err := errors.New("cert key not found").WithKind(errors.KindUnauthenticated)
-			return nil, err
+			return nil, errors.New("cert key not found").WithKind(errors.KindUnauthenticated)
 		}
 
 		result, err := jwt.ParseRSAPublicKeyFromPEM([]byte(cert))
 		if err != nil {
-			err := errors.New("error trying to validate signature").WithKind(errors.KindInternal)
-			return nil, err
+			return nil, errors.New("error trying to validate signature").WithKind(errors.KindInternal)
 		}
 
 		return result, nil
