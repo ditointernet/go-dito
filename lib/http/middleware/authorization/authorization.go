@@ -14,13 +14,28 @@ import (
 // ContextKeyAllowedStores is the context key that get and sets all accounts allowed stores
 const ContextKeyAllowedStores string = "allowed-stores"
 
+// ResourseFilter defines a type that represents a resource filter as an integer
+type ResourseFilter int
+
+const (
+	// StoreFilter means a numeric representation of the ID of the segment in database
+	StoreFilter ResourseFilter = iota
+)
+
+func (s ResourseFilter) String() string {
+	return [...]string{
+		"stores",
+	}[s]
+}
+
 // AccountAuthorizator is the struct responsible for create account authorizarion
 type AccountAuthorizator struct {
 	logger              Logger
 	authorizatorClient  AuthorizatorClient
 	authorizatorTimeout time.Duration
 	Now                 func() time.Time
-	regoClient          string
+	resourceName        string
+	ResourseFilters     []ResourseFilter
 }
 
 // NewAccountAuthorizator constructs a new account authorization middleware
@@ -28,13 +43,15 @@ func NewAccountAuthorizator(
 	logger Logger,
 	authClient AuthorizatorClient,
 	authorizatorTimeout time.Duration,
-	regoClient string,
+	resourceName string,
+	ResourseFilters []ResourseFilter,
 ) (AccountAuthorizator, error) {
 	return AccountAuthorizator{
 		logger:              logger,
 		authorizatorClient:  authClient,
 		authorizatorTimeout: authorizatorTimeout,
-		regoClient:          regoClient,
+		resourceName:        resourceName,
+		ResourseFilters:     ResourseFilters,
 		// Just for allowing mock time
 		Now: time.Now,
 	}, nil
@@ -42,8 +59,8 @@ func NewAccountAuthorizator(
 
 // Authorize is the middleware responsible for calling the auth client and check if user is authorized to make the current request
 func (a AccountAuthorizator) Authorize(ctx *routing.Context) error {
-	if a.regoClient == "" {
-		err := errors.New("missing rego client").WithKind(errors.KindInvalidInput)
+	if a.resourceName == "" {
+		err := errors.New("missing resource name").WithKind(errors.KindInvalidInput)
 		a.logger.Error(ctx, err)
 		return err
 	}
@@ -60,18 +77,23 @@ func (a AccountAuthorizator) Authorize(ctx *routing.Context) error {
 		a.logger.Error(ctx, err)
 		return err
 	}
-
 	c, cancel := context.WithDeadline(ctx, a.Now().Add(a.authorizatorTimeout))
 	defer cancel()
 
-	query := fmt.Sprintf(`allow := data.authz.%s_allow ; filter := data.authz.filter_values`, a.regoClient)
-	result, err := a.authorizatorClient.ExecuteQuery(c, query, map[string]interface{}{
-		"method":      string(ctx.Method()),
-		"path":        string(ctx.Path()),
-		"brand_id":    brandID,
-		"user_id":     accountID,
-		"filter_type": "stores",
-	})
+	query := fmt.Sprintf(`allow := data.authz.%s_allow`, a.resourceName)
+
+	resourceInput := map[string]interface{}{
+		"method":   string(ctx.Method()),
+		"path":     string(ctx.Path()),
+		"brand_id": brandID,
+		"user_id":  accountID,
+	}
+	fmt.Println(a.ResourseFilters)
+	if len(a.ResourseFilters) > 0 {
+		query = query + ` ; filter := data.authz.filter_values`
+		resourceInput["filter_type"] = a.ResourseFilters[0].String()
+	}
+	result, err := a.authorizatorClient.ExecuteQuery(c, query, resourceInput)
 	if err != nil {
 		err := errors.New("error on executing opa client query, got : %s", err).WithKind(errors.KindInternal)
 		a.logger.Error(ctx, err)
