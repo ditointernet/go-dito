@@ -82,7 +82,6 @@ func (a AccountAuthorizator) Authorize(ctx *routing.Context) error {
 		a.logger.Error(ctx, err)
 		return err
 	}
-	// todo get brand id from package brand id
 	brandID := ctx.Value(brand.ContextKeyBrandID)
 	if brandID == nil {
 		err := errors.New("missing brand id")
