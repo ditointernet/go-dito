@@ -142,6 +142,6 @@ func (a AccountAuthorizator) Authorize(ctx *routing.Context) error {
 		ctx.SetUserValue(ContextKeyAllowedStores, allowedStores)
 	}
 
-	a.logger.Info(ctx, "Authorization decision - accountID: %s with brandID %s access was granted")
+	a.logger.Debug(ctx, "Authorization decision - accountID: %s with brandID %s access was granted", accountID, brandID)
 	return nil
 }
