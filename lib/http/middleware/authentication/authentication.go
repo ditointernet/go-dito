@@ -1,7 +1,6 @@
 package authentication
 
 import (
-	"context"
 	"strings"
 
 	jwt "github.com/dgrijalva/jwt-go"
@@ -48,7 +47,7 @@ func (ua AccountAuthenticator) Authenticate(ctx *routing.Context) error {
 	token := authHeader[7:]
 
 	certs := ua.jwks.Certs()
-	parsedToken, err := jwt.Parse(token, ua.verifyJWTSignature(ctx, certs))
+	parsedToken, err := jwt.Parse(token, verifyJWTSignature(certs))
 	if err == nil {
 		setAccountID(ctx, parsedToken)
 		return nil
@@ -61,7 +60,7 @@ func (ua AccountAuthenticator) Authenticate(ctx *routing.Context) error {
 	}
 	certs = ua.jwks.Certs()
 
-	parsedToken, err = jwt.Parse(token, ua.verifyJWTSignature(ctx, certs))
+	parsedToken, err = jwt.Parse(token, verifyJWTSignature(certs))
 	if err != nil {
 		ua.logger.Error(ctx, err)
 		return http.NewErrorResponse(ctx, err)
@@ -79,7 +78,7 @@ func setAccountID(ctx *routing.Context, token *jwt.Token) {
 	ctx.SetUserValue(ContextKeyAccountID, accountID)
 }
 
-func (ua AccountAuthenticator) verifyJWTSignature(ctx context.Context, certs map[string]string) func(token *jwt.Token) (interface{}, error) {
+func verifyJWTSignature(certs map[string]string) func(token *jwt.Token) (interface{}, error) {
 	return func(token *jwt.Token) (interface{}, error) {
 		kid, ok := token.Header["kid"].(string)
 		if !ok {
