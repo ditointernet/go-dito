@@ -9,6 +9,12 @@ import (
 
 // ContextKeyBrandID is the key used to retrieve and save brand into the context
 const ContextKeyBrandID string = "Brand"
+const (
+	// CodeTypeMissingBrand indicates that brand header is no present on the request
+	CodeTypeMissingBrand errors.CodeType = "MISSING_BRAND"
+	// CodeTypeMissingLoggerDependency indicates that logger dependency was not provided
+	CodeTypeMissingLoggerDependency errors.CodeType = "MISSING_LOGGER_DEPENDENCY"
+)
 
 // AccountAuthenticator structure responsible for handling request authentication
 type BrandFiller struct {
@@ -18,7 +24,7 @@ type BrandFiller struct {
 // BrandFiller creates a new instance of the Brand structure
 func NewBrandFiller(logger logger) (BrandFiller, error) {
 	if logger == nil {
-		return BrandFiller{}, errors.New("missing logger dependency").WithKind(errors.KindInternal)
+		return BrandFiller{}, errors.New("missing logger dependency").WithKind(errors.KindInternal).WithCode(CodeTypeMissingLoggerDependency)
 	}
 	return BrandFiller{
 		logger: logger,
@@ -31,7 +37,7 @@ func (ua BrandFiller) Fill(ctx *routing.Context) error {
 	brandID := string(ctx.Request.Header.Peek(ContextKeyBrandID))
 	brandID = strings.TrimSpace(brandID)
 	if len(brandID) == 0 {
-		err := errors.New("Brand is not present on request headers").WithKind(errors.KindUnauthorized)
+		err := errors.New("Brand is not present on request headers").WithKind(errors.KindUnauthorized).WithCode(CodeTypeMissingBrand)
 		ua.logger.Error(ctx, err)
 		return err
 	}
