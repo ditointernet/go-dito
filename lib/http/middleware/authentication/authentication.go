@@ -12,6 +12,15 @@ import (
 // ContextKeyAccountID is the key used to retrieve and save accountId into the context
 const ContextKeyAccountID string = "account-id"
 
+const (
+	// CodeTypeMissingBearerToken indicates that the bearer token was not provided
+	CodeTypeMissingBearerToken errors.CodeType = "MISSING_BEARER_TOKEN"
+	// CodeTypeErrorOnRenewingCerts indicates that the application couldnt renew the JWKS certificates
+	CodeTypeErrorOnRenewingCerts errors.CodeType = "COULD_NOT_RENEW_CERTS"
+	// CodeTypeErrorOnParsingJWTToken indicates that the application couldn't parse the JWT token
+	CodeTypeErrorOnParsingJWTToken errors.CodeType = "ERROR_ON_PARSING_JWT"
+)
+
 // AccountAuthenticator structure responsible for handling request authentication
 type AccountAuthenticator struct {
 	logger logger
@@ -40,7 +49,7 @@ func NewAccountAuthenticator(logger logger, jwks jwksClient) (AccountAuthenticat
 func (ua AccountAuthenticator) Authenticate(ctx *routing.Context) error {
 	authHeader := string(ctx.Request.Header.Peek("Authorization"))
 	if len(authHeader) < 7 || strings.ToLower(authHeader[:7]) != "bearer " || authHeader[7:] == "" {
-		err := errors.New("unauthenticated request").WithKind(errors.KindUnauthenticated)
+		err := errors.New("missing or invalid authentication token").WithKind(errors.KindUnauthenticated).WithCode(CodeTypeMissingBearerToken)
 		ua.logger.Error(ctx, err)
 		return http.NewErrorResponse(ctx, err)
 	}
@@ -54,7 +63,7 @@ func (ua AccountAuthenticator) Authenticate(ctx *routing.Context) error {
 	}
 
 	if err := ua.jwks.RenewCerts(ctx); err != nil {
-		err = errors.New("error on renewing the certificates").WithKind(errors.KindInternal)
+		err = errors.New("error on renewing the certificates").WithKind(errors.KindInternal).WithCode(CodeTypeErrorOnRenewingCerts)
 		ua.logger.Error(ctx, err)
 		return http.NewErrorResponse(ctx, err)
 	}
@@ -63,6 +72,7 @@ func (ua AccountAuthenticator) Authenticate(ctx *routing.Context) error {
 	parsedToken, err = jwt.Parse(token, verifyJWTSignature(certs))
 	if err != nil {
 		ua.logger.Error(ctx, err)
+		err = errors.New(err.Error()).WithKind(errors.KindUnauthenticated).WithCode(CodeTypeErrorOnParsingJWTToken)
 		return http.NewErrorResponse(ctx, err)
 	}
 
@@ -82,16 +92,16 @@ func verifyJWTSignature(certs map[string]string) func(token *jwt.Token) (interfa
 	return func(token *jwt.Token) (interface{}, error) {
 		kid, ok := token.Header["kid"].(string)
 		if !ok {
-			return nil, errors.New("token's kid header not found").WithKind(errors.KindUnauthenticated)
+			return nil, errors.New("token's kid header not found")
 		}
 		cert, ok := certs[kid]
 		if !ok {
-			return nil, errors.New("cert key not found").WithKind(errors.KindUnauthenticated)
+			return nil, errors.New("cert key not found")
 		}
 
 		result, err := jwt.ParseRSAPublicKeyFromPEM([]byte(cert))
 		if err != nil {
-			return nil, errors.New("error trying to validate signature").WithKind(errors.KindInternal)
+			return nil, errors.New("error trying to validate JWT signature")
 		}
 
 		return result, nil

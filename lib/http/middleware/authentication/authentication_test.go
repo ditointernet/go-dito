@@ -54,7 +54,7 @@ func TestAccountAuthenticator_Authenticate(t *testing.T) {
 
 			err := ua.Authenticate(ctx)
 
-			expected := `{"error":{"code":"UNKNOWN","message":"unauthenticated request"}}`
+			expected := `{"error":{"code":"MISSING_BEARER_TOKEN","message":"missing or invalid authentication token"}}`
 			assert.Equal(t, expected, err.Error())
 		}))
 
@@ -64,7 +64,7 @@ func TestAccountAuthenticator_Authenticate(t *testing.T) {
 			ctx := newCtxWithHeaders(map[string]string{"Authorization": "basic64 "})
 			err := ua.Authenticate(ctx)
 
-			expected := `{"error":{"code":"UNKNOWN","message":"unauthenticated request"}}`
+			expected := `{"error":{"code":"MISSING_BEARER_TOKEN","message":"missing or invalid authentication token"}}`
 			assert.Equal(t, expected, err.Error())
 		}))
 
@@ -75,7 +75,7 @@ func TestAccountAuthenticator_Authenticate(t *testing.T) {
 			ctx := newCtxWithHeaders(map[string]string{"Authorization": "bearer "})
 			err := ua.Authenticate(ctx)
 
-			expected := `{"error":{"code":"UNKNOWN","message":"unauthenticated request"}}`
+			expected := `{"error":{"code":"MISSING_BEARER_TOKEN","message":"missing or invalid authentication token"}}`
 			assert.Equal(t, expected, err.Error())
 		}))
 
@@ -95,7 +95,7 @@ func TestAccountAuthenticator_Authenticate(t *testing.T) {
 
 			err := ua.Authenticate(ctx)
 
-			expected := `{"error":{"code":"UNKNOWN","message":"error on renewing the certificates"}}`
+			expected := `{"error":{"code":"COULD_NOT_RENEW_CERTS","message":"error on renewing the certificates"}}`
 			assert.Equal(t, expected, err.Error())
 		}))
 
@@ -117,7 +117,7 @@ func TestAccountAuthenticator_Authenticate(t *testing.T) {
 
 			err := ua.Authenticate(ctx)
 
-			expected := `{"error":{"code":"UNKNOWN","message":"token's kid header not found"}}`
+			expected := `{"error":{"code":"ERROR_ON_PARSING_JWT","message":"token's kid header not found"}}`
 			assert.Equal(t, expected, err.Error())
 		}))
 
@@ -138,7 +138,7 @@ func TestAccountAuthenticator_Authenticate(t *testing.T) {
 
 			err := ua.Authenticate(ctx)
 
-			expected := `{"error":{"code":"UNKNOWN","message":"cert key not found"}}`
+			expected := `{"error":{"code":"ERROR_ON_PARSING_JWT","message":"cert key not found"}}`
 			assert.Equal(t, expected, err.Error())
 		}))
 
@@ -159,7 +159,7 @@ func TestAccountAuthenticator_Authenticate(t *testing.T) {
 
 			err := ua.Authenticate(ctx)
 
-			expected := `{"error":{"code":"UNKNOWN","message":"error trying to validate signature"}}`
+			expected := `{"error":{"code":"ERROR_ON_PARSING_JWT","message":"error trying to validate JWT signature"}}`
 			assert.Equal(t, expected, err.Error())
 		}))
 
