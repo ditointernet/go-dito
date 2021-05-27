@@ -91,7 +91,7 @@ func TestAuthorize(t *testing.T) {
 			assert.EqualError(t, e, "missing auth client")
 		})
 
-	t.Run("should not authorize when there is no user id on context",
+	t.Run("should not authorize when there is no account id on context",
 		withMock(func(t *testing.T, m AccountAuthorizator) {
 			ctx := newCtxWithUserValues(map[string]interface{}{brand.ContextKeyBrandID: "any-brand2"})
 
@@ -104,7 +104,7 @@ func TestAuthorize(t *testing.T) {
 
 			var e ditoError.CustomError
 			assert.True(t, errors.As(err, &e))
-			assert.EqualError(t, e, "missing user id")
+			assert.EqualError(t, e, "missing account id")
 		}))
 
 	t.Run("should not authorize when there is no brand id on headers",
@@ -235,7 +235,7 @@ func TestAuthorize(t *testing.T) {
 			now, _ := time.Parse(time.RFC3339, "2020-01-30T03:00:00Z")
 			expectedCtx, cancel := context.WithDeadline(ctx, now.Add(timeout))
 			defer cancel()
-			logger.EXPECT().Info(gomock.Any(), gomock.Any())
+			logger.EXPECT().Debug(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any())
 			opa.EXPECT().
 				ExecuteQuery(expectedCtx, gomock.Any(), gomock.Any()).
 				Return(opaLib.AuthorizationResult{{"allow": true}}, nil)
@@ -265,7 +265,7 @@ func TestAuthorize_WithFIlters(t *testing.T) {
 		}
 	}
 
-	t.Run("should not authorize when there is no user id on context",
+	t.Run("should not authorize when there is no account id on context",
 		withMock(func(t *testing.T, m AccountAuthorizator) {
 			ctx := newCtxWithUserValues(map[string]interface{}{brand.ContextKeyBrandID: "any-brand2"})
 
@@ -278,7 +278,7 @@ func TestAuthorize_WithFIlters(t *testing.T) {
 
 			var e ditoError.CustomError
 			assert.True(t, errors.As(err, &e))
-			assert.EqualError(t, e, "missing user id")
+			assert.EqualError(t, e, "missing account id")
 		}))
 
 	t.Run("should not authorize when there is no brand id on headers",
@@ -409,7 +409,7 @@ func TestAuthorize_WithFIlters(t *testing.T) {
 			now, _ := time.Parse(time.RFC3339, "2020-01-30T03:00:00Z")
 			expectedCtx, cancel := context.WithDeadline(ctx, now.Add(timeout))
 			defer cancel()
-			logger.EXPECT().Info(gomock.Any(), gomock.Any())
+			logger.EXPECT().Debug(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any())
 			opa.EXPECT().
 				ExecuteQuery(expectedCtx, gomock.Any(), gomock.Any()).
 				Return(opaLib.AuthorizationResult{{"allow": true}}, nil)
@@ -422,7 +422,7 @@ func TestAuthorize_WithFIlters(t *testing.T) {
 
 	t.Run("should set filter values when they are found",
 		withMock(func(t *testing.T, m AccountAuthorizator) {
-			logger.EXPECT().Info(gomock.Any(), gomock.Any())
+			logger.EXPECT().Debug(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any())
 
 			ctx := newCtxWithUserValues(map[string]interface{}{
 				authentication.ContextKeyAccountID: "123456",

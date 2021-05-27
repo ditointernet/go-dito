@@ -19,6 +19,23 @@ const ContextKeyAllowedStores string = "allowed-stores"
 type ResourseFilter int
 
 const (
+	// CodeTypeMissingLoggerDependency indicates that the logger dependency parameter was not injected
+	CodeTypeMissingLoggerDependency errors.CodeType = "MISSING_LOGGER_DEPENDENCY"
+	// CodeTypeMissingAuthClientDependency indicates that the authclient dependency parameter was not injected
+	CodeTypeMissingAuthClientDependency errors.CodeType = "MISSING_AUTH_CLIENT_DEPENDENCY"
+	// CodeTypeMissingResourceNameDependency indicates that the resourceName dependency parameter was not injected
+	CodeTypeMissingResourceNameDependency errors.CodeType = "MISSING_RESOURCE_NAME_DEPENDENCY"
+	// CodeTypeMissingAccountId indicates that the accountId was not present on the context
+	CodeTypeMissingAccountId errors.CodeType = "MISSING_ACCOUNT_ID"
+	// CodeTypeMissingBrandId indicates that the brandId was not present on the context
+	CodeTypeMissingBrandId errors.CodeType = "MISSING_BRAND_ID"
+	// CodeTypeErrorExecutingAuthorizationQuery indicates that it was not possible to execute authorization client query
+	CodeTypeErrorExecutingAuthorizationQuery errors.CodeType = "CANT_EXECUTE_AUTH_QUERY"
+	// CodeTypeAccessDenied indicates that authorizatior client denied account access
+	CodeTypeAccessDenied errors.CodeType = "ACCESS_DENIED"
+)
+
+const (
 	// StoreFilter means a numeric representation of the stores filter
 	StoreFilter ResourseFilter = iota
 )
@@ -49,17 +66,17 @@ func NewAccountAuthorizator(
 	ResourseFilters []ResourseFilter,
 ) (AccountAuthorizator, error) {
 	if resourceName == "" {
-		err := errors.New("missing resource name").WithKind(errors.KindInternal)
+		err := errors.New("missing resource name").WithKind(errors.KindInternal).WithCode(CodeTypeMissingResourceNameDependency)
 		return AccountAuthorizator{}, err
 	}
 
 	if authClient == nil {
-		err := errors.New("missing auth client").WithKind(errors.KindInternal)
+		err := errors.New("missing auth client").WithKind(errors.KindInternal).WithCode(CodeTypeMissingAuthClientDependency)
 		return AccountAuthorizator{}, err
 	}
 
 	if logger == nil {
-		err := errors.New("missing logger").WithKind(errors.KindInternal)
+		err := errors.New("missing logger").WithKind(errors.KindInternal).WithCode(CodeTypeMissingLoggerDependency)
 		return AccountAuthorizator{}, err
 	}
 
@@ -78,13 +95,13 @@ func NewAccountAuthorizator(
 func (a AccountAuthorizator) Authorize(ctx *routing.Context) error {
 	accountID := ctx.Value(authentication.ContextKeyAccountID)
 	if accountID == nil {
-		err := errors.New("missing user id")
+		err := errors.New("missing account id").WithCode(CodeTypeMissingAccountId)
 		a.logger.Error(ctx, err)
 		return err
 	}
 	brandID := ctx.Value(brand.ContextKeyBrandID)
 	if brandID == nil {
-		err := errors.New("missing brand id")
+		err := errors.New("missing brand id").WithCode(CodeTypeMissingBrandId)
 		a.logger.Error(ctx, err)
 		return err
 	}
@@ -105,25 +122,25 @@ func (a AccountAuthorizator) Authorize(ctx *routing.Context) error {
 	}
 	result, err := a.authorizatorClient.ExecuteQuery(c, query, resourceInput)
 	if err != nil {
-		err := errors.New("error on executing opa client query, got : %s", err).WithKind(errors.KindInternal)
+		err := errors.New("error on executing opa client query, got : %s", err).WithKind(errors.KindInternal).WithCode(CodeTypeErrorExecutingAuthorizationQuery)
 		a.logger.Error(ctx, err)
 		return err
 	}
 	if len(result) == 0 {
-		err := errors.New("error on executing authorizator client query, got undefined result: %s", err).WithKind(errors.KindInternal)
+		err := errors.New("error on executing authorizator client query, got undefined result: %s", err).WithKind(errors.KindInternal).WithCode(CodeTypeErrorExecutingAuthorizationQuery)
 		a.logger.Error(ctx, err)
 		return err
 	}
 
 	allowed, ok := result[0]["allow"].(bool)
 	if !ok {
-		err := errors.New("error on executing authorizator client query, allow condition not found").WithKind(errors.KindInternal)
+		err := errors.New("error on executing authorizator client query, allow condition not found").WithKind(errors.KindInternal).WithCode(CodeTypeErrorExecutingAuthorizationQuery)
 		a.logger.Error(ctx, err)
 		return err
 	}
 
 	if !allowed {
-		err := errors.New("Authorization decision - accountID: %s with brandID %s access was denied", accountID, brandID).WithKind(errors.KindUnauthorized)
+		err := errors.New("Authorization decision - accountID: %s with brandID %s access was denied", accountID, brandID).WithKind(errors.KindUnauthorized).WithCode(CodeTypeAccessDenied)
 		a.logger.Error(ctx, err)
 		return err
 	}
