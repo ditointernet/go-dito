@@ -5,6 +5,7 @@ go 1.14
 require (
 	cloud.google.com/go v0.82.0 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v0.20.1
+	github.com/ditointernet/go-dito/lib/errors v1.0.1
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/google/go-cmp v0.5.6 // indirect
 	go.opentelemetry.io/otel v0.20.0
