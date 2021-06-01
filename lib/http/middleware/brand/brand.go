@@ -8,15 +8,14 @@ import (
 )
 
 // ContextKeyBrandID is the key used to retrieve and save brand into the context
-const ContextKeyBrandID string = "Brand"
+const ContextKeyBrandID string = "brand"
+
 const (
 	// CodeTypeMissingBrand indicates that brand header is no present on the request
 	CodeTypeMissingBrand errors.CodeType = "MISSING_BRAND"
-	// CodeTypeMissingLoggerDependency indicates that logger dependency was not provided
-	CodeTypeMissingLoggerDependency errors.CodeType = "MISSING_LOGGER_DEPENDENCY"
 )
 
-// AccountAuthenticator structure responsible for handling request authentication
+// BrandFiller structure responsible for injecting the brand into HTTP request context.
 type BrandFiller struct {
 	logger logger
 }
@@ -24,20 +23,28 @@ type BrandFiller struct {
 // BrandFiller creates a new instance of the Brand structure
 func NewBrandFiller(logger logger) (BrandFiller, error) {
 	if logger == nil {
-		return BrandFiller{}, errors.New("missing logger dependency").WithKind(errors.KindInternal).WithCode(CodeTypeMissingLoggerDependency)
+		return BrandFiller{}, errors.NewMissingRequiredDependency("logger")
 	}
-	return BrandFiller{
-		logger: logger,
-	}, nil
+
+	return BrandFiller{logger: logger}, nil
 }
 
-// BrandFiller is the middleware responsible for retrieving brand id from the headers
-//
+// MustNewBrandFiller creates a new instance of the Brand structure
+func MustNewBrandFiller(logger logger) BrandFiller {
+	mid, err := NewBrandFiller(logger)
+	if err != nil {
+		panic(err)
+	}
+
+	return mid
+}
+
+// Fill is the middleware responsible for retrieving brand id from the headers.
 func (ua BrandFiller) Fill(ctx *routing.Context) error {
 	brandID := string(ctx.Request.Header.Peek(ContextKeyBrandID))
 	brandID = strings.TrimSpace(brandID)
 	if len(brandID) == 0 {
-		err := errors.New("Brand is not present on request headers").WithKind(errors.KindUnauthorized).WithCode(CodeTypeMissingBrand)
+		err := errors.New("brand is not present on request headers").WithKind(errors.KindUnauthorized).WithCode(CodeTypeMissingBrand)
 		ua.logger.Error(ctx, err)
 		return err
 	}
