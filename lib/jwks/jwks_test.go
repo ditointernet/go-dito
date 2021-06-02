@@ -16,12 +16,12 @@ import (
 )
 
 func TestClient_Certs(t *testing.T) {
-	withMock := func(runner func(t *testing.T, c Client)) func(t *testing.T) {
+	withMock := func(runner func(t *testing.T, c *Client)) func(t *testing.T) {
 		return func(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
-			runner(t, Client{
+			runner(t, &Client{
 				jwksURI: "jwksURI",
 				http:    mocks.NewMockHTTPClient(ctrl),
 				certs:   map[string]string{"1": "-----BEGIN CERTIFICATE-----\ntest\n-----END CERTIFICATE-----"},
@@ -30,7 +30,7 @@ func TestClient_Certs(t *testing.T) {
 	}
 
 	t.Run("should return the certificates when the method is called",
-		withMock(func(t *testing.T, c Client) {
+		withMock(func(t *testing.T, c *Client) {
 			assert.Equal(t, c.Certs(), c.certs)
 		}))
 }
@@ -38,13 +38,13 @@ func TestClient_Certs(t *testing.T) {
 func TestClient_RenewCerts(t *testing.T) {
 	var httpMock *mocks.MockHTTPClient
 
-	withMock := func(runner func(t *testing.T, c Client)) func(t *testing.T) {
+	withMock := func(runner func(t *testing.T, c *Client)) func(t *testing.T) {
 		return func(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
 			httpMock = mocks.NewMockHTTPClient(ctrl)
-			runner(t, Client{
+			runner(t, &Client{
 				jwksURI:       "jwksURI",
 				http:          httpMock,
 				certs:         map[string]string{"1": "-----BEGIN CERTIFICATE-----\nt\n-----END CERTIFICATE-----"},
@@ -55,14 +55,14 @@ func TestClient_RenewCerts(t *testing.T) {
 	}
 
 	t.Run("should fail when the certificates fetch return error",
-		withMock(func(t *testing.T, c Client) {
+		withMock(func(t *testing.T, c *Client) {
 			httpMock.EXPECT().Get(context.TODO(), gomock.Any()).Return(http.HTTPResult{}, errors.New("error"))
 
 			assert.EqualError(t, c.RenewCerts(context.TODO()), "error")
 		}))
 
 	t.Run("should update the certificates when the renew process is successful",
-		withMock(func(t *testing.T, c Client) {
+		withMock(func(t *testing.T, c *Client) {
 			httpMock.EXPECT().Get(context.TODO(), gomock.Any()).Return(http.HTTPResult{
 				StatusCode: 200,
 				Response:   getBody(),
@@ -78,7 +78,7 @@ func TestClient_RenewCerts(t *testing.T) {
 		}))
 
 	t.Run("should not update the certificates when the renew process is called in the renew threshold",
-		withMock(func(t *testing.T, c Client) {
+		withMock(func(t *testing.T, c *Client) {
 			httpMock.EXPECT().Get(context.TODO(), gomock.Any()).Do(func(request http.HTTPRequest) (http.HTTPResult, error) {
 				t.FailNow()
 				return http.HTTPResult{}, nil
