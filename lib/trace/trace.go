@@ -3,7 +3,7 @@ package trace
 import (
 	"context"
 
-	texporter "github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace"
+	gcpexporter "github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/propagation"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
@@ -35,27 +35,27 @@ func NewTracer(params Params) (otrace.Tracer, func(context.Context) error, error
 		return nil, nil, errors.NewMissingRequiredDependency("ApplicationName")
 	}
 
-	if !params.IsProductionEnvironment {
-		tracer := otrace.NewNoopTracerProvider().Tracer(params.ApplicationName)
-		return tracer, func(context.Context) error { return nil }, nil
+	tOpts := []sdktrace.TracerProviderOption{}
+
+	if params.IsProductionEnvironment {
+		exporter, err := gcpexporter.NewExporter()
+		if err != nil {
+			return nil, nil, err
+		}
+
+		tOpts = append(tOpts, sdktrace.WithSampler(sdktrace.TraceIDRatioBased(params.TraceRatio)))
+		tOpts = append(tOpts, sdktrace.WithSyncer(exporter))
 	}
 
-	exporter, err := texporter.NewExporter()
-	if err != nil {
-		return nil, nil, err
-	}
+	tp := sdktrace.NewTracerProvider(tOpts...)
 
-	tp := sdktrace.NewTracerProvider(
-		sdktrace.WithSampler(sdktrace.TraceIDRatioBased(params.TraceRatio)),
-		sdktrace.WithSyncer(exporter),
-	)
 	otel.SetTracerProvider(tp)
 	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(
 		propagation.TraceContext{},
 		propagation.Baggage{},
 	))
 
-	return otel.GetTracerProvider().Tracer(params.ApplicationName), exporter.Shutdown, nil
+	return tp.Tracer(params.ApplicationName), tp.Shutdown, nil
 }
 
 // NewTracer creates a new Tracer.
