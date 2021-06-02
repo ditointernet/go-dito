@@ -10,6 +10,17 @@ import (
 	"github.com/ditointernet/go-dito/lib/errors"
 )
 
+type logger interface {
+	Debug(ctx context.Context, msg string, args ...interface{})
+	Info(ctx context.Context, msg string, args ...interface{})
+	Warning(ctx context.Context, msg string, args ...interface{})
+	Error(ctx context.Context, err error)
+	Critical(ctx context.Context, err error)
+}
+
+// ContextKeyRequestIPAddress is the key of RequestIP information injected into the request context
+const ContextKeyRequestIPAddress string = "request_ip"
+
 type errorPayload struct {
 	Code    errors.CodeType `json:"code,omitempty"`
 	Message string          `json:"message"`

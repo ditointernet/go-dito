@@ -1,7 +1,6 @@
 package http
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -14,19 +13,7 @@ import (
 	"github.com/rs/cors"
 	"github.com/valyala/fasthttp"
 	"github.com/valyala/fasthttp/fasthttpadaptor"
-	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
-
-type logger interface {
-	Debug(ctx context.Context, msg string, args ...interface{})
-	Info(ctx context.Context, msg string, args ...interface{})
-	Warning(ctx context.Context, msg string, args ...interface{})
-	Error(ctx context.Context, err error)
-	Critical(ctx context.Context, err error)
-}
-
-// ContextKeyRequestIPAddress is the key of RequestIP information injected into the request context
-const ContextKeyRequestIPAddress string = "request_ip"
 
 // ServerInput encapsulates the necessary Inputs to initialize a Server
 type ServerInput struct {
@@ -56,9 +43,7 @@ func NewServer(in ServerInput) Server {
 		logger:         in.Logger,
 	}
 
-	otelMid := otelhttp.NewHandler(http.HandlerFunc(dummyHandler), "http_request")
 	router.Use(
-		routing.RequestHandlerFunc(fasthttpadaptor.NewFastHTTPHandler(otelMid)),
 		slash.Remover(http.StatusMovedPermanently),
 		content.TypeNegotiator(content.JSON),
 		fault.ErrorHandler(nil, customErrorHandler),
@@ -126,5 +111,3 @@ func customErrorHandler(ctx *routing.Context, err error) error {
 
 	return NewErrorResponse(ctx, err)
 }
-
-func dummyHandler(rw http.ResponseWriter, r *http.Request) {}

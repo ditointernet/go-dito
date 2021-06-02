@@ -5,7 +5,7 @@ go 1.14
 require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/ditointernet/go-dito/lib/errors v1.0.1
-	github.com/ditointernet/go-dito/lib/log v1.1.0
+	github.com/ditointernet/go-dito/lib/log v1.1.6
 	github.com/ditointernet/go-dito/lib/opa v1.0.0
 	github.com/felixge/httpsnoop v1.0.2 // indirect
 	github.com/golang/mock v1.5.0
