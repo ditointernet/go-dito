@@ -10,7 +10,7 @@ import (
 )
 
 // ContextKeyAccountID is the key used to retrieve and save accountId into the context
-const ContextKeyAccountID string = "account-id"
+const ContextKeyAccountID string = "account_id"
 
 const (
 	// CodeTypeMissingBearerToken indicates that the bearer token was not provided

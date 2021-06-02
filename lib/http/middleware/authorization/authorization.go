@@ -13,7 +13,7 @@ import (
 )
 
 // ContextKeyAllowedStores is the context key that get and sets all accounts allowed stores
-const ContextKeyAllowedStores string = "allowed-stores"
+const ContextKeyAllowedStores string = "allowed_stores"
 
 // ResourseFilter defines a type that represents a resource filter as an integer
 type ResourseFilter int

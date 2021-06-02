@@ -26,7 +26,7 @@ type logger interface {
 }
 
 // ContextKeyRequestIPAddress is the key of RequestIP information injected into the request context
-const ContextKeyRequestIPAddress string = "request-ip"
+const ContextKeyRequestIPAddress string = "request_ip"
 
 // ServerInput encapsulates the necessary Inputs to initialize a Server
 type ServerInput struct {
