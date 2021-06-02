@@ -141,8 +141,8 @@ func (l Logger) printError(ctx context.Context, err error, level Level) {
 	span := trace.SpanFromContext(ctx)
 
 	attrs := l.extractLogAttributesFromContext(ctx)
-	attrs["kind"] = errors.Kind(err)
-	attrs["code"] = errors.Code(err)
+	attrs["kind"] = string(errors.Kind(err))
+	attrs["code"] = string(errors.Code(err))
 
 	span.RecordError(err, trace.WithAttributes(buildOtelAttributes(attrs, "exception")...))
 
