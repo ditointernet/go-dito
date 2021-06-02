@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/ditointernet/go-dito/lib/errors"
-	"go.opentelemetry.io/otel/label"
+	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -127,7 +127,7 @@ func (l Logger) print(ctx context.Context, msg string, level Level) {
 	span.AddEvent("log", trace.WithAttributes(buildOtelAttributes(attrs, "log")...))
 
 	data, _ := json.Marshal(logData{
-		TraceID:    span.SpanContext().TraceID.String(),
+		TraceID:    span.SpanContext().TraceID().String(),
 		Timestamp:  l.now().Format(time.RFC3339),
 		Level:      level.String(),
 		Message:    msg,
@@ -147,7 +147,7 @@ func (l Logger) printError(ctx context.Context, err error, level Level) {
 	span.RecordError(err, trace.WithAttributes(buildOtelAttributes(attrs, "exception")...))
 
 	data, _ := json.Marshal(logData{
-		TraceID:    span.SpanContext().TraceID.String(),
+		TraceID:    span.SpanContext().TraceID().String(),
 		Timestamp:  l.now().Format(time.RFC3339),
 		Level:      level.String(),
 		Message:    err.Error(),
@@ -157,10 +157,10 @@ func (l Logger) printError(ctx context.Context, err error, level Level) {
 	fmt.Println(string(data))
 }
 
-func buildOtelAttributes(attrs map[LogAttribute]interface{}, prefix string) []label.KeyValue {
-	eAttrs := []label.KeyValue{}
+func buildOtelAttributes(attrs map[LogAttribute]interface{}, prefix string) []attribute.KeyValue {
+	eAttrs := []attribute.KeyValue{}
 	for k, v := range attrs {
-		eAttrs = append(eAttrs, label.String(fmt.Sprintf("%s.%s", prefix, k), v.(string)))
+		eAttrs = append(eAttrs, attribute.String(fmt.Sprintf("%s.%s", prefix, k), v.(string)))
 	}
 
 	return eAttrs
