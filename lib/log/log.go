@@ -5,6 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"time"
+
+	"go.opentelemetry.io/otel/label"
+	"go.opentelemetry.io/otel/trace"
 )
 
 // Level indicates the severity of the data being logged
@@ -96,18 +99,19 @@ func (l Logger) Warning(ctx context.Context, msg string, args ...interface{}) {
 // Error logs error data
 func (l Logger) Error(ctx context.Context, err error) {
 	if l.level >= LevelError {
-		l.print(ctx, err.Error(), LevelError)
+		l.printError(ctx, err, LevelError)
 	}
 }
 
 // Critical logs critical data
 func (l Logger) Critical(ctx context.Context, err error) {
 	if l.level >= LevelCritical {
-		l.print(ctx, err.Error(), LevelCritical)
+		l.printError(ctx, err, LevelCritical)
 	}
 }
 
 type logData struct {
+	TraceID    string                       `json:"trace_id,omitempty"`
 	Timestamp  string                       `json:"timestamp"`
 	Level      string                       `json:"level"`
 	Message    string                       `json:"message"`
@@ -115,14 +119,48 @@ type logData struct {
 }
 
 func (l Logger) print(ctx context.Context, msg string, level Level) {
+	span := trace.SpanFromContext(ctx)
+
+	attrs := l.extractLogAttributesFromContext(ctx)
+
+	span.AddEvent("log", trace.WithAttributes(buildOtelAttributes(attrs, "log")...))
+
 	data, _ := json.Marshal(logData{
+		TraceID:    span.SpanContext().TraceID.String(),
 		Timestamp:  l.now().Format(time.RFC3339),
 		Level:      level.String(),
 		Message:    msg,
-		Attributes: l.extractLogAttributesFromContext(ctx),
+		Attributes: attrs,
 	})
 
 	fmt.Println(string(data))
+}
+
+func (l Logger) printError(ctx context.Context, err error, level Level) {
+	span := trace.SpanFromContext(ctx)
+
+	attrs := l.extractLogAttributesFromContext(ctx)
+
+	span.RecordError(err, trace.WithAttributes(buildOtelAttributes(attrs, "exception")...))
+
+	data, _ := json.Marshal(logData{
+		TraceID:    span.SpanContext().TraceID.String(),
+		Timestamp:  l.now().Format(time.RFC3339),
+		Level:      level.String(),
+		Message:    err.Error(),
+		Attributes: attrs,
+	})
+
+	fmt.Println(string(data))
+}
+
+func buildOtelAttributes(attrs map[LogAttribute]interface{}, prefix string) []label.KeyValue {
+	eAttrs := []label.KeyValue{}
+	for k, v := range attrs {
+		eAttrs = append(eAttrs, label.String(fmt.Sprintf("%s.%s", prefix, k), v.(string)))
+	}
+
+	return eAttrs
 }
 
 func (l Logger) extractLogAttributesFromContext(ctx context.Context) map[LogAttribute]interface{} {
