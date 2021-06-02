@@ -5,6 +5,7 @@ import (
 
 	texporter "github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace"
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/propagation"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	otrace "go.opentelemetry.io/otel/trace"
 
@@ -49,6 +50,10 @@ func NewTracer(params Params) (otrace.Tracer, func(context.Context) error, error
 		sdktrace.WithSyncer(exporter),
 	)
 	otel.SetTracerProvider(tp)
+	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(
+		propagation.TraceContext{},
+		propagation.Baggage{},
+	))
 
 	return otel.GetTracerProvider().Tracer(params.ApplicationName), exporter.Shutdown, nil
 }
