@@ -14,6 +14,7 @@ import (
 	"github.com/rs/cors"
 	"github.com/valyala/fasthttp"
 	"github.com/valyala/fasthttp/fasthttpadaptor"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
 
 type logger interface {
@@ -55,7 +56,9 @@ func NewServer(in ServerInput) Server {
 		logger:         in.Logger,
 	}
 
+	otelMid := otelhttp.NewHandler(http.HandlerFunc(dummyHandler), "http_request")
 	router.Use(
+		routing.RequestHandlerFunc(fasthttpadaptor.NewFastHTTPHandler(otelMid)),
 		slash.Remover(http.StatusMovedPermanently),
 		content.TypeNegotiator(content.JSON),
 		fault.ErrorHandler(nil, customErrorHandler),
@@ -123,3 +126,5 @@ func customErrorHandler(ctx *routing.Context, err error) error {
 
 	return NewErrorResponse(ctx, err)
 }
+
+func dummyHandler(rw http.ResponseWriter, r *http.Request) {}
