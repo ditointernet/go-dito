@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"go.opentelemetry.io/otel/trace"
+
 	"github.com/ditointernet/go-dito/lib/errors"
 )
 
@@ -26,8 +28,8 @@ type ErrorResponse struct {
 // NewErrorResponse creates a new ErrorResponse object.
 func NewErrorResponse(ctx context.Context, err error) ErrorResponse {
 	return ErrorResponse{
-		// TraceID will be collected in the future, when tracing is properly implemented by GoDito
-		status: kindToHTTPStatusCode(errors.Kind(err)),
+		TraceID: trace.SpanFromContext(ctx).SpanContext().TraceID().String(),
+		status:  kindToHTTPStatusCode(errors.Kind(err)),
 		Err: errorPayload{
 			Code:    errors.Code(err),
 			Message: err.Error(),
@@ -73,9 +75,9 @@ func NewErrorListResponse(ctx context.Context, errs ...error) ErrorListResponse 
 	}
 
 	return ErrorListResponse{
-		// TraceID will be collected in the future, when tracing is properly implemented by GoDito
-		status: kindToHTTPStatusCode(errors.Kind(errs[0])),
-		Errs:   errsPayload,
+		TraceID: trace.SpanFromContext(ctx).SpanContext().TraceID().String(),
+		status:  kindToHTTPStatusCode(errors.Kind(errs[0])),
+		Errs:    errsPayload,
 	}
 }
 
