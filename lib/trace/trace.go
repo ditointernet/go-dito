@@ -38,7 +38,7 @@ func NewTracer(params Params) (otrace.Tracer, func(context.Context) error, error
 	tOpts := []sdktrace.TracerProviderOption{}
 
 	if params.IsProductionEnvironment {
-		exporter, err := gcpexporter.NewExporter()
+		exporter, err := gcpexporter.NewExporter(gcpexporter.WithProjectID("new-dito"))
 		if err != nil {
 			return nil, nil, err
 		}
