@@ -112,11 +112,13 @@ func (l Logger) Critical(ctx context.Context, err error) {
 }
 
 type logData struct {
-	Trace      string                       `json:"trace,omitempty"`
-	Timestamp  string                       `json:"timestamp"`
-	Level      string                       `json:"severity"`
-	Message    string                       `json:"message"`
-	Attributes map[LogAttribute]interface{} `json:"attributes,omitempty"`
+	Trace        string                       `json:"trace,omitempty"`
+	SpanID       string                       `json:"span_id,omitempty"`
+	TraceSampled *bool                        `json:"trace_sampled,omitempty"`
+	Timestamp    string                       `json:"timestamp"`
+	Level        string                       `json:"severity"`
+	Message      string                       `json:"message"`
+	Attributes   map[LogAttribute]interface{} `json:"attributes,omitempty"`
 }
 
 func (l Logger) print(ctx context.Context, msg string, level Level) {
@@ -127,11 +129,13 @@ func (l Logger) print(ctx context.Context, msg string, level Level) {
 	span.AddEvent("log", trace.WithAttributes(buildOtelAttributes(attrs, "log")...))
 
 	data, _ := json.Marshal(logData{
-		Trace:      getTrace(span),
-		Timestamp:  l.now().Format(time.RFC3339),
-		Level:      level.String(),
-		Message:    msg,
-		Attributes: attrs,
+		Trace:        getTrace(span),
+		SpanID:       getSpanID(span),
+		TraceSampled: getIsTraceSampled(span),
+		Timestamp:    l.now().Format(time.RFC3339),
+		Level:        level.String(),
+		Message:      msg,
+		Attributes:   attrs,
 	})
 
 	fmt.Println(string(data))
@@ -147,11 +151,13 @@ func (l Logger) printError(ctx context.Context, err error, level Level) {
 	span.RecordError(err, trace.WithAttributes(buildOtelAttributes(attrs, "exception")...))
 
 	data, _ := json.Marshal(logData{
-		Trace:      getTrace(span),
-		Timestamp:  l.now().Format(time.RFC3339),
-		Level:      level.String(),
-		Message:    err.Error(),
-		Attributes: attrs,
+		Trace:        getTrace(span),
+		SpanID:       getSpanID(span),
+		TraceSampled: getIsTraceSampled(span),
+		Timestamp:    l.now().Format(time.RFC3339),
+		Level:        level.String(),
+		Message:      err.Error(),
+		Attributes:   attrs,
 	})
 
 	fmt.Println(string(data))
@@ -163,6 +169,23 @@ func getTrace(span trace.Span) string {
 	}
 
 	return fmt.Sprintf("projects/new-dito/traces/%s", span.SpanContext().TraceID().String())
+}
+
+func getSpanID(span trace.Span) string {
+	if !span.SpanContext().TraceID().IsValid() {
+		return ""
+	}
+
+	return span.SpanContext().SpanID().String()
+}
+
+func getIsTraceSampled(span trace.Span) *bool {
+	if !span.SpanContext().TraceID().IsValid() {
+		return nil
+	}
+
+	isSampled := span.SpanContext().IsSampled()
+	return &isSampled
 }
 
 func buildOtelAttributes(attrs map[LogAttribute]interface{}, prefix string) []attribute.KeyValue {
