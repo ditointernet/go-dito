@@ -112,7 +112,7 @@ func (l Logger) Critical(ctx context.Context, err error) {
 }
 
 type logData struct {
-	TraceID    string                       `json:"trace_id,omitempty"`
+	Trace      string                       `json:"trace,omitempty"`
 	Timestamp  string                       `json:"timestamp"`
 	Level      string                       `json:"level"`
 	Message    string                       `json:"message"`
@@ -127,7 +127,7 @@ func (l Logger) print(ctx context.Context, msg string, level Level) {
 	span.AddEvent("log", trace.WithAttributes(buildOtelAttributes(attrs, "log")...))
 
 	data, _ := json.Marshal(logData{
-		TraceID:    getTraceID(span),
+		Trace:      getTrace(span),
 		Timestamp:  l.now().Format(time.RFC3339),
 		Level:      level.String(),
 		Message:    msg,
@@ -147,7 +147,7 @@ func (l Logger) printError(ctx context.Context, err error, level Level) {
 	span.RecordError(err, trace.WithAttributes(buildOtelAttributes(attrs, "exception")...))
 
 	data, _ := json.Marshal(logData{
-		TraceID:    getTraceID(span),
+		Trace:      getTrace(span),
 		Timestamp:  l.now().Format(time.RFC3339),
 		Level:      level.String(),
 		Message:    err.Error(),
@@ -157,12 +157,12 @@ func (l Logger) printError(ctx context.Context, err error, level Level) {
 	fmt.Println(string(data))
 }
 
-func getTraceID(span trace.Span) string {
+func getTrace(span trace.Span) string {
 	if !span.SpanContext().TraceID().IsValid() {
 		return ""
 	}
 
-	return span.SpanContext().TraceID().String()
+	return fmt.Sprintf("projects/new-dito/traces/%s", span.SpanContext().TraceID().String())
 }
 
 func buildOtelAttributes(attrs map[LogAttribute]interface{}, prefix string) []attribute.KeyValue {
