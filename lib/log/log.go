@@ -114,7 +114,7 @@ func (l Logger) Critical(ctx context.Context, err error) {
 type logData struct {
 	Trace      string                       `json:"trace,omitempty"`
 	Timestamp  string                       `json:"timestamp"`
-	Level      string                       `json:"level"`
+	Level      string                       `json:"severity"`
 	Message    string                       `json:"message"`
 	Attributes map[LogAttribute]interface{} `json:"attributes,omitempty"`
 }
