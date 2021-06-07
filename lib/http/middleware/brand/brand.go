@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/ditointernet/go-dito/lib/errors"
+	"github.com/ditointernet/go-dito/lib/http/infra"
 	routing "github.com/jackwhelpton/fasthttp-routing/v2"
 )
 
@@ -18,11 +19,11 @@ const (
 
 // AccountAuthenticator structure responsible for handling request authentication
 type BrandFiller struct {
-	logger logger
+	logger infra.Logger
 }
 
 // BrandFiller creates a new instance of the Brand structure
-func NewBrandFiller(logger logger) (BrandFiller, error) {
+func NewBrandFiller(logger infra.Logger) (BrandFiller, error) {
 	if logger == nil {
 		return BrandFiller{}, errors.New("missing logger dependency").WithKind(errors.KindInternal).WithCode(CodeTypeMissingLoggerDependency)
 	}

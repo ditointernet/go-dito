@@ -2,13 +2,14 @@
 
 GOPATH=$(shell go env GOPATH)
 
-setup:
+.make.setup:
 	GO111MODULE=off go get -u golang.org/x/lint/golint
 	GO111MODULE=off go get -u github.com/golang/mock/mockgen
+	touch .make.setup
 
-mock:
+mock: .make.setup
 	rm -f mocks/inframocks.go
-	$(GOPATH)/bin/mockgen -source=contracts.go -destination=mocks/authmocks.go -package=mocks
+	$(GOPATH)/bin/mockgen -source=infra/contracts.go -destination=mocks/inframocks.go -package=mocks
 
 test: mock
 	go test ./... -cover
