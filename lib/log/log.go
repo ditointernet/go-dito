@@ -8,6 +8,7 @@ import (
 
 	"github.com/ditointernet/go-dito/lib/errors"
 	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -149,6 +150,7 @@ func (l Logger) printError(ctx context.Context, err error, level Level) {
 	attrs["code"] = string(errors.Code(err))
 
 	span.RecordError(err, trace.WithAttributes(buildOtelAttributes(attrs, "exception")...))
+	span.SetStatus(codes.Error, err.Error())
 
 	data, _ := json.Marshal(logData{
 		Trace:        getTrace(span),
