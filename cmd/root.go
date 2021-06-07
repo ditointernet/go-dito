@@ -12,7 +12,14 @@ var rootCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(createSvcCmd)
+	migrateCmd.PersistentFlags().UintP(
+		"steps", "s", 0,
+		"number of steps operation. will apply all migrations if not informed or steps equal zero",
+	)
+
+	migrateCmd.AddCommand(upCmd, downCmd, seedCmd)
+
+	rootCmd.AddCommand(createSvcCmd, migrateCmd)
 }
 
 // Execute ...
