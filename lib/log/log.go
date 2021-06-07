@@ -112,10 +112,10 @@ func (l Logger) Critical(ctx context.Context, err error) {
 }
 
 type logData struct {
-	Trace        string                       `json:"trace,omitempty"`
-	SpanID       string                       `json:"span_id,omitempty"`
-	TraceSampled *bool                        `json:"trace_sampled,omitempty"`
-	Timestamp    string                       `json:"timestamp"`
+	Trace        string                       `json:"logging.googleapis.com/trace,omitempty"`
+	SpanID       string                       `json:"logging.googleapis.com/spanId,omitempty"`
+	TraceSampled *bool                        `json:"logging.googleapis.com/trace_sampled,omitempty"`
+	Timestamp    string                       `json:"time"`
 	Level        string                       `json:"severity"`
 	Message      string                       `json:"message"`
 	Attributes   map[LogAttribute]interface{} `json:"attributes,omitempty"`
