@@ -43,7 +43,7 @@ func NewTracer(params Params) (otrace.Tracer, func(context.Context) error, error
 			return nil, nil, err
 		}
 
-		// tOpts = append(tOpts, sdktrace.WithSampler(sdktrace.TraceIDRatioBased(params.TraceRatio)))
+		tOpts = append(tOpts, sdktrace.WithSampler(sdktrace.TraceIDRatioBased(params.TraceRatio)))
 		tOpts = append(tOpts, sdktrace.WithBatcher(exporter))
 	}
 
