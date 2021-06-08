@@ -42,7 +42,7 @@ func MustNewBrandFiller(logger logger) BrandFiller {
 
 // Fill is the middleware responsible for retrieving brand id from the headers.
 func (ua BrandFiller) Fill(ctx *routing.Context) error {
-	brandID := string(ctx.Request.Header.Peek(ContextKeyBrandID))
+	brandID := string(ctx.Request.Header.Peek("brand"))
 	brandID = strings.TrimSpace(brandID)
 	if len(brandID) == 0 {
 		err := errors.New("brand is not present on request headers").WithKind(errors.KindUnauthorized).WithCode(CodeTypeMissingBrand)

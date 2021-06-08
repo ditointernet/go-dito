@@ -55,7 +55,7 @@ func TestBrandFillerFill(t *testing.T) {
 	})
 	t.Run("should include the brand in the context when brand is set in headers",
 		withMock(func(t *testing.T, m BrandFiller) {
-			ctx := newCtxWithHeaders(map[string]string{ContextKeyBrandID: expectedBrand})
+			ctx := newCtxWithHeaders(map[string]string{"brand": expectedBrand})
 
 			m.Fill(ctx)
 			brand := ctx.Value(ContextKeyBrandID)
@@ -65,7 +65,7 @@ func TestBrandFillerFill(t *testing.T) {
 
 	t.Run("should include space trimmed brand in the context when brand in the header has spaces in beginning or end",
 		withMock(func(t *testing.T, m BrandFiller) {
-			ctx := newCtxWithHeaders(map[string]string{ContextKeyBrandID: " a-brand    "})
+			ctx := newCtxWithHeaders(map[string]string{"brand": " a-brand    "})
 
 			m.Fill(ctx)
 
