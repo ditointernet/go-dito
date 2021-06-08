@@ -13,8 +13,8 @@ github.com/ditointernet/go-dito/lib/errors v1.0.0 h1:XiPhbvNOcX2fOvQPn3Odjo0hKn+
 github.com/ditointernet/go-dito/lib/errors v1.0.0/go.mod h1:8/2xc1U8fC1okV0sSrBbXCah4QntQQVp0pSlyrvh1o4=
 github.com/ditointernet/go-dito/lib/errors v1.0.1 h1:l7k7u583UiqS7eeZQux8Hp3haTFyCKS5nbcqAX0AABk=
 github.com/ditointernet/go-dito/lib/errors v1.0.1/go.mod h1:8/2xc1U8fC1okV0sSrBbXCah4QntQQVp0pSlyrvh1o4=
-github.com/ditointernet/go-dito/lib/log v1.1.6 h1:NTDdJtsBrEyenMUrSmF0DsaScvJnspp+YiQR3IaZ+LU=
-github.com/ditointernet/go-dito/lib/log v1.1.6/go.mod h1:ywOmc7R0LGLhKt8pLoBIMfCkIhBnRV5kma1V1YbmNr8=
+github.com/ditointernet/go-dito/lib/log v1.1.11 h1:HJ0URCAc+rjAoWS/UzsIyJ2BvpG1SFoT2seQMkkAJJo=
+github.com/ditointernet/go-dito/lib/log v1.1.11/go.mod h1:ywOmc7R0LGLhKt8pLoBIMfCkIhBnRV5kma1V1YbmNr8=
 github.com/ditointernet/go-dito/lib/opa v1.0.0 h1:TOAacPgIa6YZMSPEyhENcxDrd2IhKTCA1huG6zFEau4=
 github.com/ditointernet/go-dito/lib/opa v1.0.0/go.mod h1:4VUS8vSmWTSSJ8Y/RIQNJnzGC8unqm9nXr7eHLvh4Gg=
 github.com/felixge/httpsnoop v1.0.1 h1:lvB5Jl89CsZtGIWuTcDM1E/vkVs49/Ml7JJe07l8SPQ=
