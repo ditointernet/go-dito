@@ -39,7 +39,7 @@ type ErrorResponse struct {
 // NewErrorResponse creates a new ErrorResponse object.
 func NewErrorResponse(ctx context.Context, err error) ErrorResponse {
 	return ErrorResponse{
-		TraceID: trace.SpanFromContext(ctx).SpanContext().TraceID().String(),
+		TraceID: getTraceID(trace.SpanFromContext(ctx)),
 		status:  kindToHTTPStatusCode(errors.Kind(err)),
 		Err: errorPayload{
 			Code:    errors.Code(err),
@@ -86,7 +86,7 @@ func NewErrorListResponse(ctx context.Context, errs ...error) ErrorListResponse 
 	}
 
 	return ErrorListResponse{
-		TraceID: trace.SpanFromContext(ctx).SpanContext().TraceID().String(),
+		TraceID: getTraceID(trace.SpanFromContext(ctx)),
 		status:  kindToHTTPStatusCode(errors.Kind(errs[0])),
 		Errs:    errsPayload,
 	}
@@ -108,6 +108,14 @@ func (e ErrorListResponse) StatusCode() int {
 func (e ErrorListResponse) WithStatusCode(status int) ErrorListResponse {
 	e.status = status
 	return e
+}
+
+func getTraceID(span trace.Span) string {
+	if !span.SpanContext().HasTraceID() {
+		return ""
+	}
+
+	return span.SpanContext().TraceID().String()
 }
 
 func kindToHTTPStatusCode(kind errors.KindType) int {

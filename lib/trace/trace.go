@@ -38,7 +38,7 @@ func NewTracer(params Params) (otrace.Tracer, func(context.Context) error, error
 	tOpts := []sdktrace.TracerProviderOption{}
 
 	if params.IsProductionEnvironment {
-		exporter, err := gcpexporter.NewExporter(gcpexporter.WithProjectID("new-dito"))
+		exporter, err := gcpexporter.NewExporter()
 		if err != nil {
 			return nil, nil, err
 		}
@@ -58,7 +58,7 @@ func NewTracer(params Params) (otrace.Tracer, func(context.Context) error, error
 	return tp.Tracer(params.ApplicationName), tp.Shutdown, nil
 }
 
-// NewTracer creates a new Tracer.
+// MustNewTracer creates a new Tracer.
 // It produces the tracer it self and a flush function that should be used to deliver any trace residue in cases of system shutdown.
 // It panics if any error is found during tracer construction.
 // If your application is running outside of Google Cloud, make sure that your `GOOGLE_APPLICATION_CREDENTIALS` env variable is properly set.

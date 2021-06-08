@@ -51,7 +51,7 @@ func TestBrandFillerFill(t *testing.T) {
 		var e ditoError.CustomError
 
 		assert.True(t, errors.As(err, &e))
-		assert.EqualError(t, e, "missing logger dependency")
+		assert.EqualError(t, e, "missing required dependency: logger")
 	})
 	t.Run("should include the brand in the context when brand is set in headers",
 		withMock(func(t *testing.T, m BrandFiller) {

@@ -82,7 +82,8 @@ func NewAccountAuthorizator(
 	}, nil
 }
 
-// MustNewAccountAuthorizator constructs a new account authorization middleware
+// MustNewAccountAuthorizator constructs a new account authorization middleware.
+// It panics if any error is found.
 func MustNewAccountAuthorizator(
 	logger logger,
 	authClient authorizatorClient,

@@ -8,7 +8,7 @@ import (
 )
 
 // ContextKeyBrandID is the key used to retrieve and save brand into the context
-const ContextKeyBrandID string = "brand"
+const ContextKeyBrandID string = "brand_id"
 
 const (
 	// CodeTypeMissingBrand indicates that brand header is no present on the request
@@ -20,7 +20,7 @@ type BrandFiller struct {
 	logger logger
 }
 
-// BrandFiller creates a new instance of the Brand structure
+// NewBrandFiller creates a new instance of the Brand structure
 func NewBrandFiller(logger logger) (BrandFiller, error) {
 	if logger == nil {
 		return BrandFiller{}, errors.NewMissingRequiredDependency("logger")
@@ -29,7 +29,8 @@ func NewBrandFiller(logger logger) (BrandFiller, error) {
 	return BrandFiller{logger: logger}, nil
 }
 
-// MustNewBrandFiller creates a new instance of the Brand structure
+// MustNewBrandFiller creates a new instance of the Brand structure.
+// It panics if any error is found.
 func MustNewBrandFiller(logger logger) BrandFiller {
 	mid, err := NewBrandFiller(logger)
 	if err != nil {

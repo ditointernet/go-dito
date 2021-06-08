@@ -42,7 +42,8 @@ func NewClient(jwksURI string, http HTTPClient, renewMinuteThreshold int) (*Clie
 	}, nil
 }
 
-// MustNewClient constructs a new JWKS instance
+// MustNewClient constructs a new JWKS instance.
+// It panics if any error is found.
 func MustNewClient(jwksURI string, http HTTPClient, renewMinuteThreshold int) *Client {
 	cli, err := NewClient(jwksURI, http, renewMinuteThreshold)
 	if err != nil {
