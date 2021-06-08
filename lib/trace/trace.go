@@ -5,8 +5,11 @@ import (
 
 	gcpexporter "github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace"
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/propagation"
+	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
+	"go.opentelemetry.io/otel/semconv"
 	otrace "go.opentelemetry.io/otel/trace"
 
 	"github.com/ditointernet/go-dito/lib/errors"
@@ -15,10 +18,7 @@ import (
 // Params encondes necessary input data to initialize a new Tracer.
 type Params struct {
 	IsProductionEnvironment bool
-
-	// ApplicationName should be in the following format: github.com/<project_name>/<repository>
-	// E.G.: github.com/ditointernet/new-segments-service
-	ApplicationName string
+	ApplicationName         string
 
 	// TraceRatio indicates how often the system should collect traces.
 	// Use it with caution: It may overload the system and also be too expensive to mantain its value too high in a high throuput system
@@ -35,7 +35,14 @@ func NewTracer(params Params) (otrace.Tracer, func(context.Context) error, error
 		return nil, nil, errors.NewMissingRequiredDependency("ApplicationName")
 	}
 
-	tOpts := []sdktrace.TracerProviderOption{}
+	tOpts := []sdktrace.TracerProviderOption{
+		sdktrace.WithResource(resource.NewWithAttributes(
+			attribute.KeyValue{
+				Key:   semconv.ServiceNameKey,
+				Value: attribute.StringValue(params.ApplicationName),
+			},
+		)),
+	}
 
 	if params.IsProductionEnvironment {
 		exporter, err := gcpexporter.NewExporter()
