@@ -16,7 +16,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// Migration ...
+// Migration is a structure that encapsulates migration's dependencies
 type Migration struct {
 	migrate *migrate.Migrate
 }
