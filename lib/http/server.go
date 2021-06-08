@@ -40,6 +40,7 @@ var defaultAllowedHeaders = []string{
 	"Brand",
 	"Content-Type",
 	"X-CSRF-Token",
+	"X-TOTAL-COUNT",
 }
 
 // NewServer creates a new instance of Server
