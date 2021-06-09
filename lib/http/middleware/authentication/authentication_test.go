@@ -117,7 +117,7 @@ func TestAccountAuthenticator_Authenticate(t *testing.T) {
 
 			err := ua.Authenticate(ctx)
 
-			expected := `{"error":{"code":"ERROR_ON_PARSING_JWT","message":"token's kid header not found"}}`
+			expected := `{"error":{"code":"COULD_NOT_HANDLE_TOKEN","message":"token's kid header not found"}}`
 			assert.Equal(t, expected, err.Error())
 		}))
 
@@ -138,7 +138,7 @@ func TestAccountAuthenticator_Authenticate(t *testing.T) {
 
 			err := ua.Authenticate(ctx)
 
-			expected := `{"error":{"code":"ERROR_ON_PARSING_JWT","message":"cert key not found"}}`
+			expected := `{"error":{"code":"COULD_NOT_HANDLE_TOKEN","message":"cert key not found"}}`
 			assert.Equal(t, expected, err.Error())
 		}))
 
@@ -159,7 +159,7 @@ func TestAccountAuthenticator_Authenticate(t *testing.T) {
 
 			err := ua.Authenticate(ctx)
 
-			expected := `{"error":{"code":"ERROR_ON_PARSING_JWT","message":"error trying to validate JWT signature"}}`
+			expected := `{"error":{"code":"COULD_NOT_HANDLE_TOKEN","message":"error trying to validate JWT signature"}}`
 			assert.Equal(t, expected, err.Error())
 		}))
 

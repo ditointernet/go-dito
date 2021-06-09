@@ -1,7 +1,6 @@
 package http
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -15,17 +14,6 @@ import (
 	"github.com/valyala/fasthttp"
 	"github.com/valyala/fasthttp/fasthttpadaptor"
 )
-
-type logger interface {
-	Debug(ctx context.Context, msg string, args ...interface{})
-	Info(ctx context.Context, msg string, args ...interface{})
-	Warning(ctx context.Context, msg string, args ...interface{})
-	Error(ctx context.Context, err error)
-	Critical(ctx context.Context, err error)
-}
-
-// ContextKeyRequestIPAddress is the key of RequestIP information injected into the request context
-const ContextKeyRequestIPAddress string = "request_ip"
 
 // ServerInput encapsulates the necessary Inputs to initialize a Server
 type ServerInput struct {
@@ -52,6 +40,7 @@ var defaultAllowedHeaders = []string{
 	"Brand",
 	"Content-Type",
 	"X-CSRF-Token",
+	"X-TOTAL-COUNT",
 }
 
 // NewServer creates a new instance of Server

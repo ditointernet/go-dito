@@ -67,6 +67,12 @@ func (ce CustomError) Error() string {
 	return ce.message
 }
 
+// NewMissingRequiredDependency creates a new error that indicates a missing required dependency.
+// It should be producing at struct constructors.
+func NewMissingRequiredDependency(name string) error {
+	return New("missing required dependency: %s", name).WithCode("MISSING_REQUIRED_DEPENDENCY")
+}
+
 // Kind this method receives an error, then compares its interface type with the CustomError interface
 // if the interfaces types matches, returns its kind
 func Kind(err error) KindType {

@@ -5,6 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"time"
+
+	"github.com/ditointernet/go-dito/lib/errors"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 )
 
 // Level indicates the severity of the data being logged
@@ -96,33 +101,102 @@ func (l Logger) Warning(ctx context.Context, msg string, args ...interface{}) {
 // Error logs error data
 func (l Logger) Error(ctx context.Context, err error) {
 	if l.level >= LevelError {
-		l.print(ctx, err.Error(), LevelError)
+		l.printError(ctx, err, LevelError)
 	}
 }
 
 // Critical logs critical data
 func (l Logger) Critical(ctx context.Context, err error) {
 	if l.level >= LevelCritical {
-		l.print(ctx, err.Error(), LevelCritical)
+		l.printError(ctx, err, LevelCritical)
 	}
 }
 
 type logData struct {
-	Timestamp  string                       `json:"timestamp"`
-	Level      string                       `json:"level"`
-	Message    string                       `json:"message"`
-	Attributes map[LogAttribute]interface{} `json:"attributes,omitempty"`
+	Trace        string                       `json:"logging.googleapis.com/trace,omitempty"`
+	SpanID       string                       `json:"logging.googleapis.com/spanId,omitempty"`
+	TraceSampled *bool                        `json:"logging.googleapis.com/trace_sampled,omitempty"`
+	Timestamp    string                       `json:"time"`
+	Level        string                       `json:"severity"`
+	Message      string                       `json:"message"`
+	Attributes   map[LogAttribute]interface{} `json:"attributes,omitempty"`
 }
 
 func (l Logger) print(ctx context.Context, msg string, level Level) {
+	span := trace.SpanFromContext(ctx)
+
+	attrs := l.extractLogAttributesFromContext(ctx)
+
+	span.AddEvent("log", trace.WithAttributes(buildOtelAttributes(attrs, "log")...))
+
 	data, _ := json.Marshal(logData{
-		Timestamp:  l.now().Format(time.RFC3339),
-		Level:      level.String(),
-		Message:    msg,
-		Attributes: l.extractLogAttributesFromContext(ctx),
+		Trace:        getTrace(span),
+		SpanID:       getSpanID(span),
+		TraceSampled: getIsTraceSampled(span),
+		Timestamp:    l.now().Format(time.RFC3339),
+		Level:        level.String(),
+		Message:      msg,
+		Attributes:   attrs,
 	})
 
 	fmt.Println(string(data))
+}
+
+func (l Logger) printError(ctx context.Context, err error, level Level) {
+	span := trace.SpanFromContext(ctx)
+
+	attrs := l.extractLogAttributesFromContext(ctx)
+	attrs["kind"] = string(errors.Kind(err))
+	attrs["code"] = string(errors.Code(err))
+
+	span.RecordError(err, trace.WithAttributes(buildOtelAttributes(attrs, "exception")...))
+	span.SetStatus(codes.Error, err.Error())
+
+	data, _ := json.Marshal(logData{
+		Trace:        getTrace(span),
+		SpanID:       getSpanID(span),
+		TraceSampled: getIsTraceSampled(span),
+		Timestamp:    l.now().Format(time.RFC3339),
+		Level:        level.String(),
+		Message:      err.Error(),
+		Attributes:   attrs,
+	})
+
+	fmt.Println(string(data))
+}
+
+func getTrace(span trace.Span) string {
+	if !span.SpanContext().TraceID().IsValid() {
+		return ""
+	}
+
+	return fmt.Sprintf("projects/new-dito/traces/%s", span.SpanContext().TraceID().String())
+}
+
+func getSpanID(span trace.Span) string {
+	if !span.SpanContext().TraceID().IsValid() {
+		return ""
+	}
+
+	return span.SpanContext().SpanID().String()
+}
+
+func getIsTraceSampled(span trace.Span) *bool {
+	if !span.SpanContext().TraceID().IsValid() {
+		return nil
+	}
+
+	isSampled := span.SpanContext().IsSampled()
+	return &isSampled
+}
+
+func buildOtelAttributes(attrs map[LogAttribute]interface{}, prefix string) []attribute.KeyValue {
+	eAttrs := []attribute.KeyValue{}
+	for k, v := range attrs {
+		eAttrs = append(eAttrs, attribute.String(fmt.Sprintf("%s.%s", prefix, k), v.(string)))
+	}
+
+	return eAttrs
 }
 
 func (l Logger) extractLogAttributesFromContext(ctx context.Context) map[LogAttribute]interface{} {
