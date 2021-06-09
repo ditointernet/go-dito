@@ -23,11 +23,34 @@ type Client struct {
 
 // NewClient constructs a new JWKS instance
 func NewClient(jwksURI string, http HTTPClient, renewMinuteThreshold int) (*Client, error) {
+	if jwksURI == "" {
+		return nil, errors.NewMissingRequiredDependency("jwksURI")
+	}
+
+	if http == nil {
+		return nil, errors.NewMissingRequiredDependency("http")
+	}
+
+	if renewMinuteThreshold < 0 {
+		renewMinuteThreshold = 5
+	}
+
 	return &Client{
 		jwksURI:              jwksURI,
 		http:                 http,
 		renewMinuteThreshold: renewMinuteThreshold,
 	}, nil
+}
+
+// MustNewClient constructs a new JWKS instance.
+// It panics if any error is found.
+func MustNewClient(jwksURI string, http HTTPClient, renewMinuteThreshold int) *Client {
+	cli, err := NewClient(jwksURI, http, renewMinuteThreshold)
+	if err != nil {
+		panic(err)
+	}
+
+	return cli
 }
 
 // GetCerts makes a http request to jwksURI and retrieves a list of valid certtificates
@@ -57,7 +80,7 @@ func (c *Client) RenewCerts(ctx context.Context) error {
 }
 
 // Certs return a list of valid certs
-func (c Client) Certs() map[string]string {
+func (c *Client) Certs() map[string]string {
 	return c.certs
 }
 
@@ -70,7 +93,7 @@ type jwks struct {
 	Keys []jwk `json:"keys"`
 }
 
-func (c Client) fetchCerts(ctx context.Context) (map[string]string, error) {
+func (c *Client) fetchCerts(ctx context.Context) (map[string]string, error) {
 	resp, err := c.http.Get(ctx, client.HTTPRequest{URL: c.jwksURI})
 	if err != nil {
 		return nil, err

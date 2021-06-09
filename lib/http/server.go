@@ -1,7 +1,6 @@
 package http
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -16,21 +15,11 @@ import (
 	"github.com/valyala/fasthttp/fasthttpadaptor"
 )
 
-type logger interface {
-	Debug(ctx context.Context, msg string, args ...interface{})
-	Info(ctx context.Context, msg string, args ...interface{})
-	Warning(ctx context.Context, msg string, args ...interface{})
-	Error(ctx context.Context, err error)
-	Critical(ctx context.Context, err error)
-}
-
-// ContextKeyRequestIPAddress is the key of RequestIP information injected into the request context
-const ContextKeyRequestIPAddress string = "request_ip"
-
 // ServerInput encapsulates the necessary Inputs to initialize a Server
 type ServerInput struct {
 	Port           int
 	AllowedOrigins []string
+	AllowedHeaders []string
 	Handler        func(*routing.Router)
 	Logger         logger
 }
@@ -40,17 +29,32 @@ type ServerInput struct {
 type Server struct {
 	port           int
 	allowedOrigins []string
+	allowedHeaders []string
 	router         *routing.Router
 	logger         logger
+}
+
+var defaultAllowedHeaders = []string{
+	"Accept",
+	"Authorization",
+	"Brand",
+	"Content-Type",
+	"X-CSRF-Token",
+	"X-TOTAL-COUNT",
 }
 
 // NewServer creates a new instance of Server
 func NewServer(in ServerInput) Server {
 	router := routing.New()
 
+	if len(in.AllowedHeaders) == 0 {
+		in.AllowedHeaders = defaultAllowedHeaders
+	}
+
 	server := Server{
 		port:           in.Port,
 		allowedOrigins: in.AllowedOrigins,
+		allowedHeaders: in.AllowedHeaders,
 		router:         router,
 		logger:         in.Logger,
 	}
@@ -91,7 +95,7 @@ func (s Server) addCorsMiddleware() {
 			http.MethodPut,
 			http.MethodPatch,
 		},
-		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		AllowedHeaders:   s.allowedHeaders,
 		AllowCredentials: true,
 		MaxAge:           300,
 	})

@@ -5,8 +5,21 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"go.opentelemetry.io/otel/trace"
+
 	"github.com/ditointernet/go-dito/lib/errors"
 )
+
+type logger interface {
+	Debug(ctx context.Context, msg string, args ...interface{})
+	Info(ctx context.Context, msg string, args ...interface{})
+	Warning(ctx context.Context, msg string, args ...interface{})
+	Error(ctx context.Context, err error)
+	Critical(ctx context.Context, err error)
+}
+
+// ContextKeyRequestIPAddress is the key of RequestIP information injected into the request context
+const ContextKeyRequestIPAddress string = "request_ip"
 
 type errorPayload struct {
 	Code    errors.CodeType `json:"code,omitempty"`
@@ -26,8 +39,8 @@ type ErrorResponse struct {
 // NewErrorResponse creates a new ErrorResponse object.
 func NewErrorResponse(ctx context.Context, err error) ErrorResponse {
 	return ErrorResponse{
-		// TraceID will be collected in the future, when tracing is properly implemented by GoDito
-		status: kindToHTTPStatusCode(errors.Kind(err)),
+		TraceID: getTraceID(trace.SpanFromContext(ctx)),
+		status:  kindToHTTPStatusCode(errors.Kind(err)),
 		Err: errorPayload{
 			Code:    errors.Code(err),
 			Message: err.Error(),
@@ -73,9 +86,9 @@ func NewErrorListResponse(ctx context.Context, errs ...error) ErrorListResponse 
 	}
 
 	return ErrorListResponse{
-		// TraceID will be collected in the future, when tracing is properly implemented by GoDito
-		status: kindToHTTPStatusCode(errors.Kind(errs[0])),
-		Errs:   errsPayload,
+		TraceID: getTraceID(trace.SpanFromContext(ctx)),
+		status:  kindToHTTPStatusCode(errors.Kind(errs[0])),
+		Errs:    errsPayload,
 	}
 }
 
@@ -95,6 +108,14 @@ func (e ErrorListResponse) StatusCode() int {
 func (e ErrorListResponse) WithStatusCode(status int) ErrorListResponse {
 	e.status = status
 	return e
+}
+
+func getTraceID(span trace.Span) string {
+	if !span.SpanContext().HasTraceID() {
+		return ""
+	}
+
+	return span.SpanContext().TraceID().String()
 }
 
 func kindToHTTPStatusCode(kind errors.KindType) int {
