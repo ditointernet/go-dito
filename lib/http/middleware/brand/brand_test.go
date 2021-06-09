@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	ditoError "github.com/ditointernet/go-dito/lib/errors"
-	"github.com/ditointernet/go-dito/lib/http/middleware/brand/mocks"
+	"github.com/ditointernet/go-dito/lib/http/mocks"
 	"github.com/golang/mock/gomock"
 	routing "github.com/jackwhelpton/fasthttp-routing/v2"
 	"github.com/stretchr/testify/assert"
@@ -34,12 +34,12 @@ func newCtxWithHeaders(headers map[string]string) *routing.Context {
 
 func TestBrandFillerFill(t *testing.T) {
 	expectedBrand := "a-brand"
-	var logger *mocks.Mocklogger
+	var logger *mocks.MockLogger
 	withMock := func(runner func(t *testing.T, m BrandFiller)) func(t *testing.T) {
 		return func(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
-			logger = mocks.NewMocklogger(ctrl)
+			logger = mocks.NewMockLogger(ctrl)
 			middleware, _ := NewBrandFiller(logger)
 
 			runner(t, middleware)

@@ -6,6 +6,7 @@ import (
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/ditointernet/go-dito/lib/errors"
 	"github.com/ditointernet/go-dito/lib/http"
+	"github.com/ditointernet/go-dito/lib/http/infra"
 	routing "github.com/jackwhelpton/fasthttp-routing/v2"
 )
 
@@ -23,12 +24,12 @@ const (
 
 // AccountAuthenticator structure responsible for handling request authentication
 type AccountAuthenticator struct {
-	logger logger
-	jwks   jwksClient
+	logger infra.Logger
+	jwks   infra.JWKSClient
 }
 
 // NewAccountAuthenticator creates a new instance of the AccountAuthenticator structure
-func NewAccountAuthenticator(logger logger, jwks jwksClient) (AccountAuthenticator, error) {
+func NewAccountAuthenticator(logger infra.Logger, jwks infra.JWKSClient) (AccountAuthenticator, error) {
 	if logger == nil {
 		return AccountAuthenticator{}, errors.NewMissingRequiredDependency("logger")
 	}
@@ -45,7 +46,7 @@ func NewAccountAuthenticator(logger logger, jwks jwksClient) (AccountAuthenticat
 
 // NewAccountAuthenticator creates a new instance of the AccountAuthenticator structure.
 // It panics if any error is found.
-func MustNewAccountAuthenticator(logger logger, jwks jwksClient) AccountAuthenticator {
+func MustNewAccountAuthenticator(logger infra.Logger, jwks infra.JWKSClient) AccountAuthenticator {
 	auth, err := NewAccountAuthenticator(logger, jwks)
 	if err != nil {
 		panic(err)

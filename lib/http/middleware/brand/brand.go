@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/ditointernet/go-dito/lib/errors"
+	"github.com/ditointernet/go-dito/lib/http/infra"
 	routing "github.com/jackwhelpton/fasthttp-routing/v2"
 )
 
@@ -17,11 +18,11 @@ const (
 
 // BrandFiller structure responsible for injecting the brand into HTTP request context.
 type BrandFiller struct {
-	logger logger
+	logger infra.Logger
 }
 
 // NewBrandFiller creates a new instance of the Brand structure
-func NewBrandFiller(logger logger) (BrandFiller, error) {
+func NewBrandFiller(logger infra.Logger) (BrandFiller, error) {
 	if logger == nil {
 		return BrandFiller{}, errors.NewMissingRequiredDependency("logger")
 	}
@@ -31,7 +32,7 @@ func NewBrandFiller(logger logger) (BrandFiller, error) {
 
 // MustNewBrandFiller creates a new instance of the Brand structure.
 // It panics if any error is found.
-func MustNewBrandFiller(logger logger) BrandFiller {
+func MustNewBrandFiller(logger infra.Logger) BrandFiller {
 	mid, err := NewBrandFiller(logger)
 	if err != nil {
 		panic(err)

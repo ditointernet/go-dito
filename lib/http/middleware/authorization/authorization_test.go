@@ -9,9 +9,8 @@ import (
 
 	ditoError "github.com/ditointernet/go-dito/lib/errors"
 	"github.com/ditointernet/go-dito/lib/http/middleware/authentication"
-	"github.com/ditointernet/go-dito/lib/http/middleware/authorization/mocks"
 	"github.com/ditointernet/go-dito/lib/http/middleware/brand"
-	opaLib "github.com/ditointernet/go-dito/lib/opa"
+	"github.com/ditointernet/go-dito/lib/http/mocks"
 	"github.com/golang/mock/gomock"
 	routing "github.com/jackwhelpton/fasthttp-routing/v2"
 	"github.com/stretchr/testify/assert"
@@ -38,8 +37,8 @@ func newCtxWithUserValues(userValues map[string]interface{}) *routing.Context {
 }
 
 func TestAuthorize(t *testing.T) {
-	var logger *mocks.Mocklogger
-	var opa *mocks.MockauthorizatorClient
+	var logger *mocks.MockLogger
+	var authorizator *mocks.MockAuthorizatorClient
 	timeout := 100 * time.Millisecond
 
 	withMock := func(runner func(t *testing.T, m AccountAuthorizator)) func(t *testing.T) {
@@ -47,16 +46,16 @@ func TestAuthorize(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
-			logger = mocks.NewMocklogger(ctrl)
-			opa = mocks.NewMockauthorizatorClient(ctrl)
-			middleware, _ := NewAccountAuthorizator(logger, opa, timeout, "some-client", []ResourseFilter{})
+			logger = mocks.NewMockLogger(ctrl)
+			authorizator = mocks.NewMockAuthorizatorClient(ctrl)
+			middleware, _ := NewAccountAuthorizator(logger, authorizator, timeout, "some-client", []ResourseFilter{})
 
 			runner(t, middleware)
 		}
 	}
 	t.Run("should not create the authorizator instance when there isn't a resource name",
 		func(t *testing.T) {
-			_, err := NewAccountAuthorizator(logger, opa, timeout, "", []ResourseFilter{})
+			_, err := NewAccountAuthorizator(logger, authorizator, timeout, "", []ResourseFilter{})
 
 			if err == nil {
 				t.Fatal("expected error was not found")
@@ -68,7 +67,7 @@ func TestAuthorize(t *testing.T) {
 		})
 	t.Run("should not create the authorizator instance when there isn't a logger",
 		func(t *testing.T) {
-			_, err := NewAccountAuthorizator(nil, opa, timeout, "some-client", []ResourseFilter{})
+			_, err := NewAccountAuthorizator(nil, authorizator, timeout, "some-client", []ResourseFilter{})
 
 			if err == nil {
 				t.Fatal("expected error was not found")
@@ -123,7 +122,7 @@ func TestAuthorize(t *testing.T) {
 			assert.EqualError(t, e, "missing brand id")
 		}))
 
-	t.Run("should return error when opa client returns an error",
+	t.Run("should return error when authorizator client returns an error",
 		withMock(func(t *testing.T, m AccountAuthorizator) {
 			ctx := newCtxWithUserValues(map[string]interface{}{
 				authentication.ContextKeyAccountID: "123456",
@@ -134,7 +133,7 @@ func TestAuthorize(t *testing.T) {
 			defer cancel()
 
 			logger.EXPECT().Error(gomock.Any(), gomock.Any())
-			opa.EXPECT().
+			authorizator.EXPECT().
 				ExecuteQuery(expectedCtx, gomock.Any(), gomock.Any()).
 				Return(nil, errors.New("any error"))
 
@@ -145,10 +144,10 @@ func TestAuthorize(t *testing.T) {
 				t.Fatal("expected error was not found")
 			}
 
-			assert.EqualError(t, err, "error on executing opa client query, got: any error")
+			assert.EqualError(t, err, "error on executing authorizator client query, got : any error")
 		}))
 
-	t.Run("should return error when opa client returns an empty result",
+	t.Run("should return error when authorizator client returns an empty result",
 		withMock(func(t *testing.T, m AccountAuthorizator) {
 			ctx := newCtxWithUserValues(map[string]interface{}{
 				authentication.ContextKeyAccountID: "123456",
@@ -159,7 +158,7 @@ func TestAuthorize(t *testing.T) {
 			defer cancel()
 
 			logger.EXPECT().Error(gomock.Any(), gomock.Any())
-			opa.EXPECT().
+			authorizator.EXPECT().
 				ExecuteQuery(expectedCtx, gomock.Any(), gomock.Any()).
 				Return(nil, nil)
 
@@ -184,9 +183,9 @@ func TestAuthorize(t *testing.T) {
 			defer cancel()
 
 			logger.EXPECT().Error(gomock.Any(), gomock.Any())
-			opa.EXPECT().
+			authorizator.EXPECT().
 				ExecuteQuery(expectedCtx, gomock.Any(), gomock.Any()).
-				Return(opaLib.AuthorizationResult{{}}, nil)
+				Return([]map[string]interface{}{{}}, nil)
 
 			m.Now = func() time.Time { return now }
 
@@ -209,9 +208,9 @@ func TestAuthorize(t *testing.T) {
 			defer cancel()
 
 			logger.EXPECT().Debug(gomock.Any(), gomock.Any())
-			opa.EXPECT().
+			authorizator.EXPECT().
 				ExecuteQuery(expectedCtx, gomock.Any(), gomock.Any()).
-				Return(opaLib.AuthorizationResult{{"allow": false}}, nil)
+				Return([]map[string]interface{}{{"allow": false}}, nil)
 
 			m.Now = func() time.Time { return now }
 
@@ -222,7 +221,7 @@ func TestAuthorize(t *testing.T) {
 
 			var e ditoError.CustomError
 			assert.True(t, errors.As(err, &e))
-			assert.EqualError(t, e, "Authorization decision - accountID: 123456 with brandID any-brand4 access was denied")
+			assert.EqualError(t, e, "authorization decision - accountID: 123456 with brandID any-brand4 access was denied")
 		}))
 
 	t.Run("should authorize user when the user exists in the bundle data",
@@ -236,9 +235,9 @@ func TestAuthorize(t *testing.T) {
 			expectedCtx, cancel := context.WithDeadline(ctx, now.Add(timeout))
 			defer cancel()
 			logger.EXPECT().Debug(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any())
-			opa.EXPECT().
+			authorizator.EXPECT().
 				ExecuteQuery(expectedCtx, gomock.Any(), gomock.Any()).
-				Return(opaLib.AuthorizationResult{{"allow": true}}, nil)
+				Return([]map[string]interface{}{{"allow": true}}, nil)
 			m.Now = func() time.Time { return now }
 
 			err := m.Authorize(ctx)
@@ -247,9 +246,9 @@ func TestAuthorize(t *testing.T) {
 		}))
 }
 
-func TestAuthorize_WithFIlters(t *testing.T) {
-	var logger *mocks.Mocklogger
-	var opa *mocks.MockauthorizatorClient
+func TestAuthorize_WithFilters(t *testing.T) {
+	var logger *mocks.MockLogger
+	var authorizator *mocks.MockAuthorizatorClient
 	timeout := 100 * time.Millisecond
 
 	withMock := func(runner func(t *testing.T, m AccountAuthorizator)) func(t *testing.T) {
@@ -257,9 +256,9 @@ func TestAuthorize_WithFIlters(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
-			logger = mocks.NewMocklogger(ctrl)
-			opa = mocks.NewMockauthorizatorClient(ctrl)
-			middleware, _ := NewAccountAuthorizator(logger, opa, timeout, "some-client", []ResourseFilter{StoreFilter})
+			logger = mocks.NewMockLogger(ctrl)
+			authorizator = mocks.NewMockAuthorizatorClient(ctrl)
+			middleware, _ := NewAccountAuthorizator(logger, authorizator, timeout, "some-client", []ResourseFilter{StoreFilter})
 
 			runner(t, middleware)
 		}
@@ -297,7 +296,7 @@ func TestAuthorize_WithFIlters(t *testing.T) {
 			assert.EqualError(t, e, "missing brand id")
 		}))
 
-	t.Run("should return error when opa client returns an error",
+	t.Run("should return error when authorizator client returns an error",
 		withMock(func(t *testing.T, m AccountAuthorizator) {
 			ctx := newCtxWithUserValues(map[string]interface{}{
 				authentication.ContextKeyAccountID: "123456",
@@ -308,7 +307,7 @@ func TestAuthorize_WithFIlters(t *testing.T) {
 			defer cancel()
 
 			logger.EXPECT().Error(gomock.Any(), gomock.Any())
-			opa.EXPECT().
+			authorizator.EXPECT().
 				ExecuteQuery(expectedCtx, gomock.Any(), gomock.Any()).
 				Return(nil, errors.New("any error"))
 
@@ -319,10 +318,10 @@ func TestAuthorize_WithFIlters(t *testing.T) {
 				t.Fatal("expected error was not found")
 			}
 
-			assert.EqualError(t, err, "error on executing opa client query, got: any error")
+			assert.EqualError(t, err, "error on executing authorizator client query, got : any error")
 		}))
 
-	t.Run("should return error when opa client returns an empty result",
+	t.Run("should return error when authorizator client returns an empty result",
 		withMock(func(t *testing.T, m AccountAuthorizator) {
 			ctx := newCtxWithUserValues(map[string]interface{}{
 				authentication.ContextKeyAccountID: "123456",
@@ -333,7 +332,7 @@ func TestAuthorize_WithFIlters(t *testing.T) {
 			defer cancel()
 
 			logger.EXPECT().Error(gomock.Any(), gomock.Any())
-			opa.EXPECT().
+			authorizator.EXPECT().
 				ExecuteQuery(expectedCtx, gomock.Any(), gomock.Any()).
 				Return(nil, nil)
 
@@ -358,9 +357,9 @@ func TestAuthorize_WithFIlters(t *testing.T) {
 			defer cancel()
 
 			logger.EXPECT().Error(gomock.Any(), gomock.Any())
-			opa.EXPECT().
+			authorizator.EXPECT().
 				ExecuteQuery(expectedCtx, gomock.Any(), gomock.Any()).
-				Return(opaLib.AuthorizationResult{{}}, nil)
+				Return([]map[string]interface{}{{}}, nil)
 
 			m.Now = func() time.Time { return now }
 
@@ -383,9 +382,9 @@ func TestAuthorize_WithFIlters(t *testing.T) {
 			defer cancel()
 
 			logger.EXPECT().Debug(gomock.Any(), gomock.Any())
-			opa.EXPECT().
+			authorizator.EXPECT().
 				ExecuteQuery(expectedCtx, gomock.Any(), gomock.Any()).
-				Return(opaLib.AuthorizationResult{{"allow": false}}, nil)
+				Return([]map[string]interface{}{{"allow": false}}, nil)
 
 			m.Now = func() time.Time { return now }
 
@@ -396,7 +395,7 @@ func TestAuthorize_WithFIlters(t *testing.T) {
 
 			var e ditoError.CustomError
 			assert.True(t, errors.As(err, &e))
-			assert.EqualError(t, e, "Authorization decision - accountID: 123456 with brandID any-brand4 access was denied")
+			assert.EqualError(t, e, "authorization decision - accountID: 123456 with brandID any-brand4 access was denied")
 		}))
 
 	t.Run("should authorize user when the user exists in the bundle data",
@@ -410,9 +409,9 @@ func TestAuthorize_WithFIlters(t *testing.T) {
 			expectedCtx, cancel := context.WithDeadline(ctx, now.Add(timeout))
 			defer cancel()
 			logger.EXPECT().Debug(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any())
-			opa.EXPECT().
+			authorizator.EXPECT().
 				ExecuteQuery(expectedCtx, gomock.Any(), gomock.Any()).
-				Return(opaLib.AuthorizationResult{{"allow": true}}, nil)
+				Return([]map[string]interface{}{{"allow": true}}, nil)
 			m.Now = func() time.Time { return now }
 
 			err := m.Authorize(ctx)
@@ -429,9 +428,9 @@ func TestAuthorize_WithFIlters(t *testing.T) {
 				brand.ContextKeyBrandID:            "any-brand1",
 			})
 
-			opa.EXPECT().
+			authorizator.EXPECT().
 				ExecuteQuery(gomock.Any(), gomock.Any(), gomock.Any()).
-				Return(opaLib.AuthorizationResult{
+				Return([]map[string]interface{}{
 					{"allow": true, "filter": []interface{}{"fil1", "fil2"}},
 				}, nil)
 

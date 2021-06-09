@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/ditointernet/go-dito/lib/errors"
-	"github.com/ditointernet/go-dito/lib/http/middleware/authentication/mocks"
+	"github.com/ditointernet/go-dito/lib/http/mocks"
 	"github.com/golang/mock/gomock"
 	routing "github.com/jackwhelpton/fasthttp-routing/v2"
 	"github.com/stretchr/testify/assert"
@@ -32,16 +32,16 @@ func newCtxWithHeaders(headers map[string]string) *routing.Context {
 	return ctx
 }
 func TestAccountAuthenticator_Authenticate(t *testing.T) {
-	var logger *mocks.Mocklogger
-	var jwks *mocks.MockjwksClient
+	var logger *mocks.MockLogger
+	var jwks *mocks.MockJWKSClient
 
 	withMock := func(runner func(t *testing.T, ua AccountAuthenticator)) func(t *testing.T) {
 		return func(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
-			logger = mocks.NewMocklogger(ctrl)
-			jwks = mocks.NewMockjwksClient(ctrl)
+			logger = mocks.NewMockLogger(ctrl)
+			jwks = mocks.NewMockJWKSClient(ctrl)
 			middleware, _ := NewAccountAuthenticator(logger, jwks)
 			runner(t, middleware)
 		}

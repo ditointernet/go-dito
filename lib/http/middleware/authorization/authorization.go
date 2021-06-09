@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/ditointernet/go-dito/lib/errors"
+	"github.com/ditointernet/go-dito/lib/http/infra"
 	"github.com/ditointernet/go-dito/lib/http/middleware/authentication"
 	"github.com/ditointernet/go-dito/lib/http/middleware/brand"
 	routing "github.com/jackwhelpton/fasthttp-routing/v2"
@@ -43,8 +44,8 @@ func (s ResourseFilter) String() string {
 
 // AccountAuthorizator is the struct responsible for create account authorizarion
 type AccountAuthorizator struct {
-	logger              logger
-	authorizatorClient  authorizatorClient
+	logger              infra.Logger
+	authorizatorClient  infra.AuthorizatorClient
 	authorizatorTimeout time.Duration
 	Now                 func() time.Time
 	resourceName        string
@@ -53,8 +54,8 @@ type AccountAuthorizator struct {
 
 // NewAccountAuthorizator constructs a new account authorization middleware
 func NewAccountAuthorizator(
-	logger logger,
-	authClient authorizatorClient,
+	logger infra.Logger,
+	authClient infra.AuthorizatorClient,
 	authorizatorTimeout time.Duration,
 	resourceName string,
 	resourseFilters []ResourseFilter,
@@ -85,8 +86,8 @@ func NewAccountAuthorizator(
 // MustNewAccountAuthorizator constructs a new account authorization middleware.
 // It panics if any error is found.
 func MustNewAccountAuthorizator(
-	logger logger,
-	authClient authorizatorClient,
+	logger infra.Logger,
+	authClient infra.AuthorizatorClient,
 	authorizatorTimeout time.Duration,
 	resourceName string,
 	resourseFilters []ResourseFilter,
@@ -133,7 +134,7 @@ func (a AccountAuthorizator) Authorize(ctx *routing.Context) error {
 
 	result, err := a.authorizatorClient.ExecuteQuery(c, query, resourceInput)
 	if err != nil {
-		err := errors.New("error on executing opa client query, got: %s", err).WithCode(CodeTypeErrorExecutingAuthorizationQuery)
+		err := errors.New("error on executing authorizator client query, got : %s", err).WithKind(errors.KindInternal).WithCode(CodeTypeErrorExecutingAuthorizationQuery)
 		a.logger.Error(ctx, err)
 		return err
 	}
@@ -151,7 +152,7 @@ func (a AccountAuthorizator) Authorize(ctx *routing.Context) error {
 	}
 
 	if !allowed {
-		err := errors.New("Authorization decision - accountID: %s with brandID %s access was denied", accountID, brandID).WithKind(errors.KindUnauthorized).WithCode(CodeTypeAccessDenied)
+		err := errors.New("authorization decision - accountID: %s with brandID %s access was denied", accountID, brandID).WithKind(errors.KindUnauthorized).WithCode(CodeTypeAccessDenied)
 		a.logger.Debug(ctx, err.Error())
 		return err
 	}
