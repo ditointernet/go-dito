@@ -8,6 +8,8 @@ import (
 	URL "net/url"
 	"time"
 
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+
 	"github.com/ditointernet/go-dito/lib/errors"
 )
 
@@ -24,7 +26,7 @@ type Client struct {
 // NewClient creates a new Client instance
 func NewClient(timeout time.Duration) Client {
 	return Client{
-		http: &http.Client{Timeout: timeout},
+		http: &http.Client{Timeout: timeout, Transport: otelhttp.NewTransport(http.DefaultTransport)},
 	}
 }
 

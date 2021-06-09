@@ -37,7 +37,7 @@ func TestNewLogger(t *testing.T) {
 			logger.Info(ctx, "random message")
 		})
 
-		if diff := cmp.Diff(`{"timestamp":"2020-12-01T12:00:00Z","level":"INFO","message":"random message"}`, out); diff != "" {
+		if diff := cmp.Diff(`{"time":"2020-12-01T12:00:00Z","severity":"INFO","message":"random message"}`, out); diff != "" {
 			t.Errorf("mismatch (-want, +got):\n%s", diff)
 		}
 	})
@@ -60,7 +60,7 @@ func TestDebug(t *testing.T) {
 			ctx:         ctx,
 			level:       "DEBUG",
 			msg:         "random message",
-			expectedLog: `{"timestamp":"2020-12-01T12:00:00Z","level":"DEBUG","message":"random message"}`,
+			expectedLog: `{"time":"2020-12-01T12:00:00Z","severity":"DEBUG","message":"random message"}`,
 		},
 		{
 			desc:        "should not log when LogLevel is INFO",
@@ -96,7 +96,7 @@ func TestDebug(t *testing.T) {
 			level:       "DEBUG",
 			msg:         "random message with dynamic data %d",
 			msgArgs:     []interface{}{1},
-			expectedLog: `{"timestamp":"2020-12-01T12:00:00Z","level":"DEBUG","message":"random message with dynamic data 1"}`,
+			expectedLog: `{"time":"2020-12-01T12:00:00Z","severity":"DEBUG","message":"random message with dynamic data 1"}`,
 		},
 		{
 			desc:        "should log with attributes",
@@ -104,7 +104,7 @@ func TestDebug(t *testing.T) {
 			level:       "DEBUG",
 			msg:         "random message",
 			attrs:       LogAttributeSet{"attr1": true},
-			expectedLog: `{"timestamp":"2020-12-01T12:00:00Z","level":"DEBUG","message":"random message","attributes":{"attr1":"value1"}}`,
+			expectedLog: `{"time":"2020-12-01T12:00:00Z","severity":"DEBUG","message":"random message","attributes":{"attr1":"value1"}}`,
 		},
 	}
 
@@ -141,14 +141,14 @@ func TestInfo(t *testing.T) {
 			ctx:         ctx,
 			level:       "DEBUG",
 			msg:         "random message",
-			expectedLog: `{"timestamp":"2020-12-01T12:00:00Z","level":"INFO","message":"random message"}`,
+			expectedLog: `{"time":"2020-12-01T12:00:00Z","severity":"INFO","message":"random message"}`,
 		},
 		{
 			desc:        "should log when LogLevel is INFO",
 			ctx:         ctx,
 			level:       "INFO",
 			msg:         "random message",
-			expectedLog: `{"timestamp":"2020-12-01T12:00:00Z","level":"INFO","message":"random message"}`,
+			expectedLog: `{"time":"2020-12-01T12:00:00Z","severity":"INFO","message":"random message"}`,
 		},
 		{
 			desc:        "should not log when LogLevel is WARNING",
@@ -177,7 +177,7 @@ func TestInfo(t *testing.T) {
 			level:       "DEBUG",
 			msg:         "random message with dynamic data %d",
 			msgArgs:     []interface{}{1},
-			expectedLog: `{"timestamp":"2020-12-01T12:00:00Z","level":"INFO","message":"random message with dynamic data 1"}`,
+			expectedLog: `{"time":"2020-12-01T12:00:00Z","severity":"INFO","message":"random message with dynamic data 1"}`,
 		},
 		{
 			desc:        "should log with attributes",
@@ -185,7 +185,7 @@ func TestInfo(t *testing.T) {
 			level:       "DEBUG",
 			msg:         "random message",
 			attrs:       LogAttributeSet{"attr1": true},
-			expectedLog: `{"timestamp":"2020-12-01T12:00:00Z","level":"INFO","message":"random message","attributes":{"attr1":"value1"}}`,
+			expectedLog: `{"time":"2020-12-01T12:00:00Z","severity":"INFO","message":"random message","attributes":{"attr1":"value1"}}`,
 		},
 	}
 
@@ -222,21 +222,21 @@ func TestWarning(t *testing.T) {
 			ctx:         ctx,
 			level:       "DEBUG",
 			msg:         "random message",
-			expectedLog: `{"timestamp":"2020-12-01T12:00:00Z","level":"WARNING","message":"random message"}`,
+			expectedLog: `{"time":"2020-12-01T12:00:00Z","severity":"WARNING","message":"random message"}`,
 		},
 		{
 			desc:        "should log when LogLevel is INFO",
 			ctx:         ctx,
 			level:       "INFO",
 			msg:         "random message",
-			expectedLog: `{"timestamp":"2020-12-01T12:00:00Z","level":"WARNING","message":"random message"}`,
+			expectedLog: `{"time":"2020-12-01T12:00:00Z","severity":"WARNING","message":"random message"}`,
 		},
 		{
 			desc:        "should log when LogLevel is WARNING",
 			ctx:         ctx,
 			level:       "WARNING",
 			msg:         "random message",
-			expectedLog: `{"timestamp":"2020-12-01T12:00:00Z","level":"WARNING","message":"random message"}`,
+			expectedLog: `{"time":"2020-12-01T12:00:00Z","severity":"WARNING","message":"random message"}`,
 		},
 		{
 			desc:        "should not log when LogLevel is ERROR",
@@ -258,7 +258,7 @@ func TestWarning(t *testing.T) {
 			level:       "DEBUG",
 			msg:         "random message with dynamic data %d",
 			msgArgs:     []interface{}{1},
-			expectedLog: `{"timestamp":"2020-12-01T12:00:00Z","level":"WARNING","message":"random message with dynamic data 1"}`,
+			expectedLog: `{"time":"2020-12-01T12:00:00Z","severity":"WARNING","message":"random message with dynamic data 1"}`,
 		},
 		{
 			desc:        "should log with attributes",
@@ -266,7 +266,7 @@ func TestWarning(t *testing.T) {
 			level:       "DEBUG",
 			msg:         "random message",
 			attrs:       LogAttributeSet{"attr1": true},
-			expectedLog: `{"timestamp":"2020-12-01T12:00:00Z","level":"WARNING","message":"random message","attributes":{"attr1":"value1"}}`,
+			expectedLog: `{"time":"2020-12-01T12:00:00Z","severity":"WARNING","message":"random message","attributes":{"attr1":"value1"}}`,
 		},
 	}
 
@@ -302,28 +302,28 @@ func TestError(t *testing.T) {
 			ctx:         ctx,
 			level:       "DEBUG",
 			err:         errors.New("random error"),
-			expectedLog: `{"timestamp":"2020-12-01T12:00:00Z","level":"ERROR","message":"random error"}`,
+			expectedLog: `{"time":"2020-12-01T12:00:00Z","severity":"ERROR","message":"random error","attributes":{"code":"UNKNOWN","kind":"UNEXPECTED"}}`,
 		},
 		{
 			desc:        "should log when LogLevel is INFO",
 			ctx:         ctx,
 			level:       "INFO",
 			err:         errors.New("random error"),
-			expectedLog: `{"timestamp":"2020-12-01T12:00:00Z","level":"ERROR","message":"random error"}`,
+			expectedLog: `{"time":"2020-12-01T12:00:00Z","severity":"ERROR","message":"random error","attributes":{"code":"UNKNOWN","kind":"UNEXPECTED"}}`,
 		},
 		{
 			desc:        "should log when LogLevel is WARNING",
 			ctx:         ctx,
 			level:       "WARNING",
 			err:         errors.New("random error"),
-			expectedLog: `{"timestamp":"2020-12-01T12:00:00Z","level":"ERROR","message":"random error"}`,
+			expectedLog: `{"time":"2020-12-01T12:00:00Z","severity":"ERROR","message":"random error","attributes":{"code":"UNKNOWN","kind":"UNEXPECTED"}}`,
 		},
 		{
 			desc:        "should log when LogLevel is ERROR",
 			ctx:         ctx,
 			level:       "ERROR",
 			err:         errors.New("random error"),
-			expectedLog: `{"timestamp":"2020-12-01T12:00:00Z","level":"ERROR","message":"random error"}`,
+			expectedLog: `{"time":"2020-12-01T12:00:00Z","severity":"ERROR","message":"random error","attributes":{"code":"UNKNOWN","kind":"UNEXPECTED"}}`,
 		},
 		{
 			desc:        "should not log when LogLevel is CRITICAL",
@@ -338,7 +338,7 @@ func TestError(t *testing.T) {
 			level:       "DEBUG",
 			err:         errors.New("random error"),
 			attrs:       LogAttributeSet{"attr1": true},
-			expectedLog: `{"timestamp":"2020-12-01T12:00:00Z","level":"ERROR","message":"random error","attributes":{"attr1":"value1"}}`,
+			expectedLog: `{"time":"2020-12-01T12:00:00Z","severity":"ERROR","message":"random error","attributes":{"attr1":"value1","code":"UNKNOWN","kind":"UNEXPECTED"}}`,
 		},
 	}
 
@@ -374,35 +374,35 @@ func TestCritical(t *testing.T) {
 			ctx:         ctx,
 			level:       "DEBUG",
 			err:         errors.New("random error"),
-			expectedLog: `{"timestamp":"2020-12-01T12:00:00Z","level":"CRITICAL","message":"random error"}`,
+			expectedLog: `{"time":"2020-12-01T12:00:00Z","severity":"CRITICAL","message":"random error","attributes":{"code":"UNKNOWN","kind":"UNEXPECTED"}}`,
 		},
 		{
 			desc:        "should log when LogLevel is INFO",
 			ctx:         ctx,
 			level:       "INFO",
 			err:         errors.New("random error"),
-			expectedLog: `{"timestamp":"2020-12-01T12:00:00Z","level":"CRITICAL","message":"random error"}`,
+			expectedLog: `{"time":"2020-12-01T12:00:00Z","severity":"CRITICAL","message":"random error","attributes":{"code":"UNKNOWN","kind":"UNEXPECTED"}}`,
 		},
 		{
 			desc:        "should log when LogLevel is WARNING",
 			ctx:         ctx,
 			level:       "WARNING",
 			err:         errors.New("random error"),
-			expectedLog: `{"timestamp":"2020-12-01T12:00:00Z","level":"CRITICAL","message":"random error"}`,
+			expectedLog: `{"time":"2020-12-01T12:00:00Z","severity":"CRITICAL","message":"random error","attributes":{"code":"UNKNOWN","kind":"UNEXPECTED"}}`,
 		},
 		{
 			desc:        "should log when LogLevel is ERROR",
 			ctx:         ctx,
 			level:       "ERROR",
 			err:         errors.New("random error"),
-			expectedLog: `{"timestamp":"2020-12-01T12:00:00Z","level":"CRITICAL","message":"random error"}`,
+			expectedLog: `{"time":"2020-12-01T12:00:00Z","severity":"CRITICAL","message":"random error","attributes":{"code":"UNKNOWN","kind":"UNEXPECTED"}}`,
 		},
 		{
 			desc:        "should log when LogLevel is CRITICAL",
 			ctx:         ctx,
 			level:       "CRITICAL",
 			err:         errors.New("random error"),
-			expectedLog: `{"timestamp":"2020-12-01T12:00:00Z","level":"CRITICAL","message":"random error"}`,
+			expectedLog: `{"time":"2020-12-01T12:00:00Z","severity":"CRITICAL","message":"random error","attributes":{"code":"UNKNOWN","kind":"UNEXPECTED"}}`,
 		},
 		{
 			desc:        "should log with attributes",
@@ -410,7 +410,7 @@ func TestCritical(t *testing.T) {
 			level:       "DEBUG",
 			err:         errors.New("random error"),
 			attrs:       LogAttributeSet{"attr1": true},
-			expectedLog: `{"timestamp":"2020-12-01T12:00:00Z","level":"CRITICAL","message":"random error","attributes":{"attr1":"value1"}}`,
+			expectedLog: `{"time":"2020-12-01T12:00:00Z","severity":"CRITICAL","message":"random error","attributes":{"attr1":"value1","code":"UNKNOWN","kind":"UNEXPECTED"}}`,
 		},
 	}
 

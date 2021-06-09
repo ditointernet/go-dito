@@ -42,6 +42,17 @@ func NewClient(opaBundleBaseURL string, opaPollingMinDelay, opaPollingMaxDelay i
 	return Client{manager: manager}, nil
 }
 
+// MustNewClient creates a new Client object.
+// It panics if any error is found.
+func MustNewClient(opaBundleBaseURL string, opaPollingMinDelay, opaPollingMaxDelay int) Client {
+	cli, err := NewClient(opaBundleBaseURL, opaPollingMinDelay, opaPollingMaxDelay)
+	if err != nil {
+		panic(err)
+	}
+
+	return cli
+}
+
 // DecideIfAllowed indicates if the given user is allowed to perform the given action
 func (c Client) DecideIfAllowed(ctx context.Context, regoQuery, method, path, brandID, userID string) (bool, error) {
 	var decision bool

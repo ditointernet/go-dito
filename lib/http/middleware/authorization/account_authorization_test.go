@@ -63,7 +63,7 @@ func TestAuthorize(t *testing.T) {
 
 			var e ditoError.CustomError
 			assert.True(t, errors.As(err, &e))
-			assert.EqualError(t, e, "missing resource name")
+			assert.EqualError(t, e, "missing required dependency: resourceName")
 		})
 	t.Run("should not create the authorizator instance when there isn't a logger",
 		func(t *testing.T) {
@@ -75,7 +75,7 @@ func TestAuthorize(t *testing.T) {
 
 			var e ditoError.CustomError
 			assert.True(t, errors.As(err, &e))
-			assert.EqualError(t, e, "missing logger")
+			assert.EqualError(t, e, "missing required dependency: logger")
 		})
 	t.Run("should not create the authorizator instance when there isn't a authCLient",
 		func(t *testing.T) {
@@ -87,7 +87,7 @@ func TestAuthorize(t *testing.T) {
 
 			var e ditoError.CustomError
 			assert.True(t, errors.As(err, &e))
-			assert.EqualError(t, e, "missing auth client")
+			assert.EqualError(t, e, "missing required dependency: authClient")
 		})
 
 	t.Run("should not authorize when there is no account id on context",
@@ -169,7 +169,7 @@ func TestAuthorize(t *testing.T) {
 				t.Fatal("expected error was not found")
 			}
 
-			assert.EqualError(t, err, "error on executing authorizator client query, got undefined result: %!s(<nil>)")
+			assert.EqualError(t, err, "error on executing authorizator client query, got undefined result")
 		}))
 
 	t.Run("should return error when allow response is not found",
@@ -343,7 +343,7 @@ func TestAuthorize_WithFIlters(t *testing.T) {
 				t.Fatal("expected error was not found")
 			}
 
-			assert.EqualError(t, err, "error on executing authorizator client query, got undefined result: %!s(<nil>)")
+			assert.EqualError(t, err, "error on executing authorizator client query, got undefined result")
 		}))
 
 	t.Run("should return error when allow response is not found",

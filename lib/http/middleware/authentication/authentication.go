@@ -11,7 +11,7 @@ import (
 )
 
 // ContextKeyAccountID is the key used to retrieve and save accountId into the context
-const ContextKeyAccountID string = "account-id"
+const ContextKeyAccountID string = "account_id"
 
 const (
 	// CodeTypeMissingBearerToken indicates that the bearer token was not provided
@@ -19,7 +19,7 @@ const (
 	// CodeTypeErrorOnRenewingCerts indicates that the application couldnt renew the JWKS certificates
 	CodeTypeErrorOnRenewingCerts errors.CodeType = "COULD_NOT_RENEW_CERTS"
 	// CodeTypeErrorOnParsingJWTToken indicates that the application couldn't parse the JWT token
-	CodeTypeErrorOnParsingJWTToken errors.CodeType = "ERROR_ON_PARSING_JWT"
+	CodeTypeErrorOnParsingJWTToken errors.CodeType = "COULD_NOT_HANDLE_TOKEN"
 )
 
 // AccountAuthenticator structure responsible for handling request authentication
@@ -31,15 +31,28 @@ type AccountAuthenticator struct {
 // NewAccountAuthenticator creates a new instance of the AccountAuthenticator structure
 func NewAccountAuthenticator(logger infra.Logger, jwks infra.JWKSClient) (AccountAuthenticator, error) {
 	if logger == nil {
-		return AccountAuthenticator{}, errors.New("missing logger dependency").WithKind(errors.KindInternal)
+		return AccountAuthenticator{}, errors.NewMissingRequiredDependency("logger")
 	}
+
 	if jwks == nil {
-		return AccountAuthenticator{}, errors.New("missing jkwks client dependency").WithKind(errors.KindInternal)
+		return AccountAuthenticator{}, errors.NewMissingRequiredDependency("jwks")
 	}
+
 	return AccountAuthenticator{
 		logger: logger,
 		jwks:   jwks,
 	}, nil
+}
+
+// NewAccountAuthenticator creates a new instance of the AccountAuthenticator structure.
+// It panics if any error is found.
+func MustNewAccountAuthenticator(logger logger, jwks jwksClient) AccountAuthenticator {
+	auth, err := NewAccountAuthenticator(logger, jwks)
+	if err != nil {
+		panic(err)
+	}
+
+	return auth
 }
 
 // Authenticate is responsible for verify if the request is authenticated
