@@ -32,7 +32,7 @@ func NewBrandFiller(logger infra.Logger) (BrandFiller, error) {
 
 // MustNewBrandFiller creates a new instance of the Brand structure.
 // It panics if any error is found.
-func MustNewBrandFiller(logger logger) BrandFiller {
+func MustNewBrandFiller(logger infra.Logger) BrandFiller {
 	mid, err := NewBrandFiller(logger)
 	if err != nil {
 		panic(err)

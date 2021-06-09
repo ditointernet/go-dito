@@ -207,7 +207,7 @@ func TestAuthorize(t *testing.T) {
 			expectedCtx, cancel := context.WithDeadline(ctx, now.Add(timeout))
 			defer cancel()
 
-			logger.EXPECT().Error(gomock.Any(), gomock.Any())
+			logger.EXPECT().Debug(gomock.Any(), gomock.Any())
 			authorizator.EXPECT().
 				ExecuteQuery(expectedCtx, gomock.Any(), gomock.Any()).
 				Return([]map[string]interface{}{{"allow": false}}, nil)
@@ -221,7 +221,7 @@ func TestAuthorize(t *testing.T) {
 
 			var e ditoError.CustomError
 			assert.True(t, errors.As(err, &e))
-			assert.EqualError(t, e, "Authorization decision - accountID: 123456 with brandID any-brand4 access was denied")
+			assert.EqualError(t, e, "authorization decision - accountID: 123456 with brandID any-brand4 access was denied")
 		}))
 
 	t.Run("should authorize user when the user exists in the bundle data",
@@ -246,7 +246,7 @@ func TestAuthorize(t *testing.T) {
 		}))
 }
 
-func TestAuthorize_WithFIlters(t *testing.T) {
+func TestAuthorize_WithFilters(t *testing.T) {
 	var logger *mocks.MockLogger
 	var authorizator *mocks.MockAuthorizatorClient
 	timeout := 100 * time.Millisecond
@@ -381,7 +381,7 @@ func TestAuthorize_WithFIlters(t *testing.T) {
 			expectedCtx, cancel := context.WithDeadline(ctx, now.Add(timeout))
 			defer cancel()
 
-			logger.EXPECT().Error(gomock.Any(), gomock.Any())
+			logger.EXPECT().Debug(gomock.Any(), gomock.Any())
 			authorizator.EXPECT().
 				ExecuteQuery(expectedCtx, gomock.Any(), gomock.Any()).
 				Return([]map[string]interface{}{{"allow": false}}, nil)
@@ -395,7 +395,7 @@ func TestAuthorize_WithFIlters(t *testing.T) {
 
 			var e ditoError.CustomError
 			assert.True(t, errors.As(err, &e))
-			assert.EqualError(t, e, "Authorization decision - accountID: 123456 with brandID any-brand4 access was denied")
+			assert.EqualError(t, e, "authorization decision - accountID: 123456 with brandID any-brand4 access was denied")
 		}))
 
 	t.Run("should authorize user when the user exists in the bundle data",

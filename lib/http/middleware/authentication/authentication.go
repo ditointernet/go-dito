@@ -46,7 +46,7 @@ func NewAccountAuthenticator(logger infra.Logger, jwks infra.JWKSClient) (Accoun
 
 // NewAccountAuthenticator creates a new instance of the AccountAuthenticator structure.
 // It panics if any error is found.
-func MustNewAccountAuthenticator(logger logger, jwks jwksClient) AccountAuthenticator {
+func MustNewAccountAuthenticator(logger infra.Logger, jwks infra.JWKSClient) AccountAuthenticator {
 	auth, err := NewAccountAuthenticator(logger, jwks)
 	if err != nil {
 		panic(err)

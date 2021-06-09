@@ -86,8 +86,8 @@ func NewAccountAuthorizator(
 // MustNewAccountAuthorizator constructs a new account authorization middleware.
 // It panics if any error is found.
 func MustNewAccountAuthorizator(
-	logger logger,
-	authClient authorizatorClient,
+	logger infra.Logger,
+	authClient infra.AuthorizatorClient,
 	authorizatorTimeout time.Duration,
 	resourceName string,
 	resourseFilters []ResourseFilter,
@@ -152,7 +152,7 @@ func (a AccountAuthorizator) Authorize(ctx *routing.Context) error {
 	}
 
 	if !allowed {
-		err := errors.New("Authorization decision - accountID: %s with brandID %s access was denied", accountID, brandID).WithKind(errors.KindUnauthorized).WithCode(CodeTypeAccessDenied)
+		err := errors.New("authorization decision - accountID: %s with brandID %s access was denied", accountID, brandID).WithKind(errors.KindUnauthorized).WithCode(CodeTypeAccessDenied)
 		a.logger.Debug(ctx, err.Error())
 		return err
 	}
