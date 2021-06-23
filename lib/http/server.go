@@ -20,6 +20,7 @@ type ServerInput struct {
 	Port           int
 	AllowedOrigins []string
 	AllowedHeaders []string
+	ExposedHeaders []string
 	Handler        func(*routing.Router)
 	Logger         logger
 }
@@ -30,6 +31,7 @@ type Server struct {
 	port           int
 	allowedOrigins []string
 	allowedHeaders []string
+	exposedHeaders []string
 	router         *routing.Router
 	logger         logger
 }
@@ -40,6 +42,9 @@ var defaultAllowedHeaders = []string{
 	"Brand",
 	"Content-Type",
 	"X-CSRF-Token",
+}
+
+var defaultExposedHeaders = []string{
 	"X-TOTAL-COUNT",
 }
 
@@ -51,10 +56,15 @@ func NewServer(in ServerInput) Server {
 		in.AllowedHeaders = defaultAllowedHeaders
 	}
 
+	if len(in.ExposedHeaders) == 0 {
+		in.ExposedHeaders = defaultExposedHeaders
+	}
+
 	server := Server{
 		port:           in.Port,
 		allowedOrigins: in.AllowedOrigins,
 		allowedHeaders: in.AllowedHeaders,
+		exposedHeaders: in.ExposedHeaders,
 		router:         router,
 		logger:         in.Logger,
 	}
@@ -88,6 +98,7 @@ func (s Server) addCorsMiddleware() {
 
 	corsMiddleware := cors.New(cors.Options{
 		AllowedOrigins: s.allowedOrigins,
+		ExposedHeaders: s.exposedHeaders,
 		AllowedMethods: []string{
 			http.MethodGet,
 			http.MethodPost,
