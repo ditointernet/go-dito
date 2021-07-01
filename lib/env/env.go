@@ -4,7 +4,35 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 )
+
+// Environment is a constant that defines the context in which the application is running.
+type Environment int
+
+const (
+	// DevelopmentEnvironment indicates that the application is running in development environement.
+	DevelopmentEnvironment Environment = iota
+	// TestEnvironment indicates that the application is running in test environement.
+	TestEnvironment
+	// ProductionEnvironment indicates that the application is running in production environement.
+	ProductionEnvironment
+)
+
+// GetEnvironmentByLabel translates an environment label into its respective Environment constant.
+func GetEnvironmentByLabel(label string) Environment {
+	lower := strings.ToLower(label)
+
+	return map[string]Environment{
+		"development":  DevelopmentEnvironment,
+		"dev":          DevelopmentEnvironment,
+		"test":         TestEnvironment,
+		"homolog":      TestEnvironment,
+		"homologation": TestEnvironment,
+		"production":   ProductionEnvironment,
+		"prod":         ProductionEnvironment,
+	}[lower]
+}
 
 // GetString extracts a String value from the given environment variable
 func GetString(name string, defaultValue ...string) string {
