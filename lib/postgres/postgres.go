@@ -8,6 +8,9 @@ import (
 
 	"github.com/ditointernet/go-dito/lib/env"
 	"github.com/ditointernet/go-dito/lib/errors"
+
+	// Local Postgres driver
+	_ "github.com/lib/pq"
 )
 
 // postgresDriver is a type of DB driver for postgres.
