@@ -11,6 +11,8 @@ import (
 
 	// Local Postgres driver
 	_ "github.com/lib/pq"
+	// CloudSql Postgres dialer
+	_ "github.com/GoogleCloudPlatform/cloudsql-proxy/proxy/dialers/postgres"
 )
 
 // postgresDriver is a type of DB driver for postgres.
@@ -90,8 +92,7 @@ func MustNewClient(params ClientParams) Client {
 // Connect connects the client with the database.
 func (c Client) Connect(ctx context.Context) (*sql.DB, error) {
 	if c.tracer != nil {
-		var span trace.Span
-		ctx, span = c.tracer.Start(ctx, "postgres.Client.Connect")
+		_, span := c.tracer.Start(ctx, "postgres.Client.Connect")
 		defer span.End()
 	}
 
@@ -106,4 +107,13 @@ func (c Client) Connect(ctx context.Context) (*sql.DB, error) {
 
 	dbConn.SetMaxOpenConns(c.maxConn)
 	return dbConn, nil
+}
+
+// Driver indicates which Postgres driver should be used based on environment.
+func Driver(e env.Environment) string {
+	if e == env.ProductionEnvironment {
+		return postgresDriverCloudSQL.String()
+	}
+
+	return postgresDriverDefault.String()
 }
