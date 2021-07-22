@@ -157,7 +157,7 @@ type ResourceCreatedResponse struct {
 
 // NewResourceCreatedResponse creates a new ResourceCreatedResponse.
 func NewResourceCreatedResponse(id string) ResourceCreatedResponse {
-	return ResourceCreatedResponse{ID: id, Message: "Resource created succesfuly!"}
+	return ResourceCreatedResponse{ID: id, Message: "Resource created successfully!"}
 }
 
 // WithMessage overrides the default message.
