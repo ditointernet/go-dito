@@ -25,6 +25,10 @@ type Params struct {
 	// Values vary between 0 and 1, with 0 meaning No Sampling and 1 meaning Always Sampling.
 	// Values lower than 0 are treated as 0 and values greater than 1 are treated as 1.
 	TraceRatio float64
+
+	// Exporter is the chosen exporter that will be used to collect the traces.
+	// If no exporter is provided, GCP exporter will be used as default.
+	Exporter sdktrace.SpanExporter
 }
 
 // NewTracer creates a new Tracer.
@@ -45,13 +49,17 @@ func NewTracer(params Params) (otrace.Tracer, func(context.Context) error, error
 	}
 
 	if params.IsProductionEnvironment {
-		exporter, err := gcpexporter.NewExporter()
-		if err != nil {
-			return nil, nil, err
+		if params.Exporter == nil {
+			exporter, err := gcpexporter.NewExporter()
+			if err != nil {
+				return nil, nil, err
+			}
+
+			params.Exporter = exporter
 		}
 
 		tOpts = append(tOpts, sdktrace.WithSampler(sdktrace.TraceIDRatioBased(params.TraceRatio)))
-		tOpts = append(tOpts, sdktrace.WithBatcher(exporter))
+		tOpts = append(tOpts, sdktrace.WithBatcher(params.Exporter))
 	}
 
 	tp := sdktrace.NewTracerProvider(tOpts...)
@@ -68,7 +76,8 @@ func NewTracer(params Params) (otrace.Tracer, func(context.Context) error, error
 // MustNewTracer creates a new Tracer.
 // It produces the tracer it self and a flush function that should be used to deliver any trace residue in cases of system shutdown.
 // It panics if any error is found during tracer construction.
-// If your application is running outside of Google Cloud, make sure that your `GOOGLE_APPLICATION_CREDENTIALS` env variable is properly set.
+// If your application is running outside of Google Cloud and you want to use GCP exporter,
+// make sure that your `GOOGLE_APPLICATION_CREDENTIALS` env variable is properly set.
 func MustNewTracer(params Params) (otrace.Tracer, func(context.Context) error) {
 	tracer, flush, err := NewTracer(params)
 	if err != nil {
