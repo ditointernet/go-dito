@@ -12,12 +12,6 @@ type Logger interface {
 	Critical(ctx context.Context, err error)
 }
 
-type JWKSClient interface {
-	GetCerts(ctx context.Context) error
-	RenewCerts(ctx context.Context) error
-	Certs() map[string]string
-}
-
 type AuthorizatorClient interface {
 	DecideIfAllowed(ctx context.Context, regoQuery string, method, path, brandID, userID string) (bool, error)
 	ExecuteQuery(ctx context.Context, query string, input map[string]interface{}) ([]map[string]interface{}, error)
