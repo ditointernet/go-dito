@@ -10,7 +10,6 @@ require (
 	github.com/golang/mock v1.5.0
 	github.com/jackwhelpton/fasthttp-routing/v2 v2.0.0
 	github.com/rs/cors v1.7.0
-	github.com/stretchr/testify v1.7.0
 	github.com/valyala/fasthttp v1.24.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.20.0
 	go.opentelemetry.io/otel/trace v0.20.0
