@@ -1,7 +1,7 @@
 ---
 branches:
   - name: master
-  - name: semantic-release-3
+  - name: semantic-release-4
   - name: beta
     prerelease: true
 
