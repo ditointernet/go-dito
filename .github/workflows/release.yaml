@@ -16,7 +16,7 @@ jobs:
       - name: installs plugins
         run: |
           npm install -g lerna
-          npm install -D semantic-release-monorepo @semantic-release/commit-analyzer
+          npm install -D semantic-release-monorepo @semantic-release/commit-analyzer @semantic-release/release-notes-generator @semantic-release/github
       - name: run lerna with semantic release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
