@@ -1,0 +1,13 @@
+---
+branches:
+  - name: master
+  - name: semantic-release
+  - name: beta
+    prerelease: true
+
+extends: semantic-release-monorepo
+
+plugins:
+  - "@semantic-release/commit-analyzer"
+  - "@semantic-release/release-notes-generator"
+  - "@semantic-release/github"
