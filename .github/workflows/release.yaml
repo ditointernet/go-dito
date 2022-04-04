@@ -1,0 +1,21 @@
+name: Release Workflow
+
+on:
+  push:
+    branches: [semantic-release-4]
+
+jobs:
+  versioning:
+    name: Define next release version
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - name: installs plugins
+        run: npm install -D semantic-release semantic-release-monorepo lerna
+      - name: run lerna with semantic release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: lerna exec --concurrency 1 -- semantic-release --tag-format='${LERNA_PACKAGE_NAME}/v\${version}'
