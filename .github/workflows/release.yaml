@@ -14,7 +14,9 @@ jobs:
         with:
           node-version: '14'
       - name: installs plugins
-        run: npm install -g semantic-release semantic-release-monorepo lerna
+        run: |
+          npm install -g semantic-release semantic-release-monorepo lerna
+          npm install -D @semantic-release/commit-analyzer
       - name: run lerna with semantic release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
