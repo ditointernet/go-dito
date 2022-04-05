@@ -1,3 +1,3 @@
-module github.com/ditointernet/go-dito/lib/env
+module github.com/ditointernet/go-dito/env
 
 go 1.14
