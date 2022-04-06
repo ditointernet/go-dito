@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/ditointernet/go-dito/lib/log"
+	"github.com/ditointernet/go-dito/log"
 )
 
 func main() {

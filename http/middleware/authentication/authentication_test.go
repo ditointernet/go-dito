@@ -5,12 +5,13 @@ import (
 	"net"
 	"testing"
 
-	"github.com/ditointernet/go-dito/lib/errors"
-	"github.com/ditointernet/go-dito/lib/http/mocks"
 	"github.com/golang/mock/gomock"
 	routing "github.com/jackwhelpton/fasthttp-routing/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/valyala/fasthttp"
+
+	"github.com/ditointernet/go-dito/errors"
+	"github.com/ditointernet/go-dito/http/mocks"
 )
 
 func newCtx() *routing.Context {

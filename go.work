@@ -1,0 +1,11 @@
+go 1.18
+
+use (
+	./env
+	./errors
+	./http
+	./jwks
+	./log
+	./opa
+	./trace
+)

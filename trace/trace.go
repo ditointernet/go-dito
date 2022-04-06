@@ -12,10 +12,10 @@ import (
 	"go.opentelemetry.io/otel/semconv"
 	otrace "go.opentelemetry.io/otel/trace"
 
-	"github.com/ditointernet/go-dito/lib/errors"
+	"github.com/ditointernet/go-dito/errors"
 )
 
-// Params encondes necessary input data to initialize a new Tracer.
+// Params encodes necessary input data to initialize a new Tracer.
 type Params struct {
 	IsProductionEnvironment bool
 	ApplicationName         string

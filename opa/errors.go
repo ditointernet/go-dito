@@ -1,7 +1,7 @@
 package opa
 
 import (
-	"github.com/ditointernet/go-dito/lib/errors"
+	"github.com/ditointernet/go-dito/errors"
 )
 
 const (

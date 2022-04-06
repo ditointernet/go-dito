@@ -3,9 +3,10 @@ package brand
 import (
 	"strings"
 
-	"github.com/ditointernet/go-dito/lib/errors"
-	"github.com/ditointernet/go-dito/lib/http/infra"
 	routing "github.com/jackwhelpton/fasthttp-routing/v2"
+
+	"github.com/ditointernet/go-dito/errors"
+	"github.com/ditointernet/go-dito/http/infra"
 )
 
 // ContextKeyBrandID is the key used to retrieve and save brand into the context

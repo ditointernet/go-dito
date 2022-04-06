@@ -7,7 +7,7 @@ import (
 
 	"go.opentelemetry.io/otel/trace"
 
-	"github.com/ditointernet/go-dito/lib/errors"
+	"github.com/ditointernet/go-dito/errors"
 )
 
 type logger interface {

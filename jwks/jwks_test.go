@@ -9,10 +9,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ditointernet/go-dito/lib/http"
-	"github.com/ditointernet/go-dito/lib/jwks/mocks"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/ditointernet/go-dito/http"
+	"github.com/ditointernet/go-dito/jwks/mocks"
 )
 
 func TestClient_Certs(t *testing.T) {

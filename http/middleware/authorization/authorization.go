@@ -3,14 +3,14 @@ package authorization
 import (
 	"context"
 	"fmt"
-
 	"time"
 
-	"github.com/ditointernet/go-dito/lib/errors"
-	"github.com/ditointernet/go-dito/lib/http/infra"
-	"github.com/ditointernet/go-dito/lib/http/middleware/authentication"
-	"github.com/ditointernet/go-dito/lib/http/middleware/brand"
 	routing "github.com/jackwhelpton/fasthttp-routing/v2"
+
+	"github.com/ditointernet/go-dito/errors"
+	"github.com/ditointernet/go-dito/http/infra"
+	"github.com/ditointernet/go-dito/http/middleware/authentication"
+	"github.com/ditointernet/go-dito/http/middleware/brand"
 )
 
 // ContextKeyAllowedStores is the context key that get and sets all accounts allowed stores

@@ -6,10 +6,11 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/ditointernet/go-dito/lib/errors"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
+
+	"github.com/ditointernet/go-dito/errors"
 )
 
 // Level indicates the severity of the data being logged

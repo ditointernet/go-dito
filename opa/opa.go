@@ -11,7 +11,7 @@ import (
 	"github.com/open-policy-agent/opa/storage"
 	"github.com/open-policy-agent/opa/storage/inmem"
 
-	"github.com/ditointernet/go-dito/lib/errors"
+	"github.com/ditointernet/go-dito/errors"
 )
 
 // AuthorizationResult ...

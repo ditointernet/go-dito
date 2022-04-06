@@ -7,8 +7,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ditointernet/go-dito/lib/errors"
-	client "github.com/ditointernet/go-dito/lib/http"
+	"github.com/ditointernet/go-dito/errors"
+	client "github.com/ditointernet/go-dito/http"
 )
 
 // Client is the structure responsible for handling JWKS certificates

@@ -3,9 +3,9 @@ package main
 import (
 	routing "github.com/jackwhelpton/fasthttp-routing/v2"
 
-	"github.com/ditointernet/go-dito/lib/errors"
-	"github.com/ditointernet/go-dito/lib/http"
-	"github.com/ditointernet/go-dito/lib/log"
+	"github.com/ditointernet/go-dito/errors"
+	"github.com/ditointernet/go-dito/http"
+	"github.com/ditointernet/go-dito/log"
 )
 
 func main() {

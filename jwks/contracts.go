@@ -3,7 +3,7 @@ package jwks
 import (
 	"context"
 
-	"github.com/ditointernet/go-dito/lib/http"
+	"github.com/ditointernet/go-dito/http"
 )
 
 // HTTPClient is the public interface of the http client lib

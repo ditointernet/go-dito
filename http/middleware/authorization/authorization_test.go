@@ -7,14 +7,15 @@ import (
 	"testing"
 	"time"
 
-	ditoError "github.com/ditointernet/go-dito/lib/errors"
-	"github.com/ditointernet/go-dito/lib/http/middleware/authentication"
-	"github.com/ditointernet/go-dito/lib/http/middleware/brand"
-	"github.com/ditointernet/go-dito/lib/http/mocks"
 	"github.com/golang/mock/gomock"
 	routing "github.com/jackwhelpton/fasthttp-routing/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/valyala/fasthttp"
+
+	ditoError "github.com/ditointernet/go-dito/errors"
+	"github.com/ditointernet/go-dito/http/middleware/authentication"
+	"github.com/ditointernet/go-dito/http/middleware/brand"
+	"github.com/ditointernet/go-dito/http/mocks"
 )
 
 func newCtx() *routing.Context {

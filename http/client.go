@@ -10,7 +10,7 @@ import (
 
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 
-	"github.com/ditointernet/go-dito/lib/errors"
+	"github.com/ditointernet/go-dito/errors"
 )
 
 // httpClientProvider provides some http client methods
