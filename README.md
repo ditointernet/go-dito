@@ -1,3 +1,5 @@
+[![Release Workflow](https://github.com/ditointernet/go-dito/actions/workflows/release.yaml/badge.svg)](https://github.com/ditointernet/go-dito/actions/workflows/release.yaml)
+
 # Go Dito
 
 Go Dito is a repository of utilitary packages written in Go, designed to improve development experience of Dito's squads.
