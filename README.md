@@ -1,4 +1,4 @@
-[![Release Workflow](https://github.com/ditointernet/go-dito/actions/workflows/release.yaml/badge.svg)](https://github.com/ditointernet/go-dito/actions/workflows/release.yaml)
+[![Release Workflow](https://github.com/ditointernet/go-dito/actions/workflows/release.yaml/badge.svg?branch=master)](https://github.com/ditointernet/go-dito/actions/workflows/release.yaml)
 
 # Go Dito
 
