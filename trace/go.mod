@@ -4,6 +4,7 @@ go 1.18
 
 require (
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v0.20.1
+	github.com/ditointernet/go-dito/errors v1.0.0
 	go.opentelemetry.io/otel v0.20.0
 	go.opentelemetry.io/otel/sdk v0.20.0
 	go.opentelemetry.io/otel/trace v0.20.0
