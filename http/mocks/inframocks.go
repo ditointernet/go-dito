@@ -8,6 +8,7 @@ import (
 	context "context"
 	reflect "reflect"
 
+	opa "github.com/ditointernet/go-dito/opa"
 	gomock "github.com/golang/mock/gomock"
 )
 
@@ -213,10 +214,10 @@ func (mr *MockAuthorizatorClientMockRecorder) DecideIfAllowed(ctx, regoQuery, me
 }
 
 // ExecuteQuery mocks base method.
-func (m *MockAuthorizatorClient) ExecuteQuery(ctx context.Context, query string, input map[string]interface{}) ([]map[string]interface{}, error) {
+func (m *MockAuthorizatorClient) ExecuteQuery(ctx context.Context, query string, input map[string]interface{}) (opa.AuthorizationResult, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ExecuteQuery", ctx, query, input)
-	ret0, _ := ret[0].([]map[string]interface{})
+	ret0, _ := ret[0].(opa.AuthorizationResult)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
