@@ -18,6 +18,7 @@ import (
 // ServerInput encapsulates the necessary Inputs to initialize a Server
 type ServerInput struct {
 	Port           int
+	ReadBufferSize int // Bytes, e.g. 4096 == 4kB
 	AllowedOrigins []string
 	AllowedHeaders []string
 	ExposedHeaders []string
@@ -29,6 +30,7 @@ type ServerInput struct {
 // It is based on httpfast implementation
 type Server struct {
 	port           int
+	readBufferSize int
 	allowedOrigins []string
 	allowedHeaders []string
 	exposedHeaders []string
@@ -62,6 +64,7 @@ func NewServer(in ServerInput) Server {
 
 	server := Server{
 		port:           in.Port,
+		readBufferSize: in.ReadBufferSize,
 		allowedOrigins: in.AllowedOrigins,
 		allowedHeaders: in.AllowedHeaders,
 		exposedHeaders: in.ExposedHeaders,
@@ -88,7 +91,12 @@ func NewServer(in ServerInput) Server {
 
 // Run listen and serves HTTP requests at the Port specified in Server construction
 func (s Server) Run() error {
-	return fasthttp.ListenAndServe(fmt.Sprintf(":%d", s.port), s.router.HandleRequest)
+	server := fasthttp.Server{
+		Handler:        s.router.HandleRequest,
+		ReadBufferSize: s.readBufferSize,
+	}
+
+	return server.ListenAndServe(fmt.Sprintf(":%d", s.port))
 }
 
 func (s Server) addCorsMiddleware() {
