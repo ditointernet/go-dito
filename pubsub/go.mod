@@ -5,10 +5,10 @@ go 1.18
 require (
 	cloud.google.com/go/pubsub v1.24.0
 	github.com/ditointernet/go-dito/errors v1.0.0
-	github.com/ditointernet/go-dito/lib/errors v1.99.0
 	github.com/golang/mock v1.6.0
 	github.com/onsi/ginkgo v1.16.5
 	github.com/onsi/gomega v1.20.0
+	go.opentelemetry.io/otel/trace v0.20.0
 )
 
 require (
@@ -23,6 +23,7 @@ require (
 	github.com/googleapis/gax-go/v2 v2.4.0 // indirect
 	github.com/nxadm/tail v1.4.8 // indirect
 	go.opencensus.io v0.23.0 // indirect
+	go.opentelemetry.io/otel v0.20.0 // indirect
 	golang.org/x/net v0.0.0-20220624214902-1bab6f366d9e // indirect
 	golang.org/x/oauth2 v0.0.0-20220622183110-fd043fe589d2 // indirect
 	golang.org/x/sync v0.0.0-20220601150217-0de741cfad7f // indirect
