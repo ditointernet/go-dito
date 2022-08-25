@@ -19,8 +19,8 @@ import (
 var (
 	ctrl *gomock.Controller
 
-	topicM  *mocks.MockTopicer
-	resultM *mocks.MockResultier
+	topicM  *mocks.MockPublisher
+	resultM *mocks.MockGetter
 
 	ctx context.Context
 )
@@ -46,8 +46,8 @@ func TestPubSub(t *testing.T) {
 	BeforeEach(func() {
 		ctrl = gomock.NewController(GinkgoT())
 
-		topicM = mocks.NewMockTopicer(ctrl)
-		resultM = mocks.NewMockResultier(ctrl)
+		topicM = mocks.NewMockPublisher(ctrl)
+		resultM = mocks.NewMockGetter(ctrl)
 
 		ctx = context.Background()
 	})

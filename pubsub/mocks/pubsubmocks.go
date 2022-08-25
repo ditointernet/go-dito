@@ -13,68 +13,68 @@ import (
 	gomock "github.com/golang/mock/gomock"
 )
 
-// MockTopicer is a mock of Topicer interface.
-type MockTopicer struct {
+// MockPublisher is a mock of Publisher interface.
+type MockPublisher struct {
 	ctrl     *gomock.Controller
-	recorder *MockTopicerMockRecorder
+	recorder *MockPublisherMockRecorder
 }
 
-// MockTopicerMockRecorder is the mock recorder for MockTopicer.
-type MockTopicerMockRecorder struct {
-	mock *MockTopicer
+// MockPublisherMockRecorder is the mock recorder for MockPublisher.
+type MockPublisherMockRecorder struct {
+	mock *MockPublisher
 }
 
-// NewMockTopicer creates a new mock instance.
-func NewMockTopicer(ctrl *gomock.Controller) *MockTopicer {
-	mock := &MockTopicer{ctrl: ctrl}
-	mock.recorder = &MockTopicerMockRecorder{mock}
+// NewMockPublisher creates a new mock instance.
+func NewMockPublisher(ctrl *gomock.Controller) *MockPublisher {
+	mock := &MockPublisher{ctrl: ctrl}
+	mock.recorder = &MockPublisherMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockTopicer) EXPECT() *MockTopicerMockRecorder {
+func (m *MockPublisher) EXPECT() *MockPublisherMockRecorder {
 	return m.recorder
 }
 
 // Publish mocks base method.
-func (m *MockTopicer) Publish(ctx context.Context, msg *pubsub.Message) pubsub0.Resultier {
+func (m *MockPublisher) Publish(ctx context.Context, msg *pubsub.Message) pubsub0.Getter {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Publish", ctx, msg)
-	ret0, _ := ret[0].(pubsub0.Resultier)
+	ret0, _ := ret[0].(pubsub0.Getter)
 	return ret0
 }
 
 // Publish indicates an expected call of Publish.
-func (mr *MockTopicerMockRecorder) Publish(ctx, msg interface{}) *gomock.Call {
+func (mr *MockPublisherMockRecorder) Publish(ctx, msg interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Publish", reflect.TypeOf((*MockTopicer)(nil).Publish), ctx, msg)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Publish", reflect.TypeOf((*MockPublisher)(nil).Publish), ctx, msg)
 }
 
-// MockResultier is a mock of Resultier interface.
-type MockResultier struct {
+// MockGetter is a mock of Getter interface.
+type MockGetter struct {
 	ctrl     *gomock.Controller
-	recorder *MockResultierMockRecorder
+	recorder *MockGetterMockRecorder
 }
 
-// MockResultierMockRecorder is the mock recorder for MockResultier.
-type MockResultierMockRecorder struct {
-	mock *MockResultier
+// MockGetterMockRecorder is the mock recorder for MockGetter.
+type MockGetterMockRecorder struct {
+	mock *MockGetter
 }
 
-// NewMockResultier creates a new mock instance.
-func NewMockResultier(ctrl *gomock.Controller) *MockResultier {
-	mock := &MockResultier{ctrl: ctrl}
-	mock.recorder = &MockResultierMockRecorder{mock}
+// NewMockGetter creates a new mock instance.
+func NewMockGetter(ctrl *gomock.Controller) *MockGetter {
+	mock := &MockGetter{ctrl: ctrl}
+	mock.recorder = &MockGetterMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockResultier) EXPECT() *MockResultierMockRecorder {
+func (m *MockGetter) EXPECT() *MockGetterMockRecorder {
 	return m.recorder
 }
 
 // Get mocks base method.
-func (m *MockResultier) Get(ctx context.Context) (string, error) {
+func (m *MockGetter) Get(ctx context.Context) (string, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Get", ctx)
 	ret0, _ := ret[0].(string)
@@ -83,7 +83,7 @@ func (m *MockResultier) Get(ctx context.Context) (string, error) {
 }
 
 // Get indicates an expected call of Get.
-func (mr *MockResultierMockRecorder) Get(ctx interface{}) *gomock.Call {
+func (mr *MockGetterMockRecorder) Get(ctx interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockResultier)(nil).Get), ctx)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockGetter)(nil).Get), ctx)
 }

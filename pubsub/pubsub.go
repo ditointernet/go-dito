@@ -12,13 +12,13 @@ import (
 // TraceIDContextKey defines the trace id key in a context.
 const TraceIDContextKey string = "trace_id"
 
-// PubSubClient is responsible to manage a pubsub topic.
+// PubSubClient is responsible for managing a pubsub topic.
 type PubSubClient[T json.Marshaler] struct {
-	topic Topicer
+	topic Publisher
 }
 
 // NewPubSubClient returns a new instance of PubSubClient.
-func NewPubSubClient[T json.Marshaler](topic Topicer) (PubSubClient[T], error) {
+func NewPubSubClient[T json.Marshaler](topic Publisher) (PubSubClient[T], error) {
 	return PubSubClient[T]{
 		topic: topic,
 	}, nil
@@ -26,7 +26,7 @@ func NewPubSubClient[T json.Marshaler](topic Topicer) (PubSubClient[T], error) {
 
 // MustNewPubSubClient initializes Publisher by calling NewPubSubClient
 // It panics if any error is found.
-func MustNewPubSubClient[T json.Marshaler](topic Topicer) PubSubClient[T] {
+func MustNewPubSubClient[T json.Marshaler](topic Publisher) PubSubClient[T] {
 	p, err := NewPubSubClient[T](topic)
 	if err != nil {
 		panic(err)
@@ -65,7 +65,6 @@ func (c PubSubClient[T]) Publish(ctx context.Context, in ...PublishInput[T]) []e
 
 		if err != nil {
 			errs = append(errs, err)
-			continue
 		}
 	}
 

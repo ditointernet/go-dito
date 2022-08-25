@@ -13,7 +13,7 @@ type TopicWrapper struct {
 
 // Publish envelopes a pubsub topic publish method.
 // It returns a resultier.
-func (tw TopicWrapper) Publish(ctx context.Context, msg *pubsub.Message) Resultier {
+func (tw TopicWrapper) Publish(ctx context.Context, msg *pubsub.Message) Getter {
 	result := tw.topic.Publish(ctx, msg)
 	return result
 }
