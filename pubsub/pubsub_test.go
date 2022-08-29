@@ -29,7 +29,7 @@ type MessageSchemaM struct {
 }
 
 func (ms MessageSchemaM) ToBytes() ([]byte, error) {
-	b := []byte("ABCD")
+	b := []byte("ABCDE")
 	return b, nil
 }
 
