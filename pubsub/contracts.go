@@ -6,12 +6,17 @@ import (
 	"cloud.google.com/go/pubsub"
 )
 
-// Topicier defines boundary interfaces of a pubsub topic.
-type Topicer interface {
-	Publish(ctx context.Context, msg *pubsub.Message) Resultier
+// Publisher defines boundary interfaces of a pubsub topic.
+type Publisher interface {
+	Publish(ctx context.Context, msg *pubsub.Message) Getter
 }
 
-// Resultier defines boundary interfaces of a pubsub result object.
-type Resultier interface {
+// Getter defines boundary interfaces of a pubsub result object.
+type Getter interface {
 	Get(ctx context.Context) (serverID string, err error)
+}
+
+// ToByteser defines the interface of pubsub client types.
+type ToByteser interface {
+	ToBytes() ([]byte, error)
 }

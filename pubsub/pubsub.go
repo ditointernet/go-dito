@@ -2,7 +2,6 @@ package pubsub
 
 import (
 	"context"
-	"encoding/json"
 
 	"go.opentelemetry.io/otel/trace"
 
@@ -12,13 +11,13 @@ import (
 // TraceIDContextKey defines the trace id key in a context.
 const TraceIDContextKey string = "trace_id"
 
-// PubSubClient is responsible to manage a pubsub topic.
-type PubSubClient[T json.Marshaler] struct {
-	topic Topicer
+// PubSubClient is responsible for managing a pubsub topic.
+type PubSubClient[T ToByteser] struct {
+	topic Publisher
 }
 
 // NewPubSubClient returns a new instance of PubSubClient.
-func NewPubSubClient[T json.Marshaler](topic Topicer) (PubSubClient[T], error) {
+func NewPubSubClient[T ToByteser](topic Publisher) (PubSubClient[T], error) {
 	return PubSubClient[T]{
 		topic: topic,
 	}, nil
@@ -26,7 +25,7 @@ func NewPubSubClient[T json.Marshaler](topic Topicer) (PubSubClient[T], error) {
 
 // MustNewPubSubClient initializes Publisher by calling NewPubSubClient
 // It panics if any error is found.
-func MustNewPubSubClient[T json.Marshaler](topic Topicer) PubSubClient[T] {
+func MustNewPubSubClient[T ToByteser](topic Publisher) PubSubClient[T] {
 	p, err := NewPubSubClient[T](topic)
 	if err != nil {
 		panic(err)
@@ -36,7 +35,7 @@ func MustNewPubSubClient[T json.Marshaler](topic Topicer) PubSubClient[T] {
 }
 
 // PublishInput is the input for publishing data in a topic.
-type PublishInput[T json.Marshaler] struct {
+type PublishInput[T ToByteser] struct {
 	Data       T
 	Attributes map[string]string
 }
@@ -48,7 +47,7 @@ func (c PubSubClient[T]) Publish(ctx context.Context, in ...PublishInput[T]) []e
 	traceID := getTraceID(trace.SpanFromContext(ctx))
 
 	for _, message := range in {
-		data, err := message.Data.MarshalJSON()
+		data, err := message.Data.ToBytes()
 		if err != nil {
 			errs = append(errs, err)
 			continue
@@ -65,7 +64,6 @@ func (c PubSubClient[T]) Publish(ctx context.Context, in ...PublishInput[T]) []e
 
 		if err != nil {
 			errs = append(errs, err)
-			continue
 		}
 	}
 

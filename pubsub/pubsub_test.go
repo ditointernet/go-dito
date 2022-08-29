@@ -19,8 +19,8 @@ import (
 var (
 	ctrl *gomock.Controller
 
-	topicM  *mocks.MockTopicer
-	resultM *mocks.MockResultier
+	topicM  *mocks.MockPublisher
+	resultM *mocks.MockGetter
 
 	ctx context.Context
 )
@@ -28,15 +28,15 @@ var (
 type MessageSchemaM struct {
 }
 
-func (ms MessageSchemaM) MarshalJSON() ([]byte, error) {
-	b := []byte("ABCD")
+func (ms MessageSchemaM) ToBytes() ([]byte, error) {
+	b := []byte("ABCDE")
 	return b, nil
 }
 
 type MessageSchemaWithErrorM struct {
 }
 
-func (mswe MessageSchemaWithErrorM) MarshalJSON() ([]byte, error) {
+func (mswe MessageSchemaWithErrorM) ToBytes() ([]byte, error) {
 	return nil, errors.New("Error to marshal message data")
 }
 
@@ -46,8 +46,8 @@ func TestPubSub(t *testing.T) {
 	BeforeEach(func() {
 		ctrl = gomock.NewController(GinkgoT())
 
-		topicM = mocks.NewMockTopicer(ctrl)
-		resultM = mocks.NewMockResultier(ctrl)
+		topicM = mocks.NewMockPublisher(ctrl)
+		resultM = mocks.NewMockGetter(ctrl)
 
 		ctx = context.Background()
 	})
@@ -101,7 +101,7 @@ var _ = Describe("PubSubClient", func() {
 
 			When("fails to publish message into pubsub topic", func() {
 				It("returns the error list", func() {
-					data, _ := publishInput.Data.MarshalJSON()
+					data, _ := publishInput.Data.ToBytes()
 
 					pubSubMsg := &ps.Message{
 						Data:       data,
@@ -127,7 +127,7 @@ var _ = Describe("PubSubClient", func() {
 		Context("Success case", func() {
 			When("publish message into pubsub topic successfully", func() {
 				It("returns no errors", func() {
-					data, _ := publishInput.Data.MarshalJSON()
+					data, _ := publishInput.Data.ToBytes()
 
 					pubSubMsg := &ps.Message{
 						Data:       data,
