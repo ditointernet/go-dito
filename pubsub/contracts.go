@@ -15,3 +15,8 @@ type Publisher interface {
 type Getter interface {
 	Get(ctx context.Context) (serverID string, err error)
 }
+
+// ToByteser defines the interface of pubsub client types.
+type ToByteser interface {
+	ToBytes() ([]byte, error)
+}

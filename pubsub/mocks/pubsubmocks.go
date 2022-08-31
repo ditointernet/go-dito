@@ -87,3 +87,41 @@ func (mr *MockGetterMockRecorder) Get(ctx interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockGetter)(nil).Get), ctx)
 }
+
+// MockToByteser is a mock of ToByteser interface.
+type MockToByteser struct {
+	ctrl     *gomock.Controller
+	recorder *MockToByteserMockRecorder
+}
+
+// MockToByteserMockRecorder is the mock recorder for MockToByteser.
+type MockToByteserMockRecorder struct {
+	mock *MockToByteser
+}
+
+// NewMockToByteser creates a new mock instance.
+func NewMockToByteser(ctrl *gomock.Controller) *MockToByteser {
+	mock := &MockToByteser{ctrl: ctrl}
+	mock.recorder = &MockToByteserMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockToByteser) EXPECT() *MockToByteserMockRecorder {
+	return m.recorder
+}
+
+// ToBytes mocks base method.
+func (m *MockToByteser) ToBytes() ([]byte, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ToBytes")
+	ret0, _ := ret[0].([]byte)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ToBytes indicates an expected call of ToBytes.
+func (mr *MockToByteserMockRecorder) ToBytes() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ToBytes", reflect.TypeOf((*MockToByteser)(nil).ToBytes))
+}
