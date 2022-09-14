@@ -79,7 +79,7 @@ func NewSubscriberPipeline(params SubscriberPipelineParams) (subscriberPipeline,
 	sub.ReceiveSettings.Synchronous = DefaultReceiveSettingsValues.Synchronous
 
 	firstStep := steps.SubscriberReceiver{
-		Receiver: sub,
+		Subscription: sub,
 	}
 
 	sp := subscriberPipeline{

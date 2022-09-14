@@ -7,10 +7,11 @@ import (
 )
 
 type SubscriberReceiver struct {
-	Receiver messageReceiver
+	Subscription PubsubSubscriber
 }
 
-type messageReceiver interface {
+// PubsubSubscriber defines how to receive Pubsub messages just like a Pubsub Subscriber would.
+type PubsubSubscriber interface {
 	// Receive calls f with the outstanding messages from the subscription.
 	// It blocks until ctx is done, or the service returns a non-retryable error.
 	Receive(ctx context.Context, f func(context.Context, *pubsub.Message)) error
@@ -21,7 +22,7 @@ func (sr SubscriberReceiver) Do(ctx context.Context, _ chan interface{}, errCh c
 	msgsCh := make(chan interface{})
 
 	go func() {
-		err := sr.Receiver.Receive(ctx, func(c context.Context, msg *pubsub.Message) {
+		err := sr.Subscription.Receive(ctx, func(c context.Context, msg *pubsub.Message) {
 			msgsCh <- msg
 		})
 		if err != nil {
