@@ -7,9 +7,9 @@ import (
 	steps "github.com/ditointernet/go-dito/pubsub/subscriber_steps"
 )
 
-// PubsubSubscriberPipelineParams encapsulates dependencies for a SubscriberPipelineParams instance.
+// SubscriberPipelineParams encapsulates dependencies for a SubscriberPipelineParams instance.
 type SubscriberPipelineParams struct {
-	PubsubSubscription steps.PubsubSubscription
+	PubsubSubscription steps.Receiver
 
 	errCh chan error
 }
@@ -17,7 +17,7 @@ type SubscriberPipelineParams struct {
 type subscriberPipeline struct {
 	errCh chan error
 
-	steps []PipelineStep
+	steps []Doer
 }
 
 // NewSubscriberPipeline creates a new instance of subscriberPipeline.
@@ -37,7 +37,7 @@ func NewSubscriberPipeline(params SubscriberPipelineParams) (subscriberPipeline,
 
 	sp := subscriberPipeline{
 		errCh: params.errCh,
-		steps: []PipelineStep{
+		steps: []Doer{
 			firstStep,
 		},
 	}
@@ -63,8 +63,8 @@ func (sp subscriberPipeline) Run(ctx context.Context) chan any {
 	ch := sp.steps[0].Do(ctx, nil, sp.errCh)
 
 	// Attaches all additional steps to the pipeline.
-	for ii := 1; ii < len(sp.steps); ii++ {
-		ch = sp.steps[ii].Do(ctx, ch, sp.errCh)
+	for index := 1; index < len(sp.steps); index++ {
+		ch = sp.steps[index].Do(ctx, ch, sp.errCh)
 	}
 
 	// Fully configured channel, with messages that go through all pipeline steps.

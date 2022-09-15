@@ -7,7 +7,7 @@ import (
 )
 
 type SubscriberReceiver struct {
-	Subscription PubsubSubscription
+	Subscription Receiver
 }
 
 // Do executes the messageReceiver pipeline step.

@@ -142,3 +142,11 @@ var _ = Describe("Mapper", func() {
 		})
 	})
 })
+
+func fillIntegerChannel(ch chan any, numItems int) {
+	go func() {
+		for i := 0; i < numItems; i++ {
+			ch <- i
+		}
+	}()
+}
