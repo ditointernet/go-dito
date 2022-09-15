@@ -20,3 +20,19 @@ type Getter interface {
 type ToByteser interface {
 	ToBytes() ([]byte, error)
 }
+
+// SubscriberPipeline is a structure that defines a pubsub pipeline data handler.
+type SubscriberPipeline interface {
+	// Run executes the pipeline, connecting each registered step in a ordered way.
+	Run(ctx context.Context) chan any
+
+	// Map registers a new Mapper step into pipeline, which is modifies the data that passes
+	// through the pipeline. It panics if any required dependency is not properly given.
+	Map(mapFn func(any) (any, error)) SubscriberPipeline
+}
+
+// Doer indicates how pipeline steps should execute each interaction with the pipe.
+type Doer interface {
+	// Do executes a pipe entry.
+	Do(context.Context, chan any, chan error) chan any
+}
