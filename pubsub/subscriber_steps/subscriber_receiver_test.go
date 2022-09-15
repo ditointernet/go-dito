@@ -17,7 +17,7 @@ var _ = Describe("MessageReceiver", func() {
 	var (
 		ctrl *gomock.Controller
 
-		subscription *mocks.MockPubsubSubscriber
+		subscription *mocks.MockPubsubSubscription
 
 		receiver steps.SubscriberReceiver
 	)
@@ -26,7 +26,7 @@ var _ = Describe("MessageReceiver", func() {
 		t := GinkgoT()
 		ctrl = gomock.NewController(t)
 
-		subscription = mocks.NewMockPubsubSubscriber(ctrl)
+		subscription = mocks.NewMockPubsubSubscription(ctrl)
 
 		receiver = steps.SubscriberReceiver{
 			Subscription: subscription,
