@@ -3,6 +3,7 @@ package pubsub
 import (
 	"context"
 
+	"github.com/ditointernet/go-dito/errors"
 	"go.opentelemetry.io/otel/trace"
 
 	"cloud.google.com/go/pubsub"
@@ -18,6 +19,10 @@ type PubSubClient[T ToByteser] struct {
 
 // NewPubSubClient returns a new instance of PubSubClient.
 func NewPubSubClient[T ToByteser](topic Publisher) (PubSubClient[T], error) {
+	if topic == nil {
+		return PubSubClient[T]{}, errors.NewMissingRequiredDependency("topic")
+	}
+
 	return PubSubClient[T]{
 		topic: topic,
 	}, nil
