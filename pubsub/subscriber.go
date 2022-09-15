@@ -14,22 +14,6 @@ type SubscriberPipelineParams struct {
 	errCh chan error
 }
 
-// SubscriberPipeline is a structure that defines a pubsub pipeline data handler.
-type SubscriberPipeline interface {
-	// Run executes the pipeline, connecting each registered step in a ordered way.
-	Run(ctx context.Context) chan any
-
-	// Map registers a new Mapper step into pipeline, which is modifies the data that passes
-	// through the pipeline. It panics if any required dependency is not properly given.
-	Map(mapFn steps.MapFn) SubscriberPipeline
-}
-
-// PipelineStep indicates how pipeline steps should execute each interaction with the pipe.
-type PipelineStep interface {
-	// Do executes a pipe entry.
-	Do(context.Context, chan any, chan error) chan any
-}
-
 type subscriberPipeline struct {
 	errCh chan error
 
@@ -89,7 +73,7 @@ func (sp subscriberPipeline) Run(ctx context.Context) chan any {
 
 // Map registers a new Mapper step into pipeline.
 // It panics if any required dependency is not properly given.
-func (sp subscriberPipeline) Map(mapFn steps.MapFn) SubscriberPipeline {
+func (sp subscriberPipeline) Map(mapFn func(any) (any, error)) SubscriberPipeline {
 	if mapFn == nil {
 		panic(errors.NewMissingRequiredDependency("MapFn"))
 	}

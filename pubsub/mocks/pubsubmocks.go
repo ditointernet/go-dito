@@ -125,3 +125,91 @@ func (mr *MockToByteserMockRecorder) ToBytes() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ToBytes", reflect.TypeOf((*MockToByteser)(nil).ToBytes))
 }
+
+// MockSubscriberPipeline is a mock of SubscriberPipeline interface.
+type MockSubscriberPipeline struct {
+	ctrl     *gomock.Controller
+	recorder *MockSubscriberPipelineMockRecorder
+}
+
+// MockSubscriberPipelineMockRecorder is the mock recorder for MockSubscriberPipeline.
+type MockSubscriberPipelineMockRecorder struct {
+	mock *MockSubscriberPipeline
+}
+
+// NewMockSubscriberPipeline creates a new mock instance.
+func NewMockSubscriberPipeline(ctrl *gomock.Controller) *MockSubscriberPipeline {
+	mock := &MockSubscriberPipeline{ctrl: ctrl}
+	mock.recorder = &MockSubscriberPipelineMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockSubscriberPipeline) EXPECT() *MockSubscriberPipelineMockRecorder {
+	return m.recorder
+}
+
+// Map mocks base method.
+func (m *MockSubscriberPipeline) Map(mapFn func(any) (any, error)) pubsub0.SubscriberPipeline {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Map", mapFn)
+	ret0, _ := ret[0].(pubsub0.SubscriberPipeline)
+	return ret0
+}
+
+// Map indicates an expected call of Map.
+func (mr *MockSubscriberPipelineMockRecorder) Map(mapFn interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Map", reflect.TypeOf((*MockSubscriberPipeline)(nil).Map), mapFn)
+}
+
+// Run mocks base method.
+func (m *MockSubscriberPipeline) Run(ctx context.Context) chan any {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Run", ctx)
+	ret0, _ := ret[0].(chan any)
+	return ret0
+}
+
+// Run indicates an expected call of Run.
+func (mr *MockSubscriberPipelineMockRecorder) Run(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Run", reflect.TypeOf((*MockSubscriberPipeline)(nil).Run), ctx)
+}
+
+// MockPipelineStep is a mock of PipelineStep interface.
+type MockPipelineStep struct {
+	ctrl     *gomock.Controller
+	recorder *MockPipelineStepMockRecorder
+}
+
+// MockPipelineStepMockRecorder is the mock recorder for MockPipelineStep.
+type MockPipelineStepMockRecorder struct {
+	mock *MockPipelineStep
+}
+
+// NewMockPipelineStep creates a new mock instance.
+func NewMockPipelineStep(ctrl *gomock.Controller) *MockPipelineStep {
+	mock := &MockPipelineStep{ctrl: ctrl}
+	mock.recorder = &MockPipelineStepMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockPipelineStep) EXPECT() *MockPipelineStepMockRecorder {
+	return m.recorder
+}
+
+// Do mocks base method.
+func (m *MockPipelineStep) Do(arg0 context.Context, arg1 chan any, arg2 chan error) chan any {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Do", arg0, arg1, arg2)
+	ret0, _ := ret[0].(chan any)
+	return ret0
+}
+
+// Do indicates an expected call of Do.
+func (mr *MockPipelineStepMockRecorder) Do(arg0, arg1, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Do", reflect.TypeOf((*MockPipelineStep)(nil).Do), arg0, arg1, arg2)
+}
