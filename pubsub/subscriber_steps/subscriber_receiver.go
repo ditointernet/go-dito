@@ -6,6 +6,7 @@ import (
 	"cloud.google.com/go/pubsub"
 )
 
+// SubscriberReceiver is the first step of the pipeline which is responsible for reading the message from pubsub subscription.
 type SubscriberReceiver struct {
 	Subscription Receiver
 }
