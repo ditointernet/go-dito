@@ -4,6 +4,7 @@ go 1.14
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/ditointernet/go-dito/errors v1.0.0
 	github.com/google/go-cmp v0.5.6
 	go.opentelemetry.io/otel v0.20.0
 	go.opentelemetry.io/otel/trace v0.20.0

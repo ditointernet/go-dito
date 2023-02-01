@@ -2,6 +2,8 @@ package infra
 
 import (
 	"context"
+
+	"github.com/ditointernet/go-dito/opa"
 )
 
 type Logger interface {
@@ -20,5 +22,5 @@ type JWKSClient interface {
 
 type AuthorizatorClient interface {
 	DecideIfAllowed(ctx context.Context, regoQuery string, method, path, brandID, userID string) (bool, error)
-	ExecuteQuery(ctx context.Context, query string, input map[string]interface{}) ([]map[string]interface{}, error)
+	ExecuteQuery(ctx context.Context, query string, input map[string]interface{}) (opa.AuthorizationResult, error)
 }

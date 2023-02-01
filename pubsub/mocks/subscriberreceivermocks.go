@@ -12,31 +12,31 @@ import (
 	gomock "github.com/golang/mock/gomock"
 )
 
-// MockPubsubSubscription is a mock of PubsubSubscription interface.
-type MockPubsubSubscription struct {
+// MockReceiver is a mock of Receiver interface.
+type MockReceiver struct {
 	ctrl     *gomock.Controller
-	recorder *MockPubsubSubscriptionMockRecorder
+	recorder *MockReceiverMockRecorder
 }
 
-// MockPubsubSubscriptionMockRecorder is the mock recorder for MockPubsubSubscription.
-type MockPubsubSubscriptionMockRecorder struct {
-	mock *MockPubsubSubscription
+// MockReceiverMockRecorder is the mock recorder for MockReceiver.
+type MockReceiverMockRecorder struct {
+	mock *MockReceiver
 }
 
-// NewMockPubsubSubscription creates a new mock instance.
-func NewMockPubsubSubscription(ctrl *gomock.Controller) *MockPubsubSubscription {
-	mock := &MockPubsubSubscription{ctrl: ctrl}
-	mock.recorder = &MockPubsubSubscriptionMockRecorder{mock}
+// NewMockReceiver creates a new mock instance.
+func NewMockReceiver(ctrl *gomock.Controller) *MockReceiver {
+	mock := &MockReceiver{ctrl: ctrl}
+	mock.recorder = &MockReceiverMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockPubsubSubscription) EXPECT() *MockPubsubSubscriptionMockRecorder {
+func (m *MockReceiver) EXPECT() *MockReceiverMockRecorder {
 	return m.recorder
 }
 
 // Receive mocks base method.
-func (m *MockPubsubSubscription) Receive(ctx context.Context, f func(context.Context, *pubsub.Message)) error {
+func (m *MockReceiver) Receive(ctx context.Context, f func(context.Context, *pubsub.Message)) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Receive", ctx, f)
 	ret0, _ := ret[0].(error)
@@ -44,7 +44,7 @@ func (m *MockPubsubSubscription) Receive(ctx context.Context, f func(context.Con
 }
 
 // Receive indicates an expected call of Receive.
-func (mr *MockPubsubSubscriptionMockRecorder) Receive(ctx, f interface{}) *gomock.Call {
+func (mr *MockReceiverMockRecorder) Receive(ctx, f interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Receive", reflect.TypeOf((*MockPubsubSubscription)(nil).Receive), ctx, f)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Receive", reflect.TypeOf((*MockReceiver)(nil).Receive), ctx, f)
 }
