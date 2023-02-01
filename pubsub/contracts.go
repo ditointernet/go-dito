@@ -31,8 +31,8 @@ type SubscriberPipeline interface {
 	Map(mapFn func(any) (any, error)) SubscriberPipeline
 }
 
-// PipelineStep indicates how pipeline steps should execute each interaction with the pipe.
-type PipelineStep interface {
+// Doer indicates how pipeline steps should execute each interaction with the pipe.
+type Doer interface {
 	// Do executes a pipe entry.
 	Do(context.Context, chan any, chan error) chan any
 }

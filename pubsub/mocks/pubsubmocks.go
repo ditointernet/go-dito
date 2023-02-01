@@ -177,31 +177,31 @@ func (mr *MockSubscriberPipelineMockRecorder) Run(ctx interface{}) *gomock.Call 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Run", reflect.TypeOf((*MockSubscriberPipeline)(nil).Run), ctx)
 }
 
-// MockPipelineStep is a mock of PipelineStep interface.
-type MockPipelineStep struct {
+// MockDoer is a mock of Doer interface.
+type MockDoer struct {
 	ctrl     *gomock.Controller
-	recorder *MockPipelineStepMockRecorder
+	recorder *MockDoerMockRecorder
 }
 
-// MockPipelineStepMockRecorder is the mock recorder for MockPipelineStep.
-type MockPipelineStepMockRecorder struct {
-	mock *MockPipelineStep
+// MockDoerMockRecorder is the mock recorder for MockDoer.
+type MockDoerMockRecorder struct {
+	mock *MockDoer
 }
 
-// NewMockPipelineStep creates a new mock instance.
-func NewMockPipelineStep(ctrl *gomock.Controller) *MockPipelineStep {
-	mock := &MockPipelineStep{ctrl: ctrl}
-	mock.recorder = &MockPipelineStepMockRecorder{mock}
+// NewMockDoer creates a new mock instance.
+func NewMockDoer(ctrl *gomock.Controller) *MockDoer {
+	mock := &MockDoer{ctrl: ctrl}
+	mock.recorder = &MockDoerMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockPipelineStep) EXPECT() *MockPipelineStepMockRecorder {
+func (m *MockDoer) EXPECT() *MockDoerMockRecorder {
 	return m.recorder
 }
 
 // Do mocks base method.
-func (m *MockPipelineStep) Do(arg0 context.Context, arg1 chan any, arg2 chan error) chan any {
+func (m *MockDoer) Do(arg0 context.Context, arg1 chan any, arg2 chan error) chan any {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Do", arg0, arg1, arg2)
 	ret0, _ := ret[0].(chan any)
@@ -209,7 +209,7 @@ func (m *MockPipelineStep) Do(arg0 context.Context, arg1 chan any, arg2 chan err
 }
 
 // Do indicates an expected call of Do.
-func (mr *MockPipelineStepMockRecorder) Do(arg0, arg1, arg2 interface{}) *gomock.Call {
+func (mr *MockDoerMockRecorder) Do(arg0, arg1, arg2 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Do", reflect.TypeOf((*MockPipelineStep)(nil).Do), arg0, arg1, arg2)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Do", reflect.TypeOf((*MockDoer)(nil).Do), arg0, arg1, arg2)
 }

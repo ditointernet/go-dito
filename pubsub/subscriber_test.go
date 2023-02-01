@@ -39,7 +39,7 @@ var _ = Describe("Subscriber", func() {
 
 				Expect(pipe).To(Equal(subscriberPipeline{
 					errCh: mockErrCh,
-					steps: []PipelineStep{
+					steps: []Doer{
 						steps.SubscriberReceiver{
 							Subscription: fakeSub{},
 						},
