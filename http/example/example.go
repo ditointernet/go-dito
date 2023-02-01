@@ -1,6 +1,10 @@
 package main
 
 import (
+	"fmt"
+	"io/ioutil"
+	net "net/http"
+
 	routing "github.com/jackwhelpton/fasthttp-routing/v2"
 
 	"github.com/ditointernet/go-dito/errors"
@@ -71,4 +75,23 @@ func main() {
 	})
 
 	server.Run()
+
+	// How to handle a request in memory
+	
+	req, err := net.NewRequest("GET", "http://any-url-test/your-route", nil)
+	if err != nil {
+		return
+	}
+
+	res, err := server.HandleRequestInMemory(req)
+	if err != nil {
+		return
+	}
+
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return
+	}
+
+	fmt.Println(string(body))
 }
