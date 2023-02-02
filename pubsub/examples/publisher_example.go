@@ -25,11 +25,10 @@ func (ms MessageSchema) ToBytes() ([]byte, error) {
 	return data, nil
 }
 
-// Publisher_pipeline_example shows the publisher operation of a recently instantiated Generic PubsubClient with
-//
-// The Generic PubsubClient builder (MustNewPubSubClient) requires a Pubsub Publisher
-// (or something that equally implements it's  functionality). Also, all Generic PubsubClient was implemented
-// based on Generic strategy, in this way, a message schema (that implements ToByteser interface) must be passed to builder.
+// Publisher_pipeline_example shows the operation of a recently instantiated Generics compatible PubsubClient publisher.
+// It accepts any message schema, requiring only that it's type implements ToByteser interface. The message schema,
+// along with a wrapped Pubsub Topic (created with a NewTopicWrapper), must be passed to the PubsubClient builder
+// (MustNewPubSubClient).
 func Publisher_pipeline_example() {
 	PROJECT_ID := "dito-it-tracking-dev"
 	TOPIC_ID := "publisher_test"
