@@ -1,8 +1,10 @@
 package http
 
 import (
+	"context"
 	"errors"
 	"fmt"
+	"net"
 	"net/http"
 
 	routing "github.com/jackwhelpton/fasthttp-routing/v2"
@@ -13,6 +15,7 @@ import (
 	"github.com/rs/cors"
 	"github.com/valyala/fasthttp"
 	"github.com/valyala/fasthttp/fasthttpadaptor"
+	"github.com/valyala/fasthttp/fasthttputil"
 )
 
 // ServerInput encapsulates the necessary Inputs to initialize a Server
@@ -97,6 +100,29 @@ func (s Server) Run() error {
 	}
 
 	return server.ListenAndServe(fmt.Sprintf(":%d", s.port))
+}
+
+// Handle a request in memory using the server router
+func (s Server) HandleRequestInMemory(req *http.Request) (*http.Response, error) {
+	listener := fasthttputil.NewInmemoryListener()
+	defer listener.Close()
+
+	go func() {
+		err := fasthttp.Serve(listener, s.router.HandleRequest)
+		if err != nil {
+			panic(fmt.Errorf("failed to serve: %v", err))
+		}
+	}()
+
+	client := http.Client{
+		Transport: &http.Transport{
+			DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
+				return listener.Dial()
+			},
+		},
+	}
+
+	return client.Do(req)
 }
 
 func (s Server) addCorsMiddleware() {
