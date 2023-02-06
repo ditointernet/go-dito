@@ -48,6 +48,7 @@ type PublishInput[T ToByteser] struct {
 // Publish publishes messages in a pubsub topic.
 func (c PubSubClient[T]) Publish(ctx context.Context, in ...PublishInput[T]) []error {
 	var errs []error
+	var results []Getter
 
 	traceID := getTraceID(trace.SpanFromContext(ctx))
 
@@ -65,7 +66,11 @@ func (c PubSubClient[T]) Publish(ctx context.Context, in ...PublishInput[T]) []e
 		}
 
 		result := c.topic.Publish(ctx, pubSubMsg)
-		_, err = result.Get(ctx)
+		results = append(results, result)
+	}
+
+	for _, result := range results {
+		_, err := result.Get(ctx)
 
 		if err != nil {
 			errs = append(errs, err)
