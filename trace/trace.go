@@ -3,22 +3,26 @@ package trace
 import (
 	"context"
 
+	"github.com/ditointernet/go-dito/errors"
+
 	gcpexporter "github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
-	"go.opentelemetry.io/otel/semconv"
+	semconv "go.opentelemetry.io/otel/semconv/v1.17.0"
 	otrace "go.opentelemetry.io/otel/trace"
-
-	"github.com/ditointernet/go-dito/errors"
 )
 
 // Params encodes necessary input data to initialize a new Tracer.
 type Params struct {
 	IsProductionEnvironment bool
 	ApplicationName         string
+
+	// ProjectID is an optional parameter, used for specifying which project the user is uploading the stats data to.
+	// If ommited, this will default to your "Application Default Credentials".
+	ProjectID string
 
 	// TraceRatio indicates how often the system should collect traces.
 	// Use it with caution: It may overload the system and also be too expensive to mantain its value too high in a high throuput system
@@ -36,7 +40,7 @@ func NewTracer(params Params) (otrace.Tracer, func(context.Context) error, error
 	}
 
 	tOpts := []sdktrace.TracerProviderOption{
-		sdktrace.WithResource(resource.NewWithAttributes(
+		sdktrace.WithResource(resource.NewSchemaless(
 			attribute.KeyValue{
 				Key:   semconv.ServiceNameKey,
 				Value: attribute.StringValue(params.ApplicationName),
@@ -45,9 +49,19 @@ func NewTracer(params Params) (otrace.Tracer, func(context.Context) error, error
 	}
 
 	if params.IsProductionEnvironment {
-		exporter, err := gcpexporter.NewExporter()
+		exporter, err := gcpexporter.New()
 		if err != nil {
 			return nil, nil, err
+		}
+
+		// Overwrites original exporter if ProjectID is provided through params.
+		if params.ProjectID != "" {
+			exporter, err = gcpexporter.New(
+				gcpexporter.WithProjectID(params.ProjectID),
+			)
+			if err != nil {
+				return nil, nil, err
+			}
 		}
 
 		tOpts = append(tOpts, sdktrace.WithSampler(sdktrace.TraceIDRatioBased(params.TraceRatio)))
