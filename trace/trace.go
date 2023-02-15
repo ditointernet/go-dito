@@ -49,19 +49,11 @@ func NewTracer(params Params) (otrace.Tracer, func(context.Context) error, error
 	}
 
 	if params.IsProductionEnvironment {
-		exporter, err := gcpexporter.New()
+		exporter, err := gcpexporter.New(
+			gcpexporter.WithProjectID(params.ProjectID),
+		)
 		if err != nil {
 			return nil, nil, err
-		}
-
-		// Overwrites original exporter if ProjectID is provided through params.
-		if params.ProjectID != "" {
-			exporter, err = gcpexporter.New(
-				gcpexporter.WithProjectID(params.ProjectID),
-			)
-			if err != nil {
-				return nil, nil, err
-			}
 		}
 
 		tOpts = append(tOpts, sdktrace.WithSampler(sdktrace.TraceIDRatioBased(params.TraceRatio)))
