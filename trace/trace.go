@@ -51,6 +51,7 @@ func NewTracer(params Params) (otrace.Tracer, func(context.Context) error, error
 
 	if params.IsProductionEnvironment {
 		exporter, err := gcpexporter.New(
+			// Defaults to application credential's ProjectID if param is empty.
 			gcpexporter.WithProjectID(params.ProjectID),
 		)
 		if err != nil {
