@@ -64,7 +64,7 @@ var _ = Describe("Reducer", func() {
 			})
 		})
 
-		When("input channel with lists of integer values", func() {
+		When("input channel contains lists of integer values", func() {
 			BeforeEach(func() {
 				go func() {
 					inCh <- []int{0, 1, 2}
