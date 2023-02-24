@@ -133,7 +133,7 @@ var _ = Describe("Reducer", func() {
 			})
 		})
 
-		When("input channel of non-lists", func() {
+		When("input channel contains no lists", func() {
 			BeforeEach(func() {
 				go func() {
 					inCh <- 1
