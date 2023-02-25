@@ -24,11 +24,11 @@ require (
 	github.com/nxadm/tail v1.4.8 // indirect
 	go.opencensus.io v0.23.0 // indirect
 	go.opentelemetry.io/otel v0.20.0 // indirect
-	golang.org/x/net v0.0.0-20220624214902-1bab6f366d9e // indirect
+	golang.org/x/net v0.7.0 // indirect
 	golang.org/x/oauth2 v0.0.0-20220622183110-fd043fe589d2 // indirect
 	golang.org/x/sync v0.0.0-20220601150217-0de741cfad7f // indirect
-	golang.org/x/sys v0.0.0-20220624220833-87e55d714810 // indirect
-	golang.org/x/text v0.3.7 // indirect
+	golang.org/x/sys v0.5.0 // indirect
+	golang.org/x/text v0.7.0 // indirect
 	google.golang.org/api v0.86.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto v0.0.0-20220628213854-d9e0b6570c03 // indirect
