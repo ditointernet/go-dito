@@ -19,7 +19,7 @@ type KindType string
 type CustomError struct {
 	kind    KindType
 	code    CodeType
-	message string
+	message error
 }
 
 const (
@@ -46,7 +46,7 @@ func New(message string, args ...interface{}) CustomError {
 	return CustomError{
 		kind:    KindUnexpected,
 		code:    CodeUnknown,
-		message: fmt.Sprintf(message, args...),
+		message: fmt.Errorf(message, args...),
 	}
 }
 
@@ -64,6 +64,10 @@ func (ce CustomError) WithCode(code CodeType) CustomError {
 
 // Error returns CustomError message
 func (ce CustomError) Error() string {
+	return ce.message.Error()
+}
+
+func (ce CustomError) Unwrap() error {
 	return ce.message
 }
 
