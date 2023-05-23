@@ -13,7 +13,7 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: '18'
-      - name: npm run release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: lerna exec --concurrency 1 -- npx semantic-release --tag-format='${LERNA_PACKAGE_NAME}/v\${version}'
+      - name: Install semantic release plugins
+        run: npm ci
+      - name: Define next release versions
+        run: npm run release
