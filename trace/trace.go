@@ -25,15 +25,16 @@ type Params struct {
 	ProjectID string
 
 	// TraceRatio indicates how often the system should collect traces.
-	// Use it with caution: It may overload the system and also be too expensive to mantain its value too high in a high throuput system
-	// Values vary between 0 and 1, with 0 meaning No Sampling and 1 meaning Always Sampling.
+	// Use it with caution: It may overload the system and also be too expensive to mantain its value too high in a
+	// high throuput system. Values vary between 0 and 1, with 0 meaning No Sampling and 1 meaning Always Sampling.
 	// Values lower than 0 are treated as 0 and values greater than 1 are treated as 1.
 	TraceRatio float64
 }
 
 // NewTracer creates a new Tracer.
-// It produces the tracer it self and a flush function that should be used to deliver any trace residue in cases of system shutdown.
-// If your application is running outside of Google Cloud, make sure that your `GOOGLE_APPLICATION_CREDENTIALS` env variable is properly set.
+// It produces the tracer it self and a flush function that should be used to deliver any trace residue in cases of
+// system shutdown. If your application is running outside of Google Cloud, make sure that your
+// `GOOGLE_APPLICATION_CREDENTIALS` env variable is properly set.
 func NewTracer(params Params) (otrace.Tracer, func(context.Context) error, error) {
 	if params.ApplicationName == "" {
 		return nil, nil, errors.NewMissingRequiredDependency("ApplicationName")
@@ -49,7 +50,10 @@ func NewTracer(params Params) (otrace.Tracer, func(context.Context) error, error
 	}
 
 	if params.IsProductionEnvironment {
-		exporter, err := gcpexporter.New()
+		exporter, err := gcpexporter.New(
+			// Defaults to application credential's ProjectID if param is empty.
+			gcpexporter.WithProjectID(params.ProjectID),
+		)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -80,9 +84,9 @@ func NewTracer(params Params) (otrace.Tracer, func(context.Context) error, error
 }
 
 // MustNewTracer creates a new Tracer.
-// It produces the tracer it self and a flush function that should be used to deliver any trace residue in cases of system shutdown.
-// It panics if any error is found during tracer construction.
-// If your application is running outside of Google Cloud, make sure that your `GOOGLE_APPLICATION_CREDENTIALS` env variable is properly set.
+// It produces the tracer it self and a flush function that should be used to deliver any trace residue in cases of
+// system shutdown. It panics if any error is found during tracer construction. If your application is running outside
+// of Google Cloud, make sure that your `GOOGLE_APPLICATION_CREDENTIALS` env variable is properly set.
 func MustNewTracer(params Params) (otrace.Tracer, func(context.Context) error) {
 	tracer, flush, err := NewTracer(params)
 	if err != nil {

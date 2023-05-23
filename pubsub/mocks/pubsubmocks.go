@@ -7,6 +7,7 @@ package mocks
 import (
 	context "context"
 	reflect "reflect"
+	time "time"
 
 	pubsub "cloud.google.com/go/pubsub"
 	pubsub0 "github.com/ditointernet/go-dito/pubsub"
@@ -149,6 +150,34 @@ func (m *MockSubscriberPipeline) EXPECT() *MockSubscriberPipelineMockRecorder {
 	return m.recorder
 }
 
+// Batch mocks base method.
+func (m *MockSubscriberPipeline) Batch(itemType reflect.Type, batchSize int, timeout time.Duration) pubsub0.SubscriberPipeline {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Batch", itemType, batchSize, timeout)
+	ret0, _ := ret[0].(pubsub0.SubscriberPipeline)
+	return ret0
+}
+
+// Batch indicates an expected call of Batch.
+func (mr *MockSubscriberPipelineMockRecorder) Batch(itemType, batchSize, timeout interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Batch", reflect.TypeOf((*MockSubscriberPipeline)(nil).Batch), itemType, batchSize, timeout)
+}
+
+// Errors mocks base method.
+func (m *MockSubscriberPipeline) Errors() chan error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Errors")
+	ret0, _ := ret[0].(chan error)
+	return ret0
+}
+
+// Errors indicates an expected call of Errors.
+func (mr *MockSubscriberPipelineMockRecorder) Errors() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Errors", reflect.TypeOf((*MockSubscriberPipeline)(nil).Errors))
+}
+
 // Map mocks base method.
 func (m *MockSubscriberPipeline) Map(mapFn func(any) (any, error)) pubsub0.SubscriberPipeline {
 	m.ctrl.T.Helper()
@@ -161,6 +190,20 @@ func (m *MockSubscriberPipeline) Map(mapFn func(any) (any, error)) pubsub0.Subsc
 func (mr *MockSubscriberPipelineMockRecorder) Map(mapFn interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Map", reflect.TypeOf((*MockSubscriberPipeline)(nil).Map), mapFn)
+}
+
+// Reduce mocks base method.
+func (m *MockSubscriberPipeline) Reduce(reduceFn func(interface{}, interface{}, int) (interface{}, error), initialState func() interface{}) pubsub0.SubscriberPipeline {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Reduce", reduceFn, initialState)
+	ret0, _ := ret[0].(pubsub0.SubscriberPipeline)
+	return ret0
+}
+
+// Reduce indicates an expected call of Reduce.
+func (mr *MockSubscriberPipelineMockRecorder) Reduce(reduceFn, initialState interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Reduce", reflect.TypeOf((*MockSubscriberPipeline)(nil).Reduce), reduceFn, initialState)
 }
 
 // Run mocks base method.

@@ -2,6 +2,8 @@ package pubsub
 
 import (
 	"context"
+	"reflect"
+	"time"
 
 	"github.com/ditointernet/go-dito/errors"
 	steps "github.com/ditointernet/go-dito/pubsub/subscriber_steps"
@@ -80,4 +82,48 @@ func (sp subscriberPipeline) Map(mapFn func(any) (any, error)) SubscriberPipelin
 
 	sp.steps = append(sp.steps, steps.Mapper{MapFn: mapFn})
 	return sp
+}
+
+// Reduce registers a new Reducer step into pipeline.
+// It panics if any required dependency is not properly given.
+func (sp subscriberPipeline) Reduce(reduceFn func(state interface{}, item interface{}, idx int) (newState interface{}, err error), initialState func() interface{}) SubscriberPipeline {
+	if reduceFn == nil {
+		panic(errors.NewMissingRequiredDependency("ReduceFn"))
+	}
+
+	sp.steps = append(sp.steps, steps.Reducer{
+		ReduceFn:     reduceFn,
+		InitialState: initialState,
+	})
+
+	return sp
+}
+
+// Batch registers a new Batcher step into pipeline.
+// It panics if any required dependency is not properly given.
+func (sp subscriberPipeline) Batch(itemType reflect.Type, batchSize int, timeout time.Duration) SubscriberPipeline {
+	if itemType == nil {
+		panic(errors.NewMissingRequiredDependency("ItemType"))
+	}
+
+	if batchSize < 1 {
+		batchSize = 100
+	}
+
+	if timeout == 0 {
+		timeout = time.Second * 5
+	}
+
+	sp.steps = append(sp.steps, steps.Batcher{
+		ItemType:  itemType,
+		BatchSize: batchSize,
+		Timeout:   timeout,
+	})
+
+	return sp
+}
+
+// Errors exposes all errors that happens during pipeline processing.
+func (sp subscriberPipeline) Errors() chan error {
+	return sp.errCh
 }
