@@ -9,7 +9,25 @@
     "semantic-release": "19.0.2",
     "semantic-release-monorepo": "7.0.5"
   },
+  "release": {
+    {
+      "branches": [
+        "master",
+        {
+          "name": "beta",
+          "prerelease": true
+        }
+      ],
+      "extends": "semantic-release-monorepo",
+      "plugins": [
+        "@semantic-release/commit-analyzer",
+        "@semantic-release/release-notes-generator",
+        "@semantic-release/github"
+      ],
+      "tagFormat": "${LERNA_PACKAGE_NAME}/v${version}"
+    }
+  },
   "scripts": {
-    "release": "lerna exec --concurrency 1 -- semantic-release --tag-format='${LERNA_PACKAGE_NAME}/v${version}'"
+    "release": "lerna exec --concurrency 1 -- semantic-release"
   }
 }
