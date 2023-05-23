@@ -1,8 +1,15 @@
 {
-    "name": "root",
-    "private": true,
-    "devDependencies": {
-      "lerna": "^4.0.0"
-    }
+  "name": "root",
+  "private": true,
+  "devDependencies": {
+    "@semantic-release/commit-analyzer": "9.0.2",
+    "@semantic-release/github": "8.0.7",
+    "@semantic-release/release-notes-generator": "10.0.3",
+    "lerna": "6.6.2",
+    "semantic-release": "19.0.2",
+    "semantic-release-monorepo": "7.0.5"
+  },
+  "script": {
+    "release": "lerna exec --concurrency 1 -- semantic-release --tag-format='${LERNA_PACKAGE_NAME}/v${version}'"
   }
-  
+}
