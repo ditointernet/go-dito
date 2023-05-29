@@ -23,9 +23,8 @@
       "@semantic-release/release-notes-generator",
       "@semantic-release/github"
     ],
-    "tagFormat": "${LERNA_PACKAGE_NAME}/v${version}"
   },
   "scripts": {
-    "release": "lerna exec --concurrency 1 -- semantic-release"
+    "release": "lerna exec --concurrency 1 -- semantic-release --tag-format='${LERNA_PACKAGE_NAME}/v${version}'"
   }
 }
