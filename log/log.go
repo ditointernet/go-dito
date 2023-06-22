@@ -194,7 +194,7 @@ func getIsTraceSampled(span trace.Span) *bool {
 func buildOtelAttributes(attrs map[LogAttribute]interface{}, prefix string) []attribute.KeyValue {
 	eAttrs := []attribute.KeyValue{}
 	for k, v := range attrs {
-		eAttrs = append(eAttrs, attribute.String(fmt.Sprintf("%s.%s", prefix, k), v.(string)))
+		eAttrs = append(eAttrs, attribute.String(fmt.Sprintf("%s.%s", prefix, k), fmt.Sprintf("%+v", v)))
 	}
 
 	return eAttrs
