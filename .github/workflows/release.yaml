@@ -18,4 +18,4 @@ jobs:
       - name: Define next release versions
         run: npm run release
         env:
-          GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.RELEASE_GITHUB_TOKEN }}
