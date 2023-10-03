@@ -1,4 +1,7 @@
 {
-    "name": "log",
-    "private": true
+  "name": "log",
+  "private": true,
+  "scripts": {
+    "release": "semantic-release --tag-format $npm_package_name/v\\${version}"
+  }
 }

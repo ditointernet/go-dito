@@ -1,4 +1,7 @@
 {
-    "name": "pubsub",
-    "private": true
+  "name": "pubsub",
+  "private": true,
+  "scripts": {
+    "release": "semantic-release --tag-format $npm_package_name/v\\${version}"
+  }
 }
