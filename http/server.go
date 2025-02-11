@@ -75,6 +75,10 @@ func NewServer(in ServerInput) Server {
 		logger:         in.Logger,
 	}
 
+	if in.Logger != nil {
+		server.addRequestLogger()
+	}
+
 	router.Use(
 		slash.Remover(http.StatusMovedPermanently),
 		content.TypeNegotiator(content.JSON),
@@ -83,9 +87,6 @@ func NewServer(in ServerInput) Server {
 
 	server.addCorsMiddleware()
 	server.addRequestIPIntoContext()
-	if in.Logger != nil {
-		server.addRequestLogger()
-	}
 
 	in.Handler(router)
 
