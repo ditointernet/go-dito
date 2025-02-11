@@ -78,7 +78,6 @@ func NewServer(in ServerInput) Server {
 	if in.Logger != nil {
 		server.addRequestLogger()
 	}
-
 	router.Use(
 		slash.Remover(http.StatusMovedPermanently),
 		content.TypeNegotiator(content.JSON),
