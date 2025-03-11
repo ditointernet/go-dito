@@ -30,6 +30,11 @@ func NewClient(timeout time.Duration) Client {
 	}
 }
 
+// NewClient creates a new Client instance with injected stdlib client
+func NewWithStdClient(httpClient *http.Client) Client {
+	return Client{http: httpClient}
+}
+
 // Patch execute a http PATCH method with application/json headers
 func (c Client) Patch(ctx context.Context, request HTTPRequest) (rst HTTPResult, err error) {
 	if request.Headers == nil {
