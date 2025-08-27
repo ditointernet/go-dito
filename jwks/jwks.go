@@ -68,6 +68,7 @@ func (c *Client) GetCerts(ctx context.Context) error {
 // RenewCerts compare if the certs are valid if not retrieves a new list of valid certificates
 func (c *Client) RenewCerts(ctx context.Context) error {
 	c.mux.Lock()
+	defer c.mux.Unlock()
 	if time.Since(c.lastRenewTime).Minutes() > float64(c.renewMinuteThreshold) {
 		certs, err := c.fetchCerts(ctx)
 		if err != nil {
@@ -75,7 +76,6 @@ func (c *Client) RenewCerts(ctx context.Context) error {
 		}
 		c.certs = certs
 	}
-	c.mux.Unlock()
 	return nil
 }
 
